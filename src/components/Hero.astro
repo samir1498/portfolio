@@ -1,0 +1,15 @@
+---
+import { useTranslations } from '../i18n/translator';
+
+const t = useTranslations(Astro.url);
+---
+
+<section id="hero" class="h-screen flex flex-col justify-center items-center">
+    <h1 class="text-5xl font-bold">Bettahar Samir</h1>
+    <p class="text-2xl mt-4">{t('hero.title')}</p>
+    <div class="mt-8">
+        <a href="#contact" class="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded">
+            {t('hero.contact')}
+        </a>
+    </div>
+</section>
