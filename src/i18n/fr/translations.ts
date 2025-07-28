@@ -24,6 +24,7 @@ export default {
   'education.bachelor.university': 'Université Saad Dahlab de Blida',
   'education.bachelor.date': '2017 - 2020',
   'education.bachelor.description': 'Bases solides en informatique, algorithmes, bases de données et programmation orientée objet.',
+  'contact.description': 'N\'hésitez pas à me contacter pour toute question ou opportunité.',
   'contact.name': 'Nom',
   'contact.email': 'Email',
   'contact.message': 'Message',

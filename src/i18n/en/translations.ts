@@ -24,6 +24,7 @@ export default {
   'education.bachelor.university': 'University of Saad Dahlab de Blida',
   'education.bachelor.date': '2017 - 2020',
   'education.bachelor.description': 'Strong foundation in CS, algorithms, DBs, and OOP.',
+  'contact.description': 'Feel free to reach out to me for any inquiries or opportunities.',
   'contact.name': 'Name',
   'contact.email': 'Email',
   'contact.message': 'Message',
