@@ -1,0 +1,63 @@
+---
+import { useTranslations } from '../i18n/translator';
+
+const t = useTranslations(Astro.url);
+---
+
+<section id="skills" class="py-16">
+    <h2 class="text-4xl font-bold text-center mb-12">{t('nav.skills')}</h2>
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="bg-muted p-6 rounded-lg">
+                <h3 class="text-2xl font-bold mb-4">{t('skills.languages.title')}</h3>
+                <ul>
+                    <li>TypeScript</li>
+                    <li>JavaScript</li>
+                    <li>Java</li>
+                    <li>Go</li>
+                </ul>
+            </div>
+            <div class="bg-muted p-6 rounded-lg">
+                <h3 class="text-2xl font-bold mb-4">{t('skills.backend.title')}</h3>
+                <ul>
+                    <li>NestJS</li>
+                    <li>Spring Boot</li>
+                    <li>Go (API for Three.js)</li>
+                </ul>
+            </div>
+            <div class="bg-muted p-6 rounded-lg">
+                <h3 class="text-2xl font-bold mb-4">{t('skills.frontend.title')}</h3>
+                <ul>
+                    <li>React.js</li>
+                    <li>AstroJS</li>
+                    <li>SvelteKit</li>
+                    <li>Three.js</li>
+                </ul>
+            </div>
+            <div class="bg-muted p-6 rounded-lg">
+                <h3 class="text-2xl font-bold mb-4">{t('skills.infrastructure.title')}</h3>
+                <ul>
+                    <li>Docker</li>
+                    <li>Flyway</li>
+                    <li>TypeORM CLI</li>
+                    <li>GraalVM</li>
+                </ul>
+            </div>
+            <div class="bg-muted p-6 rounded-lg">
+                <h3 class="text-2xl font-bold mb-4">{t('skills.authentication.title')}</h3>
+                <ul>
+                    <li>Zitadel</li>
+                    <li>Clerk</li>
+                    <li>BetterAuth</li>
+                </ul>
+            </div>
+            <div class="bg-muted p-6 rounded-lg">
+                <h3 class="text-2xl font-bold mb-4">{t('skills.observability.title')}</h3>
+                <ul>
+                    <li>Prometheus</li>
+                    <li>OpenTelemetry</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
