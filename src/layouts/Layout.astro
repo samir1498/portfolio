@@ -1,22 +1,42 @@
+---
+import { useTranslations } from '../i18n/translator';
+import { getLangFromUrl } from '../i18n/utils';
+import '../styles/global.css';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(Astro.url);
+
+const { title } = Astro.props;
+---
 <!doctype html>
-<html lang="en">
+<html lang={lang} class="dark">
 	<head>
 		<meta charset="UTF-8" />
+		<meta name="description" content="Astro description" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<title>{title}</title>
 	</head>
-	<body>
+	<body class="bg-background text-text">
+		<header class="p-4 flex justify-between items-center">
+			<nav>
+				<a href={`/${lang}/`} class="mr-4 hover:underline hover:text-primary transition-colors">{t('nav.home')}</a>
+				<a href={`/${lang}/#experience`} class="mr-4 hover:underline hover:text-primary transition-colors">{t('nav.experience')}</a>
+				<a href={`/${lang}/#skills`} class="mr-4 hover:underline hover:text-primary transition-colors">{t('nav.skills')}</a>
+				<a href={`/${lang}/#education`} class="mr-4 hover:underline hover:text-primary transition-colors">{t('nav.education')}</a>
+				<a href={`/${lang}/#contact`} class="hover:underline hover:text-primary transition-colors">{t('nav.contact')}</a>
+			</nav>
+			<div>
+				<a href="/en/" class="mr-2">EN</a>
+				<a href="/fr/">FR</a>
+			</div>
+		</header>
 		<slot />
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
+<style is:global>
+	html {
+		scroll-behavior: smooth;
 	}
 </style>
