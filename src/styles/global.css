@@ -20,19 +20,3 @@
   /* Shadows */
   --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
-
-
-.timeline-container {
-    @apply pl-10;
-}
-.timeline-container-left {
-    @apply pr-10 text-right;
-}
-.timeline-pointer {
-    @apply absolute top-1/2 -mt-2 w-4 h-4 rounded-full bg-primary shadow;
-    left: calc(50% - 0.5rem);
-}
-.timeline-pointer-left {
-    @apply absolute top-1/2 -mt-2 w-4 h-4 rounded-full bg-primary shadow;
-    right: calc(50% - 0.5rem);
-}
