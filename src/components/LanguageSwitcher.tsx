@@ -4,8 +4,7 @@ import { Globe, Check } from "lucide-react";
 const languages = [
   { code: "en", label: "English", flag: "🇬🇧" },
   { code: "fr", label: "Français", flag: "🇫🇷" },
-  // Add more languages here:
-  // { code: "ar", label: "العربية", flag: "🇩🇿" },
+  { code: "ar", label: "العربية", flag: "🇩🇿" },
 ];
 
 interface LanguageSwitcherProps {
@@ -21,11 +20,13 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 
   useEffect(() => {
     const path = window.location.pathname;
-    const match = path.match(/^\/(en|fr)\//);
+    const match = path.match(/^\/(en|fr|ar)\//);
     if (match) {
       setCurrentLang(match[1]);
     } else if (path.startsWith("/fr")) {
       setCurrentLang("fr");
+    } else if (path.startsWith("/ar")) {
+      setCurrentLang("ar");
     }
   }, []);
 
@@ -53,7 +54,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
     const hash = window.location.hash;
     let newPath: string;
 
-    const langPattern = /^\/(en|fr)(\/|$)/;
+    const langPattern = /^\/(en|fr|ar)(\/|$)/;
     if (langPattern.test(currentPath)) {
       newPath = currentPath.replace(langPattern, `/${newLang}/`);
     } else {

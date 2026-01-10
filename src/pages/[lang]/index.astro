@@ -1,13 +1,14 @@
 ---
-import Hero from '@/components/Hero.astro';
-import Experience from '@/components/Experience.astro';
-import Skills from '@/components/Skills.astro';
-import Academic from '@/components/Academic.astro';
-import Portfolio from '@/components/Portfolio.astro';
-import Contact from '@/components/Contact';
-import Layout from '@/layouts/Layout.astro';
-import { languages } from '@/i18n/ui';
-import type { Lang } from '@/data';
+import Hero from "@/components/Hero.astro";
+import Experience from "@/components/Experience.astro";
+import Skills from "@/components/Skills.astro";
+import Academic from "@/components/Academic.astro";
+import Portfolio from "@/components/Portfolio.astro";
+import Contact from "@/components/Contact";
+import Footer from "@/components/Footer.astro";
+import Layout from "@/layouts/Layout.astro";
+import { languages } from "@/i18n/ui";
+import type { Lang } from "@/data";
 
 export async function getStaticPaths() {
   return Object.keys(languages).map((lang) => ({
@@ -19,10 +20,11 @@ const { lang } = Astro.params as { lang: Lang };
 ---
 
 <Layout title="Samir Bettahar - Portfolio">
-	<Hero lang={lang} />
-	<Experience lang={lang} />
-	<Skills lang={lang} />
-	<Academic lang={lang} />
-	<Portfolio lang={lang} />
-	<Contact lang={lang} client:visible />
+  <Hero lang={lang} />
+  <Experience lang={lang} />
+  <Skills lang={lang} />
+  <Academic lang={lang} />
+  <Portfolio lang={lang} />
+  <Contact lang={lang} client:visible />
+  <Footer />
 </Layout>

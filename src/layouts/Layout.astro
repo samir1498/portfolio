@@ -2,8 +2,10 @@
 import "../styles/global.css";
 import Navbar from "../components/Navbar";
 import { getLangFromUrl } from "../i18n/utils";
+import { isRtl } from "../i18n/ui";
 
 const lang = getLangFromUrl(Astro.url);
+const dir = isRtl(lang) ? "rtl" : "ltr";
 
 interface Props {
   title?: string;
@@ -21,7 +23,7 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
 ---
 
 <!doctype html>
-<html lang={lang} class="dark">
+<html lang={lang} dir={dir} class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

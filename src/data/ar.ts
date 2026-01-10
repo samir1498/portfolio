@@ -1,0 +1,109 @@
+import type { Experience, Education, Project } from "@/types";
+
+export const PERSONAL_INFO = {
+  name: "بطاهر سمير",
+  title: "مهندس برمجيات",
+  summary:
+    "مهندس برمجيات متكامل متخصص في تطوير تطبيقات الويب والهاتف الحديثة باستخدام React و React Native و Next.js و TypeScript و Tailwind CSS. لدي خبرة في تصميم ودمج واجهات برمجة التطبيقات REST باستخدام NestJS و Fastify، وتنفيذ المصادقة، وبناء واجهات سريعة وقابلة للصيانة وسهلة الاستخدام.",
+  available: "متاح للفرص",
+  contactMe: "تواصل معي",
+  downloadCV: "تحميل السيرة الذاتية",
+};
+
+export const EXPERIENCE: Experience[] = [
+  {
+    company: "عمل حر",
+    role: "مطور Full-Stack / موبايل مستقل",
+    period: "سبتمبر 2025 – الحاضر",
+    location: "عن بعد / الجزائر",
+    description: [
+      "تطوير تطبيقات الهاتف باستخدام React Native وتطبيقات الويب باستخدام Next.js، مع التكامل مع واجهات Fastify الخلفية.",
+      "بناء مكونات واجهة مستخدم قابلة لإعادة الاستخدام وعالية الأداء، مع التركيز على تجارب المستخدم المتجاوبة والبديهية.",
+    ],
+  },
+  {
+    company: "Omnivya",
+    role: "مطور Full-Stack",
+    period: "فبراير 2024 – أغسطس 2025",
+    location: "عن بعد",
+    description: [
+      "تصميم وإعادة هيكلة واجهات الويب المتجاوبة باستخدام React و TypeScript و AstroJS و TanStack Router.",
+      "بناء مكونات واجهة مستخدم قابلة للصيانة وعالية الأداء باستخدام Tailwind CSS.",
+      "تطوير تدفقات المصادقة الآمنة وإدارة الأدوار باستخدام Zitadel و BetterAuth.",
+      "تطوير وتحسين واجهات برمجة التطبيقات RESTful باستخدام NestJS و Spring Boot لدعم احتياجات الواجهة الأمامية SaaS.",
+      "تحسين أداء الواجهة الأمامية والتعاون الوثيق مع فرق المنتج والخلفية لضمان التسليم السلس.",
+      "تنفيذ اختبارات الوحدة والتكامل والنهاية إلى النهاية (Vitest، Playwright، TestContainers) لضمان موثوقية الكود وجودة الإنتاج.",
+    ],
+  },
+];
+
+export const EDUCATION: Education[] = [
+  {
+    institution: "جامعة سعد دحلب البليدة",
+    degree: "ماجستير في هندسة البرمجيات",
+    period: "2020 – 2022",
+    location: "البليدة، الجزائر",
+    details: "التركيز على هندسة البرمجيات، ومنهجيات التطوير، والتطوير المتكامل",
+  },
+  {
+    institution: "جامعة سعد دحلب البليدة",
+    degree: "ليسانس في نظم المعلومات وهندسة البرمجيات",
+    period: "2016 – 2020",
+    location: "البليدة، الجزائر",
+    details:
+      "أساسيات علوم الحاسوب، الخوارزميات، قواعد البيانات، والبرمجة الكائنية.",
+  },
+];
+
+export const ACADEMIC_PROJECTS: Project[] = [
+  {
+    title: "خط إنتاج برمجيات لتطبيقات البنوك الإلكترونية",
+    subtitle: "أطروحة ماجستير (Java EE، Ontologies)",
+    year: "2022",
+    description: [
+      "تصميم وتطوير خط إنتاج برمجيات لإنشاء تطبيقات البنوك الإلكترونية تلقائياً بناءً على الأنطولوجيات ونماذج الميزات.",
+      "تنفيذ مُكوِّن سطح مكتب بلغة Java Swing لاختيار الميزات وإنشاء التطبيقات.",
+      "تطوير تطبيقات ويب كاملة (بوابات العميل والإدارة) باستخدام Java EE (Servlets، JSP، JDBC) ونشرها على Tomcat/Glassfish.",
+    ],
+    technologies: ["Java EE", "Ontologies", "Java Swing", "Tomcat"],
+  },
+  {
+    title: "كشف مرض باركنسون",
+    subtitle: "مشروع ليسانس (Python، التعلم الآلي)",
+    year: "2020",
+    description: [
+      "تطوير نظام دعم قرار طبي بلغة Python للكشف عن مرض باركنسون باستخدام اختبارات الكتابة اللولبية والموجية.",
+      "تنفيذ نماذج التعلم الآلي (KNN، SVM، Random Forest) باستخدام scikit-learn، محققاً دقة تصل إلى 90%.",
+      "تطبيق تقنيات معالجة الصور واستخراج الميزات باستخدام OpenCV، بما في ذلك LBP و Haralick وmoments Hu.",
+      "بناء واجهة رسومية Tkinter تمكن الأطباء من اختبار الصور وعرض مصفوفات الارتباك ومنحنيات ROC.",
+    ],
+    technologies: [
+      "Python",
+      "Scikit-learn",
+      "OpenCV",
+      "Tkinter",
+      "التعلم الآلي",
+    ],
+  },
+];
+
+// Section titles
+export const SECTIONS = {
+  skills: "الترسانة التقنية",
+  skillsSubtitle:
+    "مجموعة أدوات شاملة لبناء تطبيقات قابلة للتوسع وعالية الأداء.",
+  experience: "الخبرة المهنية",
+  education: "التعليم",
+  academicProjects: "البحث والمشاريع الأكاديمية",
+  portfolio: "أعمالي",
+  portfolioSubtitle: "ترقبوا المشاريع المميزة قريباً!",
+  contact: "تواصل معي",
+  contactSubtitle: "هل لديك مشروع في ذهنك أو تريد مناقشة الفرص؟ لنتواصل!",
+};
+
+export const CONTACT_FORM = {
+  name: "اسمك",
+  email: "بريدك الإلكتروني",
+  message: "رسالتك",
+  send: "إرسال الرسالة",
+};
