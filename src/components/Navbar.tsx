@@ -2,23 +2,22 @@ import React, { useState, useEffect } from "react";
 import { Menu, X, Code2, Sun, Moon } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  lang?: string;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(false);
-  const [currentLang, setCurrentLang] = useState<string>("en");
+  const [currentLang, setCurrentLang] = useState<string>(lang);
 
   useEffect(() => {
     // Check initial theme
     setIsDark(document.documentElement.classList.contains("dark"));
 
-    // Check current language from URL
-    const path = window.location.pathname;
-    if (path.startsWith("/fr")) {
-      setCurrentLang("fr");
-    } else {
-      setCurrentLang("en");
-    }
+    // Sync state with prop if it changes (though usually page reloads)
+    setCurrentLang(lang);
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);

@@ -70,7 +70,7 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
   <body
     class="bg-page text-foreground antialiased overflow-x-hidden transition-colors duration-300"
   >
-    <Navbar client:load />
+    <Navbar client:load lang={lang} />
     <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <slot />
     </main>
