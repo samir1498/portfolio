@@ -31,12 +31,6 @@ export const PERSONAL_INFO = {
 
 export const SOCIAL_LINKS = [
   {
-    icon: Mail,
-    label: "Email",
-    href: `mailto:${PERSONAL_INFO.contact.email}`,
-    value: PERSONAL_INFO.contact.email,
-  },
-  {
     icon: LinkedinIcon,
     label: "LinkedIn",
     href: `https://linkedin.com/in/${PERSONAL_INFO.contact.linkedin}`,
@@ -47,18 +41,6 @@ export const SOCIAL_LINKS = [
     label: "GitHub",
     href: `https://github.com/${PERSONAL_INFO.contact.github}`,
     value: PERSONAL_INFO.contact.github,
-  },
-  {
-    icon: MessageCircle,
-    label: "WhatsApp",
-    href: `https://wa.me/${PERSONAL_INFO.contact.phone.replace(/\D/g, "")}`,
-    value: PERSONAL_INFO.contact.whatsapp,
-  },
-  {
-    icon: Phone,
-    label: "Phone",
-    href: `tel:${PERSONAL_INFO.contact.phone.replace(/\s/g, "")}`,
-    value: PERSONAL_INFO.contact.phone,
   },
 ];
 
