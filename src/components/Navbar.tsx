@@ -8,17 +8,7 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     // Check initial theme
-    if (
-      localStorage.theme === "dark" ||
-      (!("theme" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-      setIsDark(true);
-      document.documentElement.classList.add("dark");
-    } else {
-      setIsDark(false);
-      document.documentElement.classList.remove("dark");
-    }
+    setIsDark(document.documentElement.classList.contains("dark"));
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -28,15 +18,10 @@ const Navbar: React.FC = () => {
   }, []);
 
   const toggleTheme = () => {
-    if (isDark) {
-      document.documentElement.classList.remove("dark");
-      localStorage.theme = "light";
-      setIsDark(false);
-    } else {
-      document.documentElement.classList.add("dark");
-      localStorage.theme = "dark";
-      setIsDark(true);
-    }
+    const newIsDark = !isDark;
+    setIsDark(newIsDark);
+    document.documentElement.classList.toggle("dark", newIsDark);
+    localStorage.setItem("theme", newIsDark ? "dark" : "light");
   };
 
   const navLinks = [
@@ -52,19 +37,17 @@ const Navbar: React.FC = () => {
     <nav
       className={`fixed w-full z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-white/90 dark:bg-black/90 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800"
+          ? "bg-page/90 backdrop-blur-sm border-b border-border"
           : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0 flex items-center gap-2">
             <div className="bg-primary/10 p-1.5 rounded-lg">
               <Code2 className="w-6 h-6 text-primary" />
             </div>
-            <span className="text-xl font-bold text-slate-900 dark:text-white">
-              Samir.Dev
-            </span>
+            <span className="text-xl font-bold text-foreground">Samir.Dev</span>
           </div>
 
           <div className="hidden md:flex items-center gap-6">
@@ -73,7 +56,7 @@ const Navbar: React.FC = () => {
                 <a
                   key={link.name}
                   href={link.href}
-                  className="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  className="text-muted hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   {link.name}
                 </a>
@@ -81,7 +64,7 @@ const Navbar: React.FC = () => {
             </div>
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors focus:outline-none"
+              className="p-2 rounded-full bg-secondary text-muted hover:text-primary transition-colors focus:outline-none"
               aria-label="Toggle theme"
             >
               {isDark ? (
@@ -95,7 +78,7 @@ const Navbar: React.FC = () => {
           <div className="-mr-2 flex md:hidden items-center gap-4">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors focus:outline-none"
+              className="p-2 rounded-full bg-secondary text-muted hover:text-primary transition-colors focus:outline-none"
               aria-label="Toggle theme"
             >
               {isDark ? (
@@ -106,7 +89,7 @@ const Navbar: React.FC = () => {
             </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none"
+              className="inline-flex items-center justify-center p-2 rounded-md text-muted hover:text-primary hover:bg-secondary focus:outline-none"
               aria-label="Toggle menu"
             >
               {isOpen ? (
@@ -125,13 +108,13 @@ const Navbar: React.FC = () => {
           isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
         }`}
       >
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-black border-b border-slate-200 dark:border-slate-800 shadow-lg">
+        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-page border-b border-border shadow-lg">
           {navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+              className="text-muted hover:text-primary block px-3 py-2 rounded-md text-base font-medium"
             >
               {link.name}
             </a>

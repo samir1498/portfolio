@@ -5,34 +5,41 @@ import { PERSONAL_INFO } from "../data";
 
 <section
   id="about"
-  class="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 bg-white dark:bg-darker transition-colors duration-300"
+  class="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 bg-page transition-colors duration-300"
 >
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+  <div class="w-full relative z-10">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
       <!-- Text Content -->
       <div>
         <div class="animate-fade-in-up" style="animation-delay: 100ms">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50 text-primary text-sm font-medium mb-6">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6"
+          >
             <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              <span
+                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"
+              ></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"
+              ></span>
             </span>
             Available for opportunities
           </div>
         </div>
 
         <div class="animate-fade-in-up" style="animation-delay: 200ms">
-          <h1 class="text-5xl md:text-7xl font-bold tracking-tight text-slate-900 dark:text-white mb-6">
+          <h1
+            class="text-5xl md:text-7xl font-bold tracking-tight text-foreground mb-6"
+          >
             Hi, I'm <br />
             <span class="text-primary">{PERSONAL_INFO.name}</span>
           </h1>
         </div>
 
         <div class="animate-fade-in-up" style="animation-delay: 300ms">
-          <h2 class="text-2xl md:text-3xl font-light text-slate-600 dark:text-slate-300 mb-6">
+          <h2 class="text-2xl md:text-3xl font-light text-muted mb-6">
             {PERSONAL_INFO.title}
           </h2>
-          <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-8 max-w-lg">
+          <p class="text-lg text-muted leading-relaxed mb-8 max-w-lg">
             {PERSONAL_INFO.summary}
           </p>
         </div>
@@ -43,15 +50,17 @@ import { PERSONAL_INFO } from "../data";
         >
           <a
             href="#contact"
-            class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-primary rounded-lg transition-all hover:bg-blue-700 active:scale-95"
+            class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-medium text-primary-foreground bg-primary rounded-lg transition-all hover:opacity-90 active:scale-95"
           >
             Contact Me
-            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight
+              className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+            />
           </a>
           <a
             href="/cv.pdf"
             download
-            class="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
+            class="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-secondary-foreground bg-secondary border border-border rounded-lg hover:opacity-80 transition-all active:scale-95"
           >
             <Download className="mr-2 w-4 h-4" />
             Download CV
@@ -66,7 +75,7 @@ import { PERSONAL_INFO } from "../data";
             href={`https://github.com/${PERSONAL_INFO.contact.github}`}
             target="_blank"
             rel="noopener noreferrer"
-            class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors"
+            class="text-muted hover:text-primary transition-colors"
           >
             <Github className="w-6 h-6" />
           </a>
@@ -74,13 +83,13 @@ import { PERSONAL_INFO } from "../data";
             href={`https://linkedin.com/in/${PERSONAL_INFO.contact.linkedin}`}
             target="_blank"
             rel="noopener noreferrer"
-            class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors"
+            class="text-muted hover:text-primary transition-colors"
           >
             <Linkedin className="w-6 h-6" />
           </a>
           <a
             href={`mailto:${PERSONAL_INFO.contact.email}`}
-            class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors"
+            class="text-muted hover:text-primary transition-colors"
           >
             <Mail className="w-6 h-6" />
           </a>
@@ -91,11 +100,18 @@ import { PERSONAL_INFO } from "../data";
       <div class="flex justify-center lg:justify-end relative">
         <div class="animate-fade-in-left" style="animation-delay: 300ms">
           <div class="relative">
-            <!-- Abstract decoration to keep it interesting but minimal -->
-            <div class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 rounded-full border-2 border-slate-100 dark:border-slate-800 z-0 bg-blue-50 dark:bg-slate-800/50"></div>
-            <div class="absolute bottom-0 left-0 -ml-4 -mb-4 w-32 h-32 rounded-full border-2 border-primary/20 z-0"></div>
+            <div
+              class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 rounded-full border-2 border-border z-0 bg-primary/10"
+            >
+            </div>
+            <div
+              class="absolute bottom-0 left-0 -ml-4 -mb-4 w-32 h-32 rounded-full border-2 border-primary/20 z-0"
+            >
+            </div>
 
-            <div class="relative w-64 h-64 md:w-80 md:h-80 lg:w-[26rem] lg:h-[26rem] rounded-full overflow-hidden border-[6px] border-white dark:border-slate-800 shadow-xl z-10 bg-slate-100 dark:bg-slate-800 animate-float">
+            <div
+              class="relative w-64 h-64 md:w-80 md:h-80 lg:w-[26rem] lg:h-[26rem] rounded-full overflow-hidden border-[6px] border-secondary shadow-xl z-10 bg-secondary animate-float"
+            >
               <img
                 src={`https://github.com/${PERSONAL_INFO.contact.github}.png`}
                 alt={PERSONAL_INFO.name}

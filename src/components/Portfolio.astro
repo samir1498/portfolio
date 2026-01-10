@@ -1,36 +1,40 @@
 ---
-import { Construction, Rocket } from 'lucide-react';
+import { Construction, Rocket } from "lucide-react";
 ---
-<section id="showcase" class="py-24 bg-white dark:bg-darker relative overflow-hidden border-t border-slate-200 dark:border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="animate-fade-in-up">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">Latest Work</h2>
-                <div class="w-16 h-1.5 bg-primary mx-auto"></div>
-            </div>
-        </div>
 
-        <div class="animate-fade-in-up" style="animation-delay: 200ms;">
-            <div class="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 flex flex-col items-center justify-center text-center p-8">
-
-                <div class="p-6 rounded-full bg-blue-50 dark:bg-slate-800 mb-6 text-primary">
-                    <Rocket className="w-10 h-10" />
-                </div>
-
-                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-                    Projects Loading...
-                </h3>
-
-                <p class="text-slate-600 dark:text-slate-400 max-w-lg mx-auto mb-8 text-lg">
-                    I am currently curating a selection of my best commercial and personal projects. Check back soon for a showcase of interactive applications.
-                </p>
-
-                <div class="flex gap-2 items-center text-sm font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-full">
-                    <Construction className="w-4 h-4" />
-                    <span>Work in Progress</span>
-                </div>
-
-            </div>
-        </div>
+<section id="showcase" class="py-24 bg-page border-t border-border">
+  <div class="animate-fade-in-up">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-5xl font-bold text-foreground mb-4">
+        Latest Work
+      </h2>
+      <div class="w-16 h-1.5 bg-primary mx-auto"></div>
     </div>
+  </div>
+
+  <div class="animate-fade-in-up" style="animation-delay: 200ms;">
+    <div
+      class="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden border-2 border-dashed border-border bg-page flex flex-col items-center justify-center text-center p-8"
+    >
+      <div class="p-6 rounded-full bg-primary/10 mb-6 text-primary">
+        <Rocket className="w-10 h-10" />
+      </div>
+
+      <h3 class="text-2xl font-bold text-foreground mb-4">
+        Projects Loading...
+      </h3>
+
+      <p class="text-muted max-w-lg mx-auto mb-8 text-lg">
+        I am currently curating a selection of my best commercial and personal
+        projects. Check back soon for a showcase of interactive applications.
+      </p>
+
+      <div
+        class="flex gap-2 items-center text-sm font-semibold text-primary bg-primary/10 px-4 py-2 rounded-full"
+      >
+        <Construction className="w-4 h-4" />
+        <span>Work in Progress</span>
+      </div>
+    </div>
+  </div>
 </section>
