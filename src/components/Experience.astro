@@ -1,13 +1,20 @@
 ---
-import { EXPERIENCE } from "@/data";
+import { getLocalizedData, type Lang } from "@/data";
 import { Calendar, MapPin } from "lucide-react";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const { EXPERIENCE, SECTIONS } = getLocalizedData(lang);
 ---
 
 <section id="experience" class="py-20 bg-page">
   <div class="animate-fade-in-up">
     <div class="mb-16">
       <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">
-        Professional Experience
+        {SECTIONS.experience}
       </h2>
       <div class="w-16 h-1.5 bg-primary"></div>
     </div>
@@ -17,7 +24,7 @@ import { Calendar, MapPin } from "lucide-react";
   <div class="relative border-l-2 border-border ml-3 md:ml-6 space-y-16">
     {EXPERIENCE.map((job, idx) => (
       <div class="relative pl-8 md:pl-12 animate-fade-in-up" style={`animation-delay: ${idx * 200}ms`}>
-        <!-- Timeline Dot - positioned relative to parent, not animated div -->
+        <!-- Timeline Dot -->
         <span class="absolute -left-[9px] top-6 w-4 h-4 rounded-full bg-page border-4 border-primary z-10"></span>
         
         <div class="relative">

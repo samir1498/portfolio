@@ -1,6 +1,14 @@
 ---
 import { ArrowRight, Download, Github, Linkedin, Mail } from "lucide-react";
-import { PERSONAL_INFO } from "../data";
+import { getLocalizedData, type Lang } from "@/data";
+import { PERSONAL_INFO as CONTACT_INFO } from "@/shared-data";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const { PERSONAL_INFO } = getLocalizedData(lang);
 ---
 
 <section
@@ -22,7 +30,7 @@ import { PERSONAL_INFO } from "../data";
               <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"
               ></span>
             </span>
-            Available for opportunities
+            {PERSONAL_INFO.available}
           </div>
         </div>
 
@@ -30,7 +38,8 @@ import { PERSONAL_INFO } from "../data";
           <h1
             class="text-5xl md:text-7xl font-bold tracking-tight text-foreground mb-6"
           >
-            Hi, I'm <br />
+            {lang === "fr" ? "Salut, je suis" : "Hi, I'm"}
+            <br />
             <span class="text-primary">{PERSONAL_INFO.name}</span>
           </h1>
         </div>
@@ -52,7 +61,7 @@ import { PERSONAL_INFO } from "../data";
             href="#contact"
             class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-medium text-primary-foreground bg-primary rounded-lg transition-all hover:opacity-90 active:scale-95"
           >
-            Contact Me
+            {PERSONAL_INFO.contactMe}
             <ArrowRight
               className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
             />
@@ -63,7 +72,7 @@ import { PERSONAL_INFO } from "../data";
             class="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-secondary-foreground bg-secondary border border-border rounded-lg hover:opacity-80 transition-all active:scale-95"
           >
             <Download className="mr-2 w-4 h-4" />
-            Download CV
+            {PERSONAL_INFO.downloadCV}
           </a>
         </div>
 
@@ -72,7 +81,7 @@ import { PERSONAL_INFO } from "../data";
           style="animation-delay: 500ms"
         >
           <a
-            href={`https://github.com/${PERSONAL_INFO.contact.github}`}
+            href={`https://github.com/${CONTACT_INFO.contact.github}`}
             target="_blank"
             rel="noopener noreferrer"
             class="text-muted hover:text-primary transition-colors"
@@ -80,7 +89,7 @@ import { PERSONAL_INFO } from "../data";
             <Github className="w-6 h-6" />
           </a>
           <a
-            href={`https://linkedin.com/in/${PERSONAL_INFO.contact.linkedin}`}
+            href={`https://linkedin.com/in/${CONTACT_INFO.contact.linkedin}`}
             target="_blank"
             rel="noopener noreferrer"
             class="text-muted hover:text-primary transition-colors"
@@ -88,7 +97,7 @@ import { PERSONAL_INFO } from "../data";
             <Linkedin className="w-6 h-6" />
           </a>
           <a
-            href={`mailto:${PERSONAL_INFO.contact.email}`}
+            href={`mailto:${CONTACT_INFO.contact.email}`}
             class="text-muted hover:text-primary transition-colors"
           >
             <Mail className="w-6 h-6" />
@@ -113,7 +122,7 @@ import { PERSONAL_INFO } from "../data";
               class="relative w-64 h-64 md:w-80 md:h-80 lg:w-[26rem] lg:h-[26rem] rounded-full overflow-hidden border-[6px] border-secondary shadow-xl z-10 bg-secondary animate-float"
             >
               <img
-                src={`https://github.com/${PERSONAL_INFO.contact.github}.png`}
+                src={`https://github.com/${CONTACT_INFO.contact.github}.png`}
                 alt={PERSONAL_INFO.name}
                 class="w-full h-full object-cover"
               />

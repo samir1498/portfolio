@@ -1,6 +1,13 @@
 ---
-import { EDUCATION, ACADEMIC_PROJECTS } from "../data";
+import { getLocalizedData, type Lang } from "@/data";
 import { GraduationCap, Code2, Database, Brain } from "lucide-react";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const { EDUCATION, ACADEMIC_PROJECTS, SECTIONS } = getLocalizedData(lang);
 
 const getTechContent = (tech: string) => {
   const s = tech.toLowerCase();
@@ -36,7 +43,7 @@ const getTechContent = (tech: string) => {
     <div class="animate-fade-in-up">
       <div class="mb-12">
         <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">
-          Education
+          {SECTIONS.education}
         </h2>
         <div class="w-16 h-1.5 bg-primary"></div>
       </div>
@@ -79,12 +86,9 @@ const getTechContent = (tech: string) => {
     <div class="animate-fade-in-up">
       <div class="mb-12">
         <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">
-          Academic Research
+          {SECTIONS.academicProjects}
         </h2>
         <div class="w-16 h-1.5 bg-primary"></div>
-        <p class="mt-4 text-muted">
-          Selected research and major university projects.
-        </p>
       </div>
     </div>
 

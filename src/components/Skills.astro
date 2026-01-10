@@ -1,17 +1,24 @@
 ---
-import { SKILLS } from "@/data";
+import { SKILLS } from "@/shared-data";
+import { getLocalizedData, type Lang } from "@/data";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const { SECTIONS } = getLocalizedData(lang);
 ---
 
 <section id="skills" class="py-20 bg-page border-y border-border">
   <div class="animate-fade-in-up">
     <div class="text-center mb-16">
       <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">
-        Technical Arsenal
+        {SECTIONS.skills}
       </h2>
       <div class="w-16 h-1.5 bg-primary mx-auto"></div>
       <p class="mt-4 text-muted max-w-2xl mx-auto">
-        A comprehensive toolset I use to build scalable, high-performance
-        applications.
+        {SECTIONS.skillsSubtitle}
       </p>
     </div>
   </div>

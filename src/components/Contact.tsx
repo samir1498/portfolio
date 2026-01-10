@@ -1,21 +1,25 @@
 import React from "react";
-import { SOCIAL_LINKS } from "../data";
+import { SOCIAL_LINKS } from "@/shared-data";
 import { Send } from "lucide-react";
+import { type Lang, en, fr } from "@/data";
 
-const Contact: React.FC = () => {
+interface ContactProps {
+  lang: Lang;
+}
+
+const Contact: React.FC<ContactProps> = ({ lang }) => {
+  const { SECTIONS, CONTACT_FORM } = lang === "fr" ? fr : en;
+
   return (
     <section id="contact" className="py-24 bg-page border-t border-border">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
         <div className="space-y-8">
           <div className="animate-fade-in-up">
             <h2 className="text-4xl font-bold text-foreground mb-6">
-              Let's Work Together
+              {SECTIONS.contact}
             </h2>
             <p className="text-muted text-lg leading-relaxed mb-8">
-              I'm currently available for freelance projects or full-time
-              opportunities. If you have a project that needs some creative
-              direction or a robust technical solution, I'd love to hear from
-              you.
+              {SECTIONS.contactSubtitle}
             </p>
           </div>
 
@@ -62,7 +66,7 @@ const Contact: React.FC = () => {
                 htmlFor="name"
                 className="block text-sm font-medium text-muted mb-2"
               >
-                Name
+                {CONTACT_FORM.name}
               </label>
               <input
                 type="text"
@@ -76,7 +80,7 @@ const Contact: React.FC = () => {
                 htmlFor="email"
                 className="block text-sm font-medium text-muted mb-2"
               >
-                Email
+                {CONTACT_FORM.email}
               </label>
               <input
                 type="email"
@@ -90,13 +94,17 @@ const Contact: React.FC = () => {
                 htmlFor="message"
                 className="block text-sm font-medium text-muted mb-2"
               >
-                Message
+                {CONTACT_FORM.message}
               </label>
               <textarea
                 id="message"
                 rows={4}
                 className="w-full px-4 py-3 bg-page border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-foreground transition-all placeholder:text-muted resize-none"
-                placeholder="Tell me about your project..."
+                placeholder={
+                  lang === "fr"
+                    ? "Décrivez votre projet..."
+                    : "Tell me about your project..."
+                }
               ></textarea>
             </div>
             <button
@@ -104,7 +112,7 @@ const Contact: React.FC = () => {
               className="w-full flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground font-bold rounded-lg hover:opacity-90 transition-all duration-300"
             >
               <Send className="w-4 h-4 mr-2" />
-              Send Message
+              {CONTACT_FORM.send}
             </button>
           </form>
         </div>

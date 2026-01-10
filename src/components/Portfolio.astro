@@ -1,12 +1,20 @@
 ---
 import { Construction, Rocket } from "lucide-react";
+import { getLocalizedData, type Lang } from "@/data";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const { SECTIONS } = getLocalizedData(lang);
 ---
 
 <section id="showcase" class="py-24 bg-page border-t border-border">
   <div class="animate-fade-in-up">
     <div class="text-center mb-12">
       <h2 class="text-3xl md:text-5xl font-bold text-foreground mb-4">
-        Latest Work
+        {SECTIONS.portfolio}
       </h2>
       <div class="w-16 h-1.5 bg-primary mx-auto"></div>
     </div>
@@ -21,19 +29,18 @@ import { Construction, Rocket } from "lucide-react";
       </div>
 
       <h3 class="text-2xl font-bold text-foreground mb-4">
-        Projects Loading...
+        {lang === "fr" ? "Projets en cours..." : "Projects Loading..."}
       </h3>
 
       <p class="text-muted max-w-lg mx-auto mb-8 text-lg">
-        I am currently curating a selection of my best commercial and personal
-        projects. Check back soon for a showcase of interactive applications.
+        {SECTIONS.portfolioSubtitle}
       </p>
 
       <div
         class="flex gap-2 items-center text-sm font-semibold text-primary bg-primary/10 px-4 py-2 rounded-full"
       >
         <Construction className="w-4 h-4" />
-        <span>Work in Progress</span>
+        <span>{lang === "fr" ? "En cours" : "Work in Progress"}</span>
       </div>
     </div>
   </div>
