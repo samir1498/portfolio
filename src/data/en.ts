@@ -12,6 +12,19 @@ export const PERSONAL_INFO = {
 
 export const EXPERIENCE: Experience[] = [
   {
+    company: "ObserveOne",
+    role: "Full-Stack Engineer",
+    period: "Nov. 2025 – Present",
+    location: "Remote",
+    description: [
+      "Leading the architectural migration of a monitoring SaaS from MVP to scalable Service-Oriented Architecture (SOA), decoupling monolithic controllers into Service and Data Access Layers (DAL).",
+      "Engineered a robust testing infrastructure using Vitest and Playwright, increasing code coverage from <20% to >80% across backend services and frontend components.",
+      "Optimized frontend performance by refactoring complex React components and implementing Server-Sent Events (SSE) for real-time monitoring dashboards.",
+      "Designed and implemented high-volume load testing pipelines using K6 to validate system reliability under stress.",
+      "Enhanced system observability and maintainability by integrating automated CI/CD pipelines, linting tools (Knip), and strict TypeScript typing.",
+    ],
+  },
+  {
     company: "Self-Employed",
     role: "Freelance Full-Stack / Mobile Developer",
     period: "Sep. 2025 – Present",
