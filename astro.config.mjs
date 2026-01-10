@@ -24,6 +24,7 @@ export default defineConfig({
     locales: ["en", "fr", "ar"],
     routing: {
       prefixDefaultLocale: true,
+      redirectToDefaultLocale: false,
     },
   },
 });
