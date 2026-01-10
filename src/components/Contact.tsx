@@ -1,14 +1,74 @@
-import React from "react";
+import React, { useState } from "react";
 import { SOCIAL_LINKS } from "@/shared-data";
-import { Send } from "lucide-react";
+import { Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { type Lang, en, fr } from "@/data";
+
+// Get your access key from https://web3forms.com
+const WEB3FORMS_ACCESS_KEY = "YOUR_ACCESS_KEY_HERE";
 
 interface ContactProps {
   lang: Lang;
 }
 
+type FormStatus = "idle" | "loading" | "success" | "error";
+
 const Contact: React.FC<ContactProps> = ({ lang }) => {
   const { SECTIONS, CONTACT_FORM } = lang === "fr" ? fr : en;
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [status, setStatus] = useState<FormStatus>("idle");
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("loading");
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          subject: `Portfolio Contact: ${formData.name}`,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setStatus("success");
+        setFormData({ name: "", email: "", message: "" });
+        // Reset to idle after 5 seconds
+        setTimeout(() => setStatus("idle"), 5000);
+      } else {
+        setStatus("error");
+        setTimeout(() => setStatus("idle"), 5000);
+      }
+    } catch {
+      setStatus("error");
+      setTimeout(() => setStatus("idle"), 5000);
+    }
+  };
+
+  const statusMessages = {
+    success: lang === "fr" ? "Message envoyé !" : "Message sent!",
+    error: lang === "fr" ? "Erreur. Réessayez." : "Error. Please try again.",
+  };
 
   return (
     <section id="contact" className="py-24 bg-page border-t border-border">
@@ -60,7 +120,7 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
           className="animate-fade-in-up bg-page p-8 rounded-xl border border-border shadow-lg"
           style={{ animationDelay: "200ms" }}
         >
-          <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="name"
@@ -71,6 +131,9 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
               <input
                 type="text"
                 id="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
                 className="w-full px-4 py-3 bg-page border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-foreground transition-all placeholder:text-muted"
                 placeholder="John Doe"
               />
@@ -85,6 +148,9 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
               <input
                 type="email"
                 id="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
                 className="w-full px-4 py-3 bg-page border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-foreground transition-all placeholder:text-muted"
                 placeholder="john@example.com"
               />
@@ -99,6 +165,9 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
               <textarea
                 id="message"
                 rows={4}
+                value={formData.message}
+                onChange={handleChange}
+                required
                 className="w-full px-4 py-3 bg-page border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-foreground transition-all placeholder:text-muted resize-none"
                 placeholder={
                   lang === "fr"
@@ -107,12 +176,36 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
                 }
               ></textarea>
             </div>
+
+            {/* Status Messages */}
+            {status === "success" && (
+              <div className="flex items-center gap-2 text-green-500 bg-green-500/10 p-3 rounded-lg">
+                <CheckCircle className="w-5 h-5" />
+                <span>{statusMessages.success}</span>
+              </div>
+            )}
+            {status === "error" && (
+              <div className="flex items-center gap-2 text-red-500 bg-red-500/10 p-3 rounded-lg">
+                <AlertCircle className="w-5 h-5" />
+                <span>{statusMessages.error}</span>
+              </div>
+            )}
+
             <button
               type="submit"
-              className="w-full flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground font-bold rounded-lg hover:opacity-90 transition-all duration-300"
+              disabled={status === "loading"}
+              className="w-full flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground font-bold rounded-lg hover:opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Send className="w-4 h-4 mr-2" />
-              {CONTACT_FORM.send}
+              {status === "loading" ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4 mr-2" />
+              )}
+              {status === "loading"
+                ? lang === "fr"
+                  ? "Envoi..."
+                  : "Sending..."
+                : CONTACT_FORM.send}
             </button>
           </form>
         </div>
