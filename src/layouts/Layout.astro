@@ -1,8 +1,10 @@
 ---
 import "../styles/global.css";
+import { SEO } from "astro-seo";
 import Navbar from "../components/Navbar";
 import { getLangFromUrl } from "../i18n/utils";
 import { isRtl } from "../i18n/ui";
+import { getSeoConfig } from "../config/seo";
 
 const lang = getLangFromUrl(Astro.url);
 const dir = isRtl(lang) ? "rtl" : "ltr";
@@ -12,14 +14,14 @@ interface Props {
   description?: string;
 }
 
-const {
-  title = "Samir Bettahar - Software Engineer",
-  description = "Full-stack software engineer specialized in React, TypeScript, Next.js, and modern web development. View my portfolio and get in touch.",
-} = Astro.props;
+const { title, description } = Astro.props;
 
-const siteUrl = "https://samir-bettahar.dev";
-const ogImage = `${siteUrl}/og-image.png`;
-const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
+const seoConfig = getSeoConfig({
+  title,
+  description,
+  lang,
+  pathname: Astro.url.pathname,
+});
 ---
 
 <!doctype html>
@@ -28,31 +30,7 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-
-    <!-- Primary Meta Tags -->
-    <title>{title}</title>
-    <meta name="title" content={title} />
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonicalUrl} />
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/logo.png" />
-    <link rel="apple-touch-icon" href="/logo.png" />
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:locale" content={lang === "fr" ? "fr_FR" : "en_US"} />
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content={canonicalUrl} />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
+    <SEO {...seoConfig} />
 
     <!-- Theme initialization -->
     <script is:inline>
