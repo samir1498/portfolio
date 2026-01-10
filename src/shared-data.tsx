@@ -58,7 +58,7 @@ export const EXPERIENCE: Experience[] = [
   {
     company: "Omnivya",
     role: "Full-Stack Developer",
-    period: "Feb. 2024 – Aug. 2025",
+    period: "Jan. 2024 – Aug. 2025",
     location: "Remote",
     description: [
       "Designed and refactored responsive web interfaces using React, TypeScript, AstroJS, and TanStack Router.",
