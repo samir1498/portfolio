@@ -1,5 +1,5 @@
 ---
-import { ArrowRight, Download, Mail } from "lucide-react";
+import { ArrowRight, ArrowLeft, Download, Mail } from "lucide-react";
 import { getLocalizedData, type Lang } from "@/data";
 import { PERSONAL_INFO as CONTACT_INFO } from "@/shared-data";
 
@@ -38,7 +38,13 @@ const { PERSONAL_INFO } = getLocalizedData(lang);
           <h1
             class="text-5xl md:text-7xl font-bold tracking-tight text-foreground mb-6"
           >
-            {lang === "fr" ? "Salut, je suis" : "Hi, I'm"}
+            {
+              lang === "ar"
+                ? "مرحباً، أنا"
+                : lang === "fr"
+                  ? "Salut, je suis"
+                  : "Hi, I'm"
+            }
             <br />
             <span class="text-primary">{PERSONAL_INFO.name}</span>
           </h1>
@@ -62,16 +68,20 @@ const { PERSONAL_INFO } = getLocalizedData(lang);
             class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-medium text-primary-foreground bg-primary rounded-lg transition-all hover:opacity-90 active:scale-95"
           >
             {PERSONAL_INFO.contactMe}
-            <ArrowRight
-              className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
-            />
+            {
+              lang === "ar" ? (
+                <ArrowLeft className="me-2 w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              ) : (
+                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              )
+            }
           </a>
           <a
             href="/cv.pdf"
             download
             class="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-secondary-foreground bg-secondary border border-border rounded-lg hover:opacity-80 transition-all active:scale-95"
           >
-            <Download className="mr-2 w-4 h-4" />
+            <Download className="rtl:ml-2 ltr:mr-2 w-4 h-4" />
             {PERSONAL_INFO.downloadCV}
           </a>
         </div>
