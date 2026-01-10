@@ -1,33 +1,23 @@
 ---
-// src/pages/index.astro
-// Landing page with language detection redirect and SEO tags for social sharing
-import { SEO } from "astro-seo";
-import { getSeoConfig } from "../config/seo";
+import Hero from "@/components/Hero.astro";
+import Experience from "@/components/Experience.astro";
+import Skills from "@/components/Skills.astro";
+import Academic from "@/components/Academic.astro";
+import Portfolio from "@/components/Portfolio.astro";
+import Contact from "@/components/Contact";
+import Footer from "@/components/Footer.astro";
+import Layout from "@/layouts/Layout.astro";
 
-const seoConfig = getSeoConfig();
+// This page serves as the default (English) landing page at "/"
+const lang = "en";
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <SEO {...seoConfig} />
-  </head>
-  <body>
-    <script>
-      import { navigate } from "astro:transitions/client";
-
-      const lang = navigator.language.split("-")[0];
-      if (lang === "fr") {
-        navigate("/fr/");
-      } else if (lang === "ar") {
-        navigate("/ar/");
-      } else {
-        navigate("/en/");
-      }
-    </script>
-    <noscript>
-      <meta http-equiv="refresh" content="0;url=/en/" />
-    </noscript>
-  </body>
-</html>
+<Layout title="Samir Bettahar - Portfolio">
+  <Hero lang={lang} />
+  <Experience lang={lang} />
+  <Skills lang={lang} />
+  <Academic lang={lang} />
+  <Portfolio lang={lang} />
+  <Contact lang={lang} client:visible />
+  <Footer />
+</Layout>
