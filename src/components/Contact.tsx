@@ -109,7 +109,7 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
                     className="flex items-center p-4 bg-page border border-border rounded-lg hover:border-primary transition-all group shadow-sm hover:shadow-md"
                   >
                     <div className="p-2 bg-primary/10 rounded text-muted group-hover:text-primary transition-colors">
-                      <Icon className="w-5 h-5" />
+                      <Icon />
                     </div>
                     <div className="rtl:mr-4 ltr:ml-4 overflow-hidden flex-1">
                       <p className="text-xs text-muted font-bold uppercase tracking-wider mb-1">

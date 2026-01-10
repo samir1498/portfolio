@@ -1,5 +1,5 @@
 import type { Experience, Education, Project, SkillCategory } from "./types";
-import { Mail, Phone, MessageCircle } from "lucide-react";
+
 
 // Simple SVG icon components for brands (Lucide deprecated brand icons)
 const GithubIcon = () => (
