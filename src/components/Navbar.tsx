@@ -1,14 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { Menu, X, Code2, Sun, Moon } from "lucide-react";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [currentLang, setCurrentLang] = useState<string>("en");
 
   useEffect(() => {
     // Check initial theme
     setIsDark(document.documentElement.classList.contains("dark"));
+
+    // Check current language from URL
+    const path = window.location.pathname;
+    if (path.startsWith("/fr")) {
+      setCurrentLang("fr");
+    } else {
+      setCurrentLang("en");
+    }
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -25,11 +35,17 @@ const Navbar: React.FC = () => {
   };
 
   const navLinks = [
-    { name: "About", href: "#about" },
-    { name: "Skills", href: "#skills" },
-    { name: "Experience", href: "#experience" },
-    { name: "Academic", href: "#academic" },
-    { name: "Projects", href: "#showcase" },
+    { name: currentLang === "fr" ? "À propos" : "About", href: "#about" },
+    { name: currentLang === "fr" ? "Compétences" : "Skills", href: "#skills" },
+    {
+      name: currentLang === "fr" ? "Expérience" : "Experience",
+      href: "#experience",
+    },
+    {
+      name: currentLang === "fr" ? "Formation" : "Academic",
+      href: "#academic",
+    },
+    { name: currentLang === "fr" ? "Projets" : "Projects", href: "#showcase" },
     { name: "Contact", href: "#contact" },
   ];
 
@@ -50,7 +66,8 @@ const Navbar: React.FC = () => {
             <span className="text-xl font-bold text-foreground">Samir.Dev</span>
           </div>
 
-          <div className="hidden md:flex items-center gap-6">
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-4">
             <div className="flex items-baseline space-x-6">
               {navLinks.map((link) => (
                 <a
@@ -62,6 +79,11 @@ const Navbar: React.FC = () => {
                 </a>
               ))}
             </div>
+
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+
+            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-full bg-secondary text-muted hover:text-primary transition-colors focus:outline-none"
@@ -75,7 +97,10 @@ const Navbar: React.FC = () => {
             </button>
           </div>
 
-          <div className="-mr-2 flex md:hidden items-center gap-4">
+          {/* Mobile Controls */}
+          <div className="-mr-2 flex md:hidden items-center gap-2">
+            <LanguageSwitcher compact />
+
             <button
               onClick={toggleTheme}
               className="p-2 rounded-full bg-secondary text-muted hover:text-primary transition-colors focus:outline-none"
@@ -87,6 +112,7 @@ const Navbar: React.FC = () => {
                 <Moon className="w-5 h-5" />
               )}
             </button>
+
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-muted hover:text-primary hover:bg-secondary focus:outline-none"
