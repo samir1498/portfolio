@@ -33,9 +33,30 @@ const { title } = Astro.props;
     </script>
   </head>
   <body
-    class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 bg-page text-foreground antialiased overflow-x-hidden transition-colors duration-300"
+    class="bg-page text-foreground antialiased overflow-x-hidden transition-colors duration-300"
   >
     <Navbar client:load />
-    <slot />
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <slot />
+    </main>
+    <script is:inline>
+      // Intersection Observer for scroll-triggered animations
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("in-view");
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+
+      document
+        .querySelectorAll(".animate-fade-in-up, .animate-fade-in-left")
+        .forEach((el) => {
+          observer.observe(el);
+        });
+    </script>
   </body>
 </html>
