@@ -35,18 +35,55 @@ const Navbar: React.FC = () => {
   };
 
   const navLinks = [
-    { name: currentLang === "fr" ? "À propos" : "About", href: "#about" },
-    { name: currentLang === "fr" ? "Compétences" : "Skills", href: "#skills" },
     {
-      name: currentLang === "fr" ? "Expérience" : "Experience",
+      name:
+        currentLang === "ar"
+          ? "نبذة عني"
+          : currentLang === "fr"
+          ? "À propos"
+          : "About",
+      href: "#about",
+    },
+    {
+      name:
+        currentLang === "ar"
+          ? "المهارات"
+          : currentLang === "fr"
+          ? "Compétences"
+          : "Skills",
+      href: "#skills",
+    },
+    {
+      name:
+        currentLang === "ar"
+          ? "الخبرة"
+          : currentLang === "fr"
+          ? "Expérience"
+          : "Experience",
       href: "#experience",
     },
     {
-      name: currentLang === "fr" ? "Formation" : "Academic",
+      name:
+        currentLang === "ar"
+          ? "التعليم"
+          : currentLang === "fr"
+          ? "Formation"
+          : "Academic",
       href: "#academic",
     },
-    { name: currentLang === "fr" ? "Projets" : "Projects", href: "#showcase" },
-    { name: "Contact", href: "#contact" },
+    {
+      name:
+        currentLang === "ar"
+          ? "المشاريع"
+          : currentLang === "fr"
+          ? "Projets"
+          : "Projects",
+      href: "#showcase",
+    },
+    {
+      name: currentLang === "ar" ? "تواصل" : "Contact",
+      href: "#contact",
+    },
   ];
 
   return (
