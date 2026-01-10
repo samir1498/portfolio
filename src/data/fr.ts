@@ -17,11 +17,11 @@ export const EXPERIENCE: Experience[] = [
     period: "Nov. 2025 – Présent",
     location: "Télétravail",
     description: [
-      "Pilotage de la migration architecturale d'un SaaS de monitoring d'un MVP vers une architecture orientée services (SOA) évolutive, découplant les contrôleurs monolithiques en couches de services et d'accès aux données (DAL).",
-      "Conception d'une infrastructure de test robuste utilisant Vitest et Playwright, augmentant la couverture de code de <20% à >80% sur les services backend et les composants frontend.",
-      "Optimisation des performances frontend en refactorisant des composants React complexes et en implémentant des Server-Sent Events (SSE) pour des tableaux de bord en temps réel.",
-      "Conception et mise en œuvre de pipelines de tests de charge à haut volume avec K6 pour valider la fiabilité du système sous contrainte.",
-      "Amélioration de l'observabilité et de la maintenabilité du système par l'intégration de pipelines CI/CD automatisés, d'outils de linting (Knip) et d'un typage TypeScript strict.",
+      "Migration d'un backend Express.js monolithique vers une architecture orientée services (SOA) évolutive, découplant les services principaux vers une couche d'accès aux données (DAL).",
+      "Architecture et optimisation d'un dashboard Next.js haute performance, intégrant des mises à jour temps réel via SSE et refactorisant les composants UI complexes.",
+      "Développement d'une CLI TypeScript robuste pour la gestion automatisée du monitoring, intégrant des flux d'authentification sécurisés.",
+      "Mise en place d'une infrastructure de test complète avec Vitest et Playwright, atteignant >80% de couverture sur l'ensemble de la stack (Frontend, Backend et CLI).",
+      "Conception de pipelines de tests de charge à haut volume avec K6 pour valider la fiabilité du système.",
     ],
   },
   {
