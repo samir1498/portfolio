@@ -1,7 +1,9 @@
 ---
 import { ArrowRight, ArrowLeft, Download, Mail } from "lucide-react";
+import { Image } from "astro:assets";
 import { getLocalizedData, type Lang } from "@/data";
 import { PERSONAL_INFO as CONTACT_INFO } from "@/shared-data";
+import profileImage from "@/assets/me.jpeg";
 
 interface Props {
   lang: Lang;
@@ -95,6 +97,7 @@ const { PERSONAL_INFO } = getLocalizedData(lang);
             target="_blank"
             rel="noopener noreferrer"
             class="text-muted hover:text-primary transition-colors"
+            aria-label="GitHub Profile"
           >
             <svg viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
               <path
@@ -107,6 +110,7 @@ const { PERSONAL_INFO } = getLocalizedData(lang);
             target="_blank"
             rel="noopener noreferrer"
             class="text-muted hover:text-primary transition-colors"
+            aria-label="LinkedIn Profile"
           >
             <svg viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
               <path
@@ -117,6 +121,7 @@ const { PERSONAL_INFO } = getLocalizedData(lang);
           <a
             href={`mailto:${CONTACT_INFO.contact.email}`}
             class="text-muted hover:text-primary transition-colors"
+            aria-label="Email Me"
           >
             <Mail className="w-6 h-6" />
           </a>
@@ -125,7 +130,7 @@ const { PERSONAL_INFO } = getLocalizedData(lang);
 
       <!-- Profile Image -->
       <div class="flex justify-center lg:justify-end relative">
-        <div class="animate-fade-in-left" style="animation-delay: 300ms">
+        <div class="animate-fade-in-left">
           <div class="relative">
             <div
               class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 rounded-full border-2 border-border z-0 bg-primary/10"
@@ -139,10 +144,11 @@ const { PERSONAL_INFO } = getLocalizedData(lang);
             <div
               class="relative w-64 h-64 md:w-80 md:h-80 lg:w-[26rem] lg:h-[26rem] rounded-full overflow-hidden border-[6px] border-secondary shadow-xl z-10 bg-secondary animate-float"
             >
-              <img
-                src={`https://github.com/${CONTACT_INFO.contact.github}.png`}
+              <Image
+                src={profileImage}
                 alt={PERSONAL_INFO.name}
                 class="w-full h-full object-cover"
+                loading="eager"
               />
             </div>
           </div>

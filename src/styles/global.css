@@ -27,11 +27,11 @@
   --primary-foreground: #ffffff;
   --secondary: #f1f5f9;
   --secondary-foreground: #334155;
-  --muted: #64748b;
+  --muted: #475569; /* Increased contrast (Slate-600) from #64748b */
   --border: #e2e8f0;
 }
 
-/* Dark Mode */
+  /* Dark Mode */
 :root.dark {
   --page: #020617;
   --foreground: #f8fafc;
@@ -39,7 +39,7 @@
   --primary-foreground: #ffffff;
   --secondary: #1e293b;
   --secondary-foreground: #cbd5e1;
-  --muted: #94a3b8;
+  --muted: #cbd5e1; /* Increased contrast (Slate-300) from #94a3b8 */
   --border: #334155;
 }
 
