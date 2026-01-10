@@ -111,11 +111,14 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
                     <div className="p-2 bg-primary/10 rounded text-muted group-hover:text-primary transition-colors">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <div className="ml-4 overflow-hidden">
-                      <p className="text-xs text-muted font-bold uppercase tracking-wider">
+                    <div className="rtl:mr-4 ltr:ml-4 overflow-hidden flex-1">
+                      <p className="text-xs text-muted font-bold uppercase tracking-wider mb-1">
                         {link.label}
                       </p>
-                      <p className="text-foreground font-medium truncate">
+                      <p
+                        className="text-foreground font-medium truncate rtl:text-right"
+                        dir="ltr"
+                      >
                         {link.value}
                       </p>
                     </div>
