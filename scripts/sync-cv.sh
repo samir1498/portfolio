@@ -13,7 +13,7 @@ echo "🚀 Starting CV Sync..."
 # 1. Build CVs
 echo "📦 Building CVs in $CV_PROJECT_DIR..."
 cd "$CV_PROJECT_DIR"
-make clean && make all
+make all
 
 # 2. Ensure destination exists
 mkdir -p "$DEST_DIR"
