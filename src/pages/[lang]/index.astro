@@ -1,11 +1,12 @@
 ---
-import Hero from '../../components/Hero.astro';
-import Experience from '../../components/Experience.astro';
-import Skills from '../../components/Skills.astro';
-import Education from '../../components/Education.astro';
-import Contact from '../../components/Contact.astro';
-import Layout from '../../layouts/Layout.astro';
-import { languages } from '../../i18n/ui';
+import Hero from '@/components/Hero.astro';
+import Experience from '@/components/Experience.astro';
+import Skills from '@/components/Skills.astro';
+import Academic from '@/components/Academic.astro';
+import Portfolio from '@/components/Portfolio.astro';
+import Contact from '@/components/Contact';
+import Layout from '@/layouts/Layout.astro';
+import { languages } from '@/i18n/ui';
 
 export async function getStaticPaths() {
   return Object.keys(languages).map((lang) => ({
@@ -15,11 +16,12 @@ export async function getStaticPaths() {
 ---
 
 <Layout title="Samir Bettahar - Portfolio">
-	<main class="p-4">
+	<main>
 		<Hero />
 		<Experience />
 		<Skills />
-		<Education />
-		<Contact />
+		<Academic />
+		<Portfolio />
+		<Contact client:visible />
 	</main>
 </Layout>

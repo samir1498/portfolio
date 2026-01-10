@@ -1,63 +1,84 @@
 ---
-import { useTranslations } from '../i18n/translator';
+import { SKILLS } from '@/data';
+import { Shield, Code2 } from 'lucide-react';
 
-const t = useTranslations(Astro.url);
+// This function returns a slug string for simple-icons, or a React Component for lucide
+const getSkillIcon = (skill: string) => {
+  const s = skill.toLowerCase();
+  let slug = '';
+
+  // Explicit mapping for better accuracy
+  if (s.includes('typescript')) slug = 'typescript';
+  else if (s.includes('javascript')) slug = 'javascript';
+  else if (s === 'java') slug = 'openjdk';
+  else if (s.includes('go')) slug = 'go';
+  else if (s.includes('react')) slug = 'react';
+  else if (s.includes('next')) slug = 'nextdotjs';
+  else if (s.includes('astro')) slug = 'astro';
+  else if (s.includes('svelte')) slug = 'svelte';
+  else if (s.includes('tailwind')) slug = 'tailwindcss';
+  else if (s.includes('nest')) slug = 'nestjs';
+  else if (s.includes('fastify')) slug = 'fastify';
+  else if (s.includes('spring')) slug = 'springboot';
+  else if (s.includes('postgres')) slug = 'postgresql';
+  else if (s.includes('typeorm')) slug = 'typeorm';
+  else if (s.includes('flyway')) slug = 'flyway';
+  else if (s.includes('docker')) slug = 'docker';
+  else if (s.includes('graal')) slug = 'graalvm';
+  else if (s.includes('zitadel')) slug = 'zitadel';
+  else if (s.includes('clerk')) slug = 'clerk';
+  else if (s.includes('vitest')) slug = 'vitest';
+  else if (s.includes('testcontainers')) slug = 'testcontainers';
+  else if (s.includes('playwright')) slug = 'playwright';
+  else if (s.includes('prometheus')) slug = 'prometheus';
+  else if (s.includes('opentelemetry')) slug = 'opentelemetry';
+
+  if (slug) return slug;
+
+  if (s.includes('auth')) return Shield;
+
+  return Code2;
+};
 ---
 
-<section id="skills" class="py-16">
-    <h2 class="text-4xl font-bold text-center mb-12">{t('nav.skills')}</h2>
-    <div class="container mx-auto px-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="bg-muted p-6 rounded-lg">
-                <h3 class="text-2xl font-bold mb-4">{t('skills.languages.title')}</h3>
-                <ul>
-                    <li>TypeScript</li>
-                    <li>JavaScript</li>
-                    <li>Java</li>
-                    <li>Go</li>
-                </ul>
-            </div>
-            <div class="bg-muted p-6 rounded-lg">
-                <h3 class="text-2xl font-bold mb-4">{t('skills.backend.title')}</h3>
-                <ul>
-                    <li>NestJS</li>
-                    <li>Spring Boot</li>
-                    <li>Go (API for Three.js)</li>
-                </ul>
-            </div>
-            <div class="bg-muted p-6 rounded-lg">
-                <h3 class="text-2xl font-bold mb-4">{t('skills.frontend.title')}</h3>
-                <ul>
-                    <li>React.js</li>
-                    <li>AstroJS</li>
-                    <li>SvelteKit</li>
-                    <li>Three.js</li>
-                </ul>
-            </div>
-            <div class="bg-muted p-6 rounded-lg">
-                <h3 class="text-2xl font-bold mb-4">{t('skills.infrastructure.title')}</h3>
-                <ul>
-                    <li>Docker</li>
-                    <li>Flyway</li>
-                    <li>TypeORM CLI</li>
-                    <li>GraalVM</li>
-                </ul>
-            </div>
-            <div class="bg-muted p-6 rounded-lg">
-                <h3 class="text-2xl font-bold mb-4">{t('skills.authentication.title')}</h3>
-                <ul>
-                    <li>Zitadel</li>
-                    <li>Clerk</li>
-                    <li>BetterAuth</li>
-                </ul>
-            </div>
-            <div class="bg-muted p-6 rounded-lg">
-                <h3 class="text-2xl font-bold mb-4">{t('skills.observability.title')}</h3>
-                <ul>
-                    <li>Prometheus</li>
-                    <li>OpenTelemetry</li>
-                </ul>
-            </div>
-        </div>
+<section id="skills" class="py-20 relative bg-slate-50 dark:bg-dark">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="animate-fade-in-up">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">Technical Arsenal</h2>
+        <div class="w-16 h-1.5 bg-primary mx-auto"></div>
+        <p class="mt-4 text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+          A comprehensive toolset I use to build scalable, high-performance applications.
+        </p>
+      </div>
     </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {SKILLS.map((category, idx) => (
+        <div class="animate-fade-in-up" style={`animation-delay: ${idx * 100}ms;`}>
+          <div class="h-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-lg hover:border-primary/50 transition-colors duration-300 group shadow-sm hover:shadow-md">
+            <div class="mb-4">
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2">
+                {category.name}
+              </h3>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              {category.skills.map(skill => {
+                const Icon = getSkillIcon(skill);
+                return (
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded transition-colors hover:bg-white hover:border-primary dark:hover:bg-slate-700 dark:hover:border-primary group/pill">
+                    {typeof Icon === 'string'
+                      ? <img src={`https://cdn.simpleicons.org/${Icon}`} alt={skill} class="w-3.5 h-3.5" loading="lazy" />
+                      : <Icon className="w-3.5 h-3.5 text-slate-500" />
+                    }
+                    {skill}
+                  </span>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
 </section>
