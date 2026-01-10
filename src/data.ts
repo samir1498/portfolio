@@ -110,7 +110,6 @@ export const ACADEMIC_PROJECTS: Project[] = [
       "Ontologies",
       "Java Swing",
       "Tomcat",
-      "Glassfish",
     ],
   },
   {
@@ -134,25 +133,73 @@ export const ACADEMIC_PROJECTS: Project[] = [
 ];
 
 export const SKILLS: SkillCategory[] = [
-  { name: "Languages", skills: ["TypeScript", "JavaScript", "Java", "Go"] },
+  {
+    name: "Languages",
+    skills: [
+      { name: "TypeScript", icon: "/icons/typescript.svg" },
+      { name: "JavaScript", icon: "/icons/javascript.svg" },
+      { name: "Java", icon: "/icons/openjdk.svg" },
+      { name: "Go", icon: "/icons/go.svg" },
+    ],
+  },
   {
     name: "Frontend",
     skills: [
-      "React.js",
-      "Next.js",
-      "React Native",
-      "AstroJS",
-      "SvelteKit",
-      "Tailwind CSS",
+      { name: "React.js", icon: "/icons/react.svg" },
+      { name: "Next.js", icon: "/icons/nextdotjs.svg" },
+      { name: "React Native", icon: "/icons/react.svg" },
+      { name: "AstroJS", icon: "/icons/astro.svg" },
+      { name: "SvelteKit", icon: "/icons/svelte.svg" },
+      { name: "Tailwind CSS", icon: "/icons/tailwindcss.svg" },
     ],
   },
-  { name: "Backend", skills: ["NestJS", "Fastify", "Spring Boot", "Go (API)"] },
+  {
+    name: "Backend",
+    skills: [
+      { name: "NestJS", icon: "/icons/nestjs.svg" },
+      { name: "Fastify", icon: "/icons/fastify.svg" },
+      { name: "Spring Boot", icon: "/icons/springboot.svg" },
+      { name: "Go (API)", icon: "/icons/go.svg" },
+    ],
+  },
   {
     name: "Database",
-    skills: ["PostgreSQL", "Spring Data JPA", "TypeORM", "Flyway"],
+    skills: [
+      { name: "PostgreSQL", icon: "/icons/postgresql.svg" },
+      { name: "Spring Data JPA", icon: "/icons/spring.svg" },
+      { name: "TypeORM", icon: "/icons/typeorm.svg" },
+      { name: "Flyway", icon: "/icons/flyway.svg" },
+    ],
   },
-  { name: "DevOps & Infra", skills: ["Docker", "GraalVM"] },
-  { name: "Auth", skills: ["Zitadel", "Clerk", "BetterAuth", "Fastify OAuth"] },
-  { name: "Testing", skills: ["Vitest", "TestContainers", "Playwright"] },
-  { name: "Observability", skills: ["Prometheus", "OpenTelemetry"] },
+  {
+    name: "DevOps & Infra",
+    skills: [
+      { name: "Docker", icon: "/icons/docker.svg" },
+      { name: "GraalVM", icon: "/icons/graalvm.svg" },
+    ],
+  },
+  {
+    name: "Auth",
+    skills: [
+      { name: "Zitadel", icon: "/icons/zitadel.svg" },
+      { name: "Clerk", icon: "/icons/clerk.svg" },
+      { name: "BetterAuth", icon: "/icons/betterauth.svg" },
+      { name: "Fastify OAuth", icon: "/icons/fastify.svg" },
+    ],
+  },
+  {
+    name: "Testing",
+    skills: [
+      { name: "Vitest", icon: "/icons/vitest.svg" },
+      { name: "TestContainers", icon: "/icons/testcontainers.svg" },
+      { name: "Playwright", icon: "/icons/playwright.svg" },
+    ],
+  },
+  {
+    name: "Observability",
+    skills: [
+      { name: "Prometheus", icon: "/icons/prometheus.svg" },
+      { name: "OpenTelemetry", icon: "/icons/opentelemetry.svg" },
+    ],
+  },
 ];

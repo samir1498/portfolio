@@ -4,24 +4,23 @@ import { GraduationCap, Code2, Database, Brain } from "lucide-react";
 
 const getTechContent = (tech: string) => {
   const s = tech.toLowerCase();
-  let slug = "";
 
-  if (s.includes("java")) slug = "openjdk";
-  if (s.includes("jee") || s.includes("java ee")) slug = "jakartaee";
-  if (s.includes("tomcat")) slug = "apachetomcat";
-  if (s.includes("glassfish")) slug = "eclipseglassfish";
-  if (s.includes("python")) slug = "python";
-  if (s.includes("scikit")) slug = "scikitlearn";
-  if (s.includes("opencv")) slug = "opencv";
-  if (s.includes("tkinter")) slug = "python";
-  if (s.includes("react")) slug = "react";
-  if (s.includes("next")) slug = "nextdotjs";
-  if (s.includes("node")) slug = "nodedotjs";
+  // Check specific patterns FIRST (before generic "java")
+  if (s.includes("jee") || s.includes("java ee") || s.includes("jakarta"))
+    return { type: "icon", path: "/icons/jakartaee.svg" };
+  if (s.includes("tomcat"))
+    return { type: "icon", path: "/icons/apachetomcat.svg" };
+  if (s.includes("java")) return { type: "icon", path: "/icons/openjdk.svg" };
+  if (s.includes("python") || s.includes("tkinter"))
+    return { type: "icon", path: "/icons/python.svg" };
+  if (s.includes("scikit"))
+    return { type: "icon", path: "/icons/scikitlearn.svg" };
+  if (s.includes("opencv")) return { type: "icon", path: "/icons/opencv.svg" };
+  if (s.includes("react")) return { type: "icon", path: "/icons/react.svg" };
+  if (s.includes("next")) return { type: "icon", path: "/icons/nextdotjs.svg" };
+  if (s.includes("node")) return { type: "icon", path: "/icons/nodedotjs.svg" };
 
-  if (slug) {
-    return { type: "icon", slug };
-  }
-
+  // Fallback by category
   if (s.includes("data") || s.includes("ontology"))
     return { type: "component", Component: Database };
   if (s.includes("learning") || s.includes("ai"))
@@ -127,9 +126,9 @@ const getTechContent = (tech: string) => {
                     <div class="flex items-center gap-1.5 px-3 py-1.5 bg-page rounded text-xs text-muted border border-border">
                       {content.type === "icon" ? (
                         <img
-                          src={`https://cdn.simpleicons.org/${content.slug}`}
+                          src={content.path}
                           alt={tech}
-                          class="w-3 h-3"
+                          class="w-3 h-3 dark:invert dark:brightness-200"
                           loading="lazy"
                         />
                       ) : (

@@ -22,7 +22,12 @@ export interface Project {
   technologies: string[];
 }
 
+export interface Skill {
+  name: string;
+  icon: string; // path to SVG in /icons/
+}
+
 export interface SkillCategory {
   name: string;
-  skills: string[];
+  skills: Skill[];
 }

@@ -1,40 +1,5 @@
 ---
 import { SKILLS } from "@/data";
-import { Shield, Code2 } from "lucide-react";
-
-const getSkillIcon = (skill: string) => {
-  const s = skill.toLowerCase();
-  let slug = "";
-
-  if (s.includes("typescript")) slug = "typescript";
-  else if (s.includes("javascript")) slug = "javascript";
-  else if (s === "java") slug = "openjdk";
-  else if (s.includes("go")) slug = "go";
-  else if (s.includes("react")) slug = "react";
-  else if (s.includes("next")) slug = "nextdotjs";
-  else if (s.includes("astro")) slug = "astro";
-  else if (s.includes("svelte")) slug = "svelte";
-  else if (s.includes("tailwind")) slug = "tailwindcss";
-  else if (s.includes("nest")) slug = "nestjs";
-  else if (s.includes("fastify")) slug = "fastify";
-  else if (s.includes("spring")) slug = "springboot";
-  else if (s.includes("postgres")) slug = "postgresql";
-  else if (s.includes("typeorm")) slug = "typeorm";
-  else if (s.includes("flyway")) slug = "flyway";
-  else if (s.includes("docker")) slug = "docker";
-  else if (s.includes("graal")) slug = "graalvm";
-  else if (s.includes("zitadel")) slug = "zitadel";
-  else if (s.includes("clerk")) slug = "clerk";
-  else if (s.includes("vitest")) slug = "vitest";
-  else if (s.includes("testcontainers")) slug = "testcontainers";
-  else if (s.includes("playwright")) slug = "playwright";
-  else if (s.includes("prometheus")) slug = "prometheus";
-  else if (s.includes("opentelemetry")) slug = "opentelemetry";
-
-  if (slug) return slug;
-  if (s.includes("auth")) return Shield;
-  return Code2;
-};
 ---
 
 <section id="skills" class="py-20 bg-page border-y border-border">
@@ -65,24 +30,17 @@ const getSkillIcon = (skill: string) => {
               </h3>
             </div>
             <div class="flex flex-wrap gap-2">
-              {category.skills.map((skill) => {
-                const Icon = getSkillIcon(skill);
-                return (
-                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium bg-page text-muted border border-border rounded transition-colors hover:border-primary group/pill">
-                    {typeof Icon === "string" ? (
-                      <img
-                        src={`https://cdn.simpleicons.org/${Icon}`}
-                        alt={skill}
-                        class="w-3.5 h-3.5"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <Icon className="w-3.5 h-3.5 text-muted" />
-                    )}
-                    {skill}
-                  </span>
-                );
-              })}
+              {category.skills.map((skill) => (
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium bg-page text-muted border border-border rounded transition-colors hover:border-primary">
+                  <img
+                    src={skill.icon}
+                    alt={skill.name}
+                    class="w-3.5 h-3.5 dark:invert dark:brightness-200"
+                    loading="lazy"
+                  />
+                  {skill.name}
+                </span>
+              ))}
             </div>
           </div>
         </div>
