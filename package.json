@@ -4,10 +4,12 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "sync:cv": "./scripts/sync-cv.sh",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check"
+    "check": "astro check",
+    "prepare": "husky"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
@@ -23,5 +25,8 @@
     "react-dom": "^19.1.0",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
   }
 }
