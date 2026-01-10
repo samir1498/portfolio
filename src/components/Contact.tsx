@@ -145,7 +145,7 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-3 bg-page border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-foreground transition-all placeholder:text-muted"
-                placeholder="John Doe"
+                placeholder={CONTACT_FORM.placeholderName}
               />
             </div>
             <div>
@@ -162,7 +162,7 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-3 bg-page border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-foreground transition-all placeholder:text-muted"
-                placeholder="john@example.com"
+                placeholder={CONTACT_FORM.placeholderEmail}
               />
             </div>
             <div>
@@ -179,24 +179,20 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-3 bg-page border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-foreground transition-all placeholder:text-muted resize-none"
-                placeholder={
-                  lang === "fr"
-                    ? "Décrivez votre projet..."
-                    : "Tell me about your project..."
-                }
+                placeholder={CONTACT_FORM.placeholderMessage}
               ></textarea>
             </div>
 
             {/* Status Messages */}
             {status === "success" && (
               <div className="flex items-center gap-2 text-green-500 bg-green-500/10 p-3 rounded-lg">
-                <CheckCircle className="w-5 h-5" />
+                <CheckCircle className="w-5 h-5 rtl:ml-2 ltr:mr-2" />
                 <span>{statusMessages.success}</span>
               </div>
             )}
             {status === "error" && (
               <div className="flex items-center gap-2 text-red-500 bg-red-500/10 p-3 rounded-lg">
-                <AlertCircle className="w-5 h-5" />
+                <AlertCircle className="w-5 h-5 rtl:ml-2 ltr:mr-2" />
                 <span>{statusMessages.error}</span>
               </div>
             )}
@@ -207,12 +203,14 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
               className="w-full flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground font-bold rounded-lg hover:opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {status === "loading" ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="w-4 h-4 rtl:ml-2 ltr:mr-2 animate-spin" />
               ) : (
-                <Send className="w-4 h-4 mr-2" />
+                <Send className="w-4 h-4 rtl:ml-2 ltr:mr-2 rtl:-scale-x-100" />
               )}
               {status === "loading"
-                ? lang === "fr"
+                ? lang === "ar"
+                  ? "جاري الإرسال..."
+                  : lang === "fr"
                   ? "Envoi..."
                   : "Sending..."
                 : CONTACT_FORM.send}

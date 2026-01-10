@@ -106,4 +106,7 @@ export const CONTACT_FORM = {
   email: "بريدك الإلكتروني",
   message: "رسالتك",
   send: "إرسال الرسالة",
+  placeholderName: "محمد أحمد",
+  placeholderEmail: "mohamed@example.com",
+  placeholderMessage: "أخبرني عن مشروعك...",
 };

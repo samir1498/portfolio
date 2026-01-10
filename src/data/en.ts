@@ -108,4 +108,7 @@ export const CONTACT_FORM = {
   email: "Your Email",
   message: "Your Message",
   send: "Send Message",
+  placeholderName: "John Doe",
+  placeholderEmail: "john@example.com",
+  placeholderMessage: "Tell me about your project...",
 };
