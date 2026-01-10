@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { SOCIAL_LINKS } from "@/shared-data";
 import { Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
-import { type Lang, en, fr } from "@/data";
+import { type Lang, getLocalizedData } from "@/data";
 
 // Web3Forms access key
 const WEB3FORMS_ACCESS_KEY = "96fbb359-4d6b-4c3e-a7c4-fa7ec80a7bda";
@@ -13,7 +13,7 @@ interface ContactProps {
 type FormStatus = "idle" | "loading" | "success" | "error";
 
 const Contact: React.FC<ContactProps> = ({ lang }) => {
-  const { SECTIONS, CONTACT_FORM } = lang === "fr" ? fr : en;
+  const { SECTIONS, CONTACT_FORM } = getLocalizedData(lang);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -66,8 +66,18 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
   };
 
   const statusMessages = {
-    success: lang === "fr" ? "Message envoyé !" : "Message sent!",
-    error: lang === "fr" ? "Erreur. Réessayez." : "Error. Please try again.",
+    success:
+      lang === "ar"
+        ? "تم إرسال الرسالة!"
+        : lang === "fr"
+        ? "Message envoyé !"
+        : "Message sent!",
+    error:
+      lang === "ar"
+        ? "خطأ. حاول مرة أخرى."
+        : lang === "fr"
+        ? "Erreur. Réessayez."
+        : "Error. Please try again.",
   };
 
   return (
