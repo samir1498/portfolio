@@ -3,8 +3,8 @@ import { SOCIAL_LINKS } from "@/shared-data";
 import { Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { type Lang, en, fr } from "@/data";
 
-// Get your access key from https://web3forms.com
-const WEB3FORMS_ACCESS_KEY = "YOUR_ACCESS_KEY_HERE";
+// Web3Forms access key
+const WEB3FORMS_ACCESS_KEY = "96fbb359-4d6b-4c3e-a7c4-fa7ec80a7bda";
 
 interface ContactProps {
   lang: Lang;
