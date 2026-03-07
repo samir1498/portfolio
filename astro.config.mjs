@@ -12,6 +12,11 @@ export default defineConfig({
   site: "https://samir-bettahar.dev",
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      watch: {
+        ignored: ["**/.unlighthouse/**", "**/.unlighthouse-ci/**"],
+      },
+    },
     resolve: {
       alias: {
         "@": path.resolve(path.dirname(fileURLToPath(import.meta.url)), "src"),

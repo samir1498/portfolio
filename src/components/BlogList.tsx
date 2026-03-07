@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Search, Calendar, Tag, XCircle } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Search, Calendar, Tag, XCircle, ArrowUpRight } from "lucide-react";
 
 interface Post {
   slug: string;
@@ -17,25 +17,23 @@ interface BlogListProps {
 }
 
 export default function BlogList({ initialPosts, allTags }: BlogListProps) {
-  const [posts, setPosts] = useState(initialPosts);
   const [activeTag, setActiveTag] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
+  const filteredPosts = useMemo(
+    () =>
+      initialPosts.filter((post) => {
+        const matchesSearch = post.data.title
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const matchesTag =
+          activeTag === "all" || post.data.tags.includes(activeTag);
+        return matchesSearch && matchesTag;
+      }),
+    [initialPosts, searchQuery, activeTag],
+  );
 
-  useEffect(() => {
-    const filtered = initialPosts.filter((post) => {
-      const matchesSearch = post.data.title
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      const matchesTag = activeTag === "all" || post.data.tags.includes(activeTag);
-      return matchesSearch && matchesTag;
-    });
-    setPosts(filtered);
-  }, [searchQuery, activeTag, initialPosts]);
+  const isSinglePost = filteredPosts.length === 1;
 
   const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("en", {
@@ -46,39 +44,36 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
 
   return (
     <div className="w-full">
-      {/* Search Bar */}
-      <div className="relative mx-auto mt-12 max-w-xl group">
-        <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary/20 to-primary/10 opacity-50 blur transition duration-500 group-hover:opacity-100"></div>
-        <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-            <Search className="h-5 w-5 text-muted transition-colors group-hover:text-primary" />
+      <div className="relative mx-auto mt-12 max-w-xl">
+        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-secondary text-primary">
+            <Search className="h-4 w-4" />
           </div>
-          <input
-            type="text"
-            placeholder="Search articles..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full rounded-full border border-border/50 bg-page/80 py-4 pl-12 pr-4 text-foreground placeholder-muted backdrop-blur-xl focus:border-primary/50 focus:outline-none focus:ring-1 focus:ring-primary/50 sm:text-sm transition-all shadow-sm"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="absolute inset-y-0 right-0 flex items-center pr-4 text-muted hover:text-foreground"
-            >
-              <XCircle className="h-5 w-5" />
-            </button>
-          )}
         </div>
+        <input
+          type="text"
+          placeholder="Search articles..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="block w-full rounded-xl border border-border bg-page py-3.5 pl-14 pr-10 text-foreground placeholder-muted focus:border-primary focus:outline-none sm:text-sm transition-colors"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery("")}
+            className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted hover:text-foreground"
+          >
+            <XCircle className="h-5 w-5" />
+          </button>
+        )}
       </div>
 
-      {/* Category Filters */}
       <div className="mt-8 flex flex-wrap justify-center gap-2">
         <button
           onClick={() => setActiveTag("all")}
-          className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-all backdrop-blur-sm ${
+          className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
             activeTag === "all"
-              ? "border-primary/30 bg-primary/10 text-primary shadow-sm"
-              : "border-border/40 bg-secondary/30 text-muted hover:bg-secondary/60 hover:text-foreground hover:scale-105"
+              ? "border-primary/60 bg-page text-primary"
+              : "border-border bg-secondary text-muted hover:bg-page hover:text-foreground"
           }`}
         >
           All
@@ -87,10 +82,10 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
           <button
             key={tag}
             onClick={() => setActiveTag(tag)}
-            className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-all backdrop-blur-sm ${
+            className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
               activeTag === tag
-                ? "border-primary/30 bg-primary/10 text-primary shadow-sm"
-                : "border-border/40 bg-secondary/30 text-muted hover:bg-secondary/60 hover:text-foreground hover:scale-105"
+                ? "border-primary/60 bg-page text-primary"
+                : "border-border bg-secondary text-muted hover:bg-page hover:text-foreground"
             }`}
           >
             {tag}
@@ -98,76 +93,98 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
         ))}
       </div>
 
-      {/* Posts Grid */}
-      {posts.length > 0 ? (
-        <div className="mt-20 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post, index) => (
+      {filteredPosts.length > 0 ? (
+        <div
+          className={
+            isSinglePost
+              ? "mt-16 max-w-3xl mx-auto text-left"
+              : "mt-16 grid gap-6 text-left sm:grid-cols-2 xl:grid-cols-3"
+          }
+        >
+          {filteredPosts.map((post) => (
             <article
               key={post.slug}
-              className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-secondary/10 border border-white/5 p-8 transition-all duration-300 hover:-translate-y-1 hover:bg-secondary/20 hover:shadow-2xl hover:shadow-primary/5 ${
-                isLoaded ? "animate-fade-in-up" : "opacity-0"
+              className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-border bg-secondary transition-colors hover:border-primary/50 ${
+                isSinglePost ? "p-8 md:p-9" : "p-6"
               }`}
-              style={{ animationDelay: `${index * 100}ms` }}
             >
-              {/* Hover Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
-
               <div className="relative z-10">
-                <div className="flex items-center justify-between gap-2 mb-4">
+                <div className="mb-4 flex items-center justify-between gap-2">
                   <time
                     dateTime={new Date(post.data.pubDate).toISOString()}
-                    className="flex items-center gap-1.5 text-xs font-medium text-muted tracking-wider uppercase"
+                    className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted"
                   >
-                    <Calendar className="w-3 h-3" />
+                    <Calendar className="h-3 w-3" />
                     {formatDate(post.data.pubDate)}
                   </time>
-                  <div className="h-px flex-1 bg-border/30 mx-3 group-hover:bg-primary/20 transition-colors"></div>
+                  <div className="mx-3 h-px flex-1 bg-border/40 transition-colors group-hover:bg-primary/35" />
                 </div>
 
-                <h3 className="text-2xl font-bold text-foreground transition-colors group-hover:text-primary leading-tight">
-                  <a href={`/blog/${post.slug}/`} className="focus:outline-none">
-                    <span className="absolute inset-0" aria-hidden="true"></span>
+                <h3
+                  className={`font-bold leading-tight text-foreground transition-colors group-hover:text-primary ${
+                    isSinglePost ? "text-4xl" : "text-2xl"
+                  }`}
+                >
+                  <a
+                    href={`/blog/${post.slug}/`}
+                    className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-md"
+                  >
                     {post.data.title}
                   </a>
                 </h3>
 
-                <p className="mt-4 text-sm text-muted line-clamp-3 leading-relaxed group-hover:text-secondary-foreground/80 transition-colors">
+                <p
+                  className={`mt-4 line-clamp-3 leading-relaxed text-muted transition-colors group-hover:text-secondary-foreground/85 ${
+                    isSinglePost ? "text-lg" : "text-sm"
+                  }`}
+                >
                   {post.data.description}
                 </p>
               </div>
 
-              <div className="relative z-10 mt-8 flex flex-wrap gap-2">
-                {post.data.tags.slice(0, 3).map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1 rounded-md bg-secondary/40 px-2.5 py-1 text-xs font-medium text-secondary-foreground/70 ring-1 ring-inset ring-white/5 transition-colors group-hover:bg-secondary/60 group-hover:text-secondary-foreground"
-                  >
-                    <Tag className="w-3 h-3" />
-                    {tag}
-                  </span>
-                ))}
-                {post.data.tags.length > 3 && (
-                  <span className="inline-flex items-center rounded-md bg-secondary/40 px-2.5 py-1 text-xs font-medium text-secondary-foreground/70 ring-1 ring-inset ring-white/5">
-                    +{post.data.tags.length - 3}
-                  </span>
-                )}
+              <div className="relative z-10 mt-7 flex items-end justify-between gap-4">
+                <div className="flex flex-wrap gap-2">
+                  {post.data.tags.slice(0, 3).map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1 rounded-md border border-border bg-page px-2.5 py-1 text-xs font-medium text-secondary-foreground/85"
+                    >
+                      <Tag className="h-3 w-3" />
+                      {tag}
+                    </span>
+                  ))}
+                  {post.data.tags.length > 3 && (
+                    <span className="inline-flex items-center rounded-md border border-border bg-page px-2.5 py-1 text-xs font-medium text-secondary-foreground/85">
+                      +{post.data.tags.length - 3}
+                    </span>
+                  )}
+                </div>
+
+                <a
+                  href={`/blog/${post.slug}/`}
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition-colors hover:text-primary/85"
+                >
+                  Read
+                  <ArrowUpRight className="h-4 w-4" />
+                </a>
               </div>
             </article>
           ))}
         </div>
       ) : (
-        /* No Results Message */
-        <div className="mt-20 text-center animate-fade-in-up">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary/30 mb-4">
+        <div className="mt-20 text-center">
+          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full border border-border bg-secondary">
             <Search className="h-8 w-8 text-muted" />
           </div>
-          <p className="text-lg text-muted">No articles found matching your criteria.</p>
+          <p className="text-lg text-muted">
+            No articles found matching your criteria.
+          </p>
           <button
             onClick={() => {
               setSearchQuery("");
               setActiveTag("all");
             }}
-            className="mt-4 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+            className="mt-4 text-sm font-medium text-primary transition-colors hover:text-primary/80"
           >
             Clear search filters
           </button>
