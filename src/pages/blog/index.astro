@@ -1,53 +1,82 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import { getCollection } from "astro:content";
 
-const posts = [
-  {
-    title: "Why I'm Deepening My Java Skills in 2026",
-    slug: "why-im-deepening-java-skills-2026",
-    date: "2026-03-07",
-    summary:
-      "My plan to go deeper in Java outside work: from Java 8 to 25, JVM internals, performance, and weekly execution.",
-  },
-];
+const posts = (await getCollection("blog"))
+    .filter((post) => !post.data.draft)
+    .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 ---
 
 <Layout
-  title="Blog | Samir Bettahar"
-  description="Notes on software engineering, Java deep dives, experiments, and practical tools."
+    title="Blog | Samir Bettahar"
+    description="Notes on software engineering, Java deep dives, experiments, and practical tools."
 >
-  <section class="pt-28 pb-16">
-    <header class="max-w-3xl">
-      <p class="text-sm uppercase tracking-[0.2em] text-primary font-semibold">Samir's Blog</p>
-      <h1 class="mt-3 text-4xl md:text-5xl font-bold text-foreground tracking-tight">Building In Public</h1>
-      <p class="mt-5 text-lg text-muted leading-relaxed">
-        This blog is where I share my engineering journey, lessons learned, and practical experiments.
-      </p>
-    </header>
+    <section class="pt-28 pb-16">
+        <header class="max-w-3xl">
+            <p
+                class="text-sm uppercase tracking-[0.2em] text-primary font-semibold"
+            >
+                Samir's Blog
+            </p>
+            <h1
+                class="mt-3 text-4xl md:text-5xl font-bold text-foreground tracking-tight"
+            >
+                Building In Public
+            </h1>
+            <p class="mt-5 text-lg text-muted leading-relaxed">
+                This blog is where I share my engineering journey, lessons
+                learned, and practical experiments.
+            </p>
+        </header>
 
-    <section class="mt-10 rounded-2xl border border-border bg-secondary/40 p-6 md:p-8 max-w-4xl">
-      <h2 class="text-2xl font-bold text-foreground">Blog Goals</h2>
-      <ul class="mt-4 space-y-2 text-muted list-disc pl-5">
-        <li>Share real experience from day-to-day engineering decisions and trade-offs.</li>
-        <li>Document random side projects and "recreational programming" builds.</li>
-        <li>Publish practical notes on tools, workflows, and what actually works.</li>
-        <li>Track my Java deep-dive path with transparent progress and outcomes.</li>
-      </ul>
-    </section>
+        <section
+            class="mt-10 rounded-2xl border border-border bg-secondary/40 p-6 md:p-8 max-w-4xl"
+        >
+            <h2 class="text-2xl font-bold text-foreground">Blog Goals</h2>
+            <ul class="mt-4 space-y-2 text-muted list-disc pl-5">
+                <li>
+                    Share real experience from day-to-day engineering decisions
+                    and trade-offs.
+                </li>
+                <li>
+                    Document random side projects and "recreational programming"
+                    builds.
+                </li>
+                <li>
+                    Publish practical notes on tools, workflows, and what
+                    actually works.
+                </li>
+                <li>
+                    Track my Java deep-dive path with transparent progress and
+                    outcomes.
+                </li>
+            </ul>
+        </section>
 
-    <section class="mt-10">
-      <h2 class="text-2xl font-bold text-foreground">Posts</h2>
-      <div class="mt-5 grid gap-4">
-        {posts.map((post) => (
-          <article class="rounded-xl border border-border bg-page p-6 hover:border-primary/50 transition-colors">
-            <p class="text-sm text-muted">{post.date}</p>
-            <h3 class="mt-2 text-xl font-semibold text-foreground">
-              <a href={`/blog/${post.slug}/`} class="hover:text-primary transition-colors">{post.title}</a>
-            </h3>
-            <p class="mt-2 text-muted">{post.summary}</p>
-          </article>
-        ))}
-      </div>
+        <section class="mt-10">
+            <h2 class="text-2xl font-bold text-foreground">Posts</h2>
+            <div class="mt-5 grid gap-4">
+                {
+                    posts.map((post) => (
+                        <article class="rounded-xl border border-border bg-page p-6 hover:border-primary/50 transition-colors">
+                            <p class="text-sm text-muted">
+                                {post.data.pubDate.toISOString().slice(0, 10)}
+                            </p>
+                            <h3 class="mt-2 text-xl font-semibold text-foreground">
+                                <a
+                                    href={`/blog/${post.slug}/`}
+                                    class="hover:text-primary transition-colors"
+                                >
+                                    {post.data.title}
+                                </a>
+                            </h3>
+                            <p class="mt-2 text-muted">
+                                {post.data.description}
+                            </p>
+                        </article>
+                    ))
+                }
+            </div>
+        </section>
     </section>
-  </section>
 </Layout>

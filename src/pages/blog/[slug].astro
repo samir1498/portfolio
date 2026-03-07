@@ -1,0 +1,41 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props as { post: CollectionEntry<"blog"> };
+const { Content } = await post.render();
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+  <article class="pt-28 pb-16 max-w-3xl">
+    <a href="/blog/" class="text-sm font-medium text-primary hover:underline">← Back to blog</a>
+
+    <header class="mt-4">
+      <p class="text-sm text-muted">{post.data.pubDate.toISOString().slice(0, 10)}</p>
+      <h1 class="mt-2 text-4xl font-bold tracking-tight text-foreground">{post.data.title}</h1>
+      <p class="mt-4 text-lg text-muted leading-relaxed">{post.data.description}</p>
+    </header>
+
+    {post.data.tags.length > 0 && (
+      <ul class="mt-5 flex flex-wrap gap-2">
+        {post.data.tags.map((tag) => (
+          <li class="px-3 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground border border-border">
+            {tag}
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <section class="mt-10 prose prose-slate dark:prose-invert max-w-none prose-headings:tracking-tight prose-a:text-primary hover:prose-a:opacity-80">
+      <Content />
+    </section>
+  </article>
+</Layout>
