@@ -2,6 +2,7 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@astrojs/react";
+import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -17,7 +18,7 @@ export default defineConfig({
       },
     },
   },
-  integrations: [react(), sitemap()],
+  integrations: [mdx(), react(), sitemap()],
   output: "static",
   i18n: {
     defaultLocale: "en",

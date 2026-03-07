@@ -12,29 +12,36 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props as { post: CollectionEntry<"blog"> };
 const { Content } = await post.render();
+
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat("en", {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+  }).format(date);
 ---
 
 <Layout title={post.data.title} description={post.data.description}>
-  <article class="pt-28 pb-16 max-w-3xl">
-    <a href="/blog/" class="text-sm font-medium text-primary hover:underline">← Back to blog</a>
+  <article class="pt-28 pb-20 max-w-3xl mx-auto">
+    <a href="/blog/" class="inline-flex items-center text-sm font-medium text-primary hover:underline">← Back to blog</a>
 
-    <header class="mt-4">
-      <p class="text-sm text-muted">{post.data.pubDate.toISOString().slice(0, 10)}</p>
-      <h1 class="mt-2 text-4xl font-bold tracking-tight text-foreground">{post.data.title}</h1>
+    <header class="mt-5">
+      <p class="text-sm text-muted">{formatDate(post.data.pubDate)}</p>
+      <h1 class="mt-2 text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-tight">{post.data.title}</h1>
       <p class="mt-4 text-lg text-muted leading-relaxed">{post.data.description}</p>
+
+      {post.data.tags.length > 0 && (
+        <ul class="mt-5 flex flex-wrap gap-2">
+          {post.data.tags.map((tag) => (
+            <li class="px-2.5 py-1 rounded-full text-xs font-medium bg-secondary border border-border text-secondary-foreground">
+              {tag}
+            </li>
+          ))}
+        </ul>
+      )}
     </header>
 
-    {post.data.tags.length > 0 && (
-      <ul class="mt-5 flex flex-wrap gap-2">
-        {post.data.tags.map((tag) => (
-          <li class="px-3 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground border border-border">
-            {tag}
-          </li>
-        ))}
-      </ul>
-    )}
-
-    <section class="mt-10 prose prose-slate dark:prose-invert max-w-none prose-headings:tracking-tight prose-a:text-primary hover:prose-a:opacity-80">
+    <section class="blog-content mt-10 rounded-2xl border border-border bg-page p-6 md:p-8">
       <Content />
     </section>
   </article>

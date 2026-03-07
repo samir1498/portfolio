@@ -19,14 +19,16 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
 
     // Sync state with prop if it changes (though usually page reloads)
     setCurrentLang(lang);
-    setIsBlogPage(window.location.pathname.startsWith("/blog"));
+    const blogPath = window.location.pathname.startsWith("/blog");
+    setIsBlogPage(blogPath);
+    setScrolled(blogPath || window.scrollY > 20);
 
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(blogPath || window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lang]);
 
   const toggleTheme = () => {
     const newIsDark = !isDark;
