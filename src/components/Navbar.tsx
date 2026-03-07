@@ -11,6 +11,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [currentLang, setCurrentLang] = useState<string>(lang);
+  const [isBlogPage, setIsBlogPage] = useState(false);
 
   useEffect(() => {
     // Check initial theme
@@ -18,6 +19,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
 
     // Sync state with prop if it changes (though usually page reloads)
     setCurrentLang(lang);
+    setIsBlogPage(window.location.pathname.startsWith("/blog"));
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -39,8 +41,8 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
         currentLang === "ar"
           ? "نبذة عني"
           : currentLang === "fr"
-          ? "À propos"
-          : "About",
+            ? "À propos"
+            : "About",
       href: "#about",
     },
     {
@@ -48,8 +50,8 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
         currentLang === "ar"
           ? "المهارات"
           : currentLang === "fr"
-          ? "Compétences"
-          : "Skills",
+            ? "Compétences"
+            : "Skills",
       href: "#skills",
     },
     {
@@ -57,8 +59,8 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
         currentLang === "ar"
           ? "الخبرة"
           : currentLang === "fr"
-          ? "Expérience"
-          : "Experience",
+            ? "Expérience"
+            : "Experience",
       href: "#experience",
     },
     {
@@ -66,8 +68,8 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
         currentLang === "ar"
           ? "التعليم"
           : currentLang === "fr"
-          ? "Formation"
-          : "Academic",
+            ? "Formation"
+            : "Academic",
       href: "#academic",
     },
     {
@@ -75,15 +77,22 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
         currentLang === "ar"
           ? "المشاريع"
           : currentLang === "fr"
-          ? "Projets"
-          : "Projects",
+            ? "Projets"
+            : "Projects",
       href: "#showcase",
     },
     {
       name: currentLang === "ar" ? "تواصل" : "Contact",
       href: "#contact",
     },
+    {
+      name: currentLang === "ar" ? "المدونة" : "Blog",
+      href: "/blog",
+    },
   ];
+
+  const withPrefix = (href: string) =>
+    isBlogPage && href.startsWith("#") ? `/${href}` : href;
 
   return (
     <nav
@@ -108,7 +117,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
               {navLinks.map((link) => (
                 <a
                   key={link.name}
-                  href={link.href}
+                  href={withPrefix(link.href)}
                   className="text-muted hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   {link.name}
@@ -174,7 +183,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
           {navLinks.map((link) => (
             <a
               key={link.name}
-              href={link.href}
+              href={withPrefix(link.href)}
               onClick={() => setIsOpen(false)}
               className="text-muted hover:text-primary block px-3 py-2 rounded-md text-base font-medium"
             >
