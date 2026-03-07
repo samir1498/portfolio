@@ -5,12 +5,24 @@ import { type Lang, getLocalizedData } from "@/data";
 
 // Web3Forms access key
 const WEB3FORMS_ACCESS_KEY = "96fbb359-4d6b-4c3e-a7c4-fa7ec80a7bda";
+const RATE_LIMIT_WINDOW_MS = 30_000;
+const MAX_NAME_LENGTH = 80;
+const MAX_EMAIL_LENGTH = 254;
+const MIN_MESSAGE_LENGTH = 10;
+const MAX_MESSAGE_LENGTH = 2000;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface ContactProps {
   lang: Lang;
 }
 
-type FormStatus = "idle" | "loading" | "success" | "error";
+type FormStatus =
+  | "idle"
+  | "loading"
+  | "success"
+  | "error"
+  | "invalid"
+  | "rate_limited";
 
 const Contact: React.FC<ContactProps> = ({ lang }) => {
   const { SECTIONS, CONTACT_FORM } = getLocalizedData(lang);
@@ -19,17 +31,55 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
     name: "",
     email: "",
     message: "",
+    website: "",
   });
   const [status, setStatus] = useState<FormStatus>("idle");
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Honeypot field should stay empty; bots often fill all inputs.
+    if (formData.website.trim() !== "") {
+      setStatus("success");
+      setFormData({ name: "", email: "", message: "", website: "" });
+      return;
+    }
+
+    const now = Date.now();
+    const lastSubmitAt = Number(
+      globalThis.localStorage?.getItem("portfolio-contact-last-submit-at") ??
+        "0",
+    );
+    if (now - lastSubmitAt < RATE_LIMIT_WINDOW_MS) {
+      setStatus("rate_limited");
+      setTimeout(() => setStatus("idle"), 5000);
+      return;
+    }
+
+    const name = formData.name.trim();
+    const email = formData.email.trim();
+    const message = formData.message.trim();
+    const isValid =
+      name.length > 0 &&
+      name.length <= MAX_NAME_LENGTH &&
+      email.length > 0 &&
+      email.length <= MAX_EMAIL_LENGTH &&
+      EMAIL_PATTERN.test(email) &&
+      message.length >= MIN_MESSAGE_LENGTH &&
+      message.length <= MAX_MESSAGE_LENGTH;
+
+    if (!isValid) {
+      setStatus("invalid");
+      setTimeout(() => setStatus("idle"), 5000);
+      return;
+    }
+
     setStatus("loading");
 
     try {
@@ -41,18 +91,22 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
         },
         body: JSON.stringify({
           access_key: WEB3FORMS_ACCESS_KEY,
-          name: formData.name,
-          email: formData.email,
-          message: formData.message,
-          subject: `Portfolio Contact: ${formData.name}`,
+          name,
+          email,
+          message,
+          subject: `Portfolio Contact: ${name}`,
         }),
       });
 
       const result = await response.json();
 
       if (result.success) {
+        globalThis.localStorage?.setItem(
+          "portfolio-contact-last-submit-at",
+          String(now),
+        );
         setStatus("success");
-        setFormData({ name: "", email: "", message: "" });
+        setFormData({ name: "", email: "", message: "", website: "" });
         // Reset to idle after 5 seconds
         setTimeout(() => setStatus("idle"), 5000);
       } else {
@@ -70,14 +124,26 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
       lang === "ar"
         ? "تم إرسال الرسالة!"
         : lang === "fr"
-        ? "Message envoyé !"
-        : "Message sent!",
+          ? "Message envoyé !"
+          : "Message sent!",
     error:
       lang === "ar"
         ? "خطأ. حاول مرة أخرى."
         : lang === "fr"
-        ? "Erreur. Réessayez."
-        : "Error. Please try again.",
+          ? "Erreur. Réessayez."
+          : "Error. Please try again.",
+    invalid:
+      lang === "ar"
+        ? "تحقق من البيانات المدخلة."
+        : lang === "fr"
+          ? "Vérifiez les données saisies."
+          : "Please check your input.",
+    rate_limited:
+      lang === "ar"
+        ? "يرجى الانتظار قبل إرسال رسالة أخرى."
+        : lang === "fr"
+          ? "Veuillez attendre avant d'envoyer un autre message."
+          : "Please wait before sending another message.",
   };
 
   return (
@@ -147,6 +213,7 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
                 value={formData.name}
                 onChange={handleChange}
                 required
+                maxLength={MAX_NAME_LENGTH}
                 className="w-full px-4 py-3 bg-page border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-foreground transition-all placeholder:text-muted"
                 placeholder={CONTACT_FORM.placeholderName}
               />
@@ -164,6 +231,7 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                maxLength={MAX_EMAIL_LENGTH}
                 className="w-full px-4 py-3 bg-page border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-foreground transition-all placeholder:text-muted"
                 placeholder={CONTACT_FORM.placeholderEmail}
               />
@@ -181,9 +249,23 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
                 value={formData.message}
                 onChange={handleChange}
                 required
+                minLength={MIN_MESSAGE_LENGTH}
+                maxLength={MAX_MESSAGE_LENGTH}
                 className="w-full px-4 py-3 bg-page border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-foreground transition-all placeholder:text-muted resize-none"
                 placeholder={CONTACT_FORM.placeholderMessage}
               ></textarea>
+            </div>
+
+            <div className="hidden" aria-hidden="true">
+              <label htmlFor="website">Website</label>
+              <input
+                type="text"
+                id="website"
+                tabIndex={-1}
+                autoComplete="off"
+                value={formData.website}
+                onChange={handleChange}
+              />
             </div>
 
             {/* Status Messages */}
@@ -197,6 +279,18 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
               <div className="flex items-center gap-2 text-red-500 bg-red-500/10 p-3 rounded-lg">
                 <AlertCircle className="w-5 h-5 rtl:ml-2 ltr:mr-2" />
                 <span>{statusMessages.error}</span>
+              </div>
+            )}
+            {status === "invalid" && (
+              <div className="flex items-center gap-2 text-amber-500 bg-amber-500/10 p-3 rounded-lg">
+                <AlertCircle className="w-5 h-5 rtl:ml-2 ltr:mr-2" />
+                <span>{statusMessages.invalid}</span>
+              </div>
+            )}
+            {status === "rate_limited" && (
+              <div className="flex items-center gap-2 text-amber-500 bg-amber-500/10 p-3 rounded-lg">
+                <AlertCircle className="w-5 h-5 rtl:ml-2 ltr:mr-2" />
+                <span>{statusMessages.rate_limited}</span>
               </div>
             )}
 
@@ -214,8 +308,8 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
                 ? lang === "ar"
                   ? "جاري الإرسال..."
                   : lang === "fr"
-                  ? "Envoi..."
-                  : "Sending..."
+                    ? "Envoi..."
+                    : "Sending..."
                 : CONTACT_FORM.send}
             </button>
           </form>

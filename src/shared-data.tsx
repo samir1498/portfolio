@@ -1,6 +1,5 @@
 import type { Experience, Education, Project, SkillCategory } from "./types";
 
-
 // Simple SVG icon components for brands (Lucide deprecated brand icons)
 const GithubIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
@@ -14,6 +13,12 @@ const LinkedinIcon = () => (
   </svg>
 );
 
+const EmailIcon = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+    <path d="M1.5 6A2.5 2.5 0 0 1 4 3.5h16A2.5 2.5 0 0 1 22.5 6v12a2.5 2.5 0 0 1-2.5 2.5H4A2.5 2.5 0 0 1 1.5 18V6zm2.39-.5 8.11 6.09 8.11-6.09H3.89zm16.61 2.5-7.75 5.82a1.25 1.25 0 0 1-1.5 0L3.5 8v10a.5.5 0 0 0 .5.5h16a.5.5 0 0 0 .5-.5V8z" />
+  </svg>
+);
+
 export const PERSONAL_INFO = {
   name: "Bettahar Samir",
   title: "Software Engineer",
@@ -21,7 +26,7 @@ export const PERSONAL_INFO = {
     "Full-stack software engineer specialized in modern web and mobile application development with React, React Native, Next.js, TypeScript, and Tailwind CSS. Experienced in designing and integrating REST APIs using NestJS and Fastify, implementing authentication, and building fast, maintainable, and user-friendly interfaces.",
   contact: {
     phone: "(+213) 675 24 84 41",
-    email: "Bettahar.Samir@outlook.com",
+    email: "contact@samir-bettahar.dev",
     github: "samir1498",
     linkedin: "samir-bettahar",
     location: "Algiers, Algeria",
@@ -30,6 +35,12 @@ export const PERSONAL_INFO = {
 };
 
 export const SOCIAL_LINKS = [
+  {
+    icon: EmailIcon,
+    label: "Email",
+    href: `mailto:${PERSONAL_INFO.contact.email}`,
+    value: PERSONAL_INFO.contact.email,
+  },
   {
     icon: LinkedinIcon,
     label: "LinkedIn",
