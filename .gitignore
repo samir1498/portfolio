@@ -2,3 +2,5 @@ node_modules
 .astro
 dist
 lighthouse-report.json
+.unlighthouse
+.unlighthouse-ci

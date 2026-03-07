@@ -1,0 +1,74 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
+
+export async function getStaticPaths() {
+    const posts = await getCollection("blog", ({ data }) => !data.draft);
+    return posts.map((post) => ({
+        params: { slug: post.slug },
+        props: { post },
+    }));
+}
+
+const { post } = Astro.props as { post: CollectionEntry<"blog"> };
+const { Content } = await post.render();
+const ogImage = post.data.ogImage || "/og/default.png";
+const ogImageAlt =
+    post.data.ogImageAlt || `${post.data.title} social preview image`;
+
+const formatDate = (date: Date) =>
+    new Intl.DateTimeFormat("en", {
+        year: "numeric",
+        month: "long",
+        day: "2-digit",
+    }).format(date);
+---
+
+<Layout
+    title={post.data.title}
+    description={post.data.description}
+    ogType="article"
+    ogImage={ogImage}
+    ogImageAlt={ogImageAlt}
+    publishedTime={post.data.pubDate}
+    modifiedTime={post.data.updatedDate}
+    articleTags={post.data.tags}
+>
+    <article class="pt-28 pb-20 max-w-3xl mx-auto">
+        <a
+            href="/blog/"
+            class="inline-flex items-center text-sm font-medium text-primary hover:underline"
+            >← Back to blog</a
+        >
+
+        <header class="mt-5">
+            <p class="text-sm text-muted">{formatDate(post.data.pubDate)}</p>
+            <h1
+                class="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-foreground leading-tight"
+            >
+                {post.data.title}
+            </h1>
+            <p class="mt-4 text-base md:text-lg text-muted leading-relaxed">
+                {post.data.description}
+            </p>
+
+            {
+                post.data.tags.length > 0 && (
+                    <ul class="mt-5 flex flex-wrap gap-2">
+                        {post.data.tags.map((tag) => (
+                            <li class="px-2.5 py-1 rounded-full text-xs font-medium bg-secondary border border-border text-secondary-foreground">
+                                {tag}
+                            </li>
+                        ))}
+                    </ul>
+                )
+            }
+        </header>
+
+        <section
+            class="mt-8 rounded-2xl border border-border/80 bg-secondary/20 p-6 md:p-8 text-base leading-8 text-secondary-foreground [&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:leading-tight [&_h2]:text-foreground [&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-foreground [&_p]:mt-4 [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mt-2 [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-4 [&_strong]:font-bold [&_strong]:text-foreground"
+        >
+            <Content />
+        </section>
+    </article>
+</Layout>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Menu, X, Code2, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 interface NavbarProps {
@@ -11,6 +11,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [currentLang, setCurrentLang] = useState<string>(lang);
+  const [isBlogPage, setIsBlogPage] = useState(false);
 
   useEffect(() => {
     // Check initial theme
@@ -18,13 +19,16 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
 
     // Sync state with prop if it changes (though usually page reloads)
     setCurrentLang(lang);
+    const blogPath = window.location.pathname.startsWith("/blog");
+    setIsBlogPage(blogPath);
+    setScrolled(blogPath || window.scrollY > 20);
 
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(blogPath || window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lang]);
 
   const toggleTheme = () => {
     const newIsDark = !isDark;
@@ -39,8 +43,8 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
         currentLang === "ar"
           ? "نبذة عني"
           : currentLang === "fr"
-          ? "À propos"
-          : "About",
+            ? "À propos"
+            : "About",
       href: "#about",
     },
     {
@@ -48,8 +52,8 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
         currentLang === "ar"
           ? "المهارات"
           : currentLang === "fr"
-          ? "Compétences"
-          : "Skills",
+            ? "Compétences"
+            : "Skills",
       href: "#skills",
     },
     {
@@ -57,8 +61,8 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
         currentLang === "ar"
           ? "الخبرة"
           : currentLang === "fr"
-          ? "Expérience"
-          : "Experience",
+            ? "Expérience"
+            : "Experience",
       href: "#experience",
     },
     {
@@ -66,8 +70,8 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
         currentLang === "ar"
           ? "التعليم"
           : currentLang === "fr"
-          ? "Formation"
-          : "Academic",
+            ? "Formation"
+            : "Academic",
       href: "#academic",
     },
     {
@@ -75,15 +79,24 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
         currentLang === "ar"
           ? "المشاريع"
           : currentLang === "fr"
-          ? "Projets"
-          : "Projects",
+            ? "Projets"
+            : "Projects",
       href: "#showcase",
     },
     {
       name: currentLang === "ar" ? "تواصل" : "Contact",
       href: "#contact",
     },
+    {
+      name: currentLang === "ar" ? "المدونة" : "Blog",
+      href: "/blog",
+    },
   ];
+
+  const withPrefix = (href: string) =>
+    isBlogPage && href.startsWith("#") ? `/${href}` : href;
+  const homeHref =
+    currentLang === "fr" || currentLang === "ar" ? `/${currentLang}` : "/";
 
   return (
     <nav
@@ -95,12 +108,19 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex-shrink-0 flex items-center gap-2">
-            <div className="bg-primary/10 p-1.5 rounded-lg">
-              <Code2 className="w-6 h-6 text-primary" />
-            </div>
+          <a
+            href={homeHref}
+            onClick={() => setIsOpen(false)}
+            className="flex-shrink-0 flex items-center gap-2 group"
+            aria-label="Go to homepage"
+          >
+            <img
+              src="/brand/logo-mark.svg"
+              alt="Samir.Dev logo"
+              className="w-9 h-9 rounded-lg ring-1 ring-primary/20 group-hover:ring-primary/45 transition-all"
+            />
             <span className="text-xl font-bold text-foreground">Samir.Dev</span>
-          </div>
+          </a>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-4">
@@ -108,7 +128,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
               {navLinks.map((link) => (
                 <a
                   key={link.name}
-                  href={link.href}
+                  href={withPrefix(link.href)}
                   className="text-muted hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   {link.name}
@@ -174,7 +194,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
           {navLinks.map((link) => (
             <a
               key={link.name}
-              href={link.href}
+              href={withPrefix(link.href)}
               onClick={() => setIsOpen(false)}
               className="text-muted hover:text-primary block px-3 py-2 rounded-md text-base font-medium"
             >

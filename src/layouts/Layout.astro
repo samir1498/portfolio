@@ -10,66 +10,93 @@ const lang = getLangFromUrl(Astro.url);
 const dir = isRtl(lang) ? "rtl" : "ltr";
 
 interface Props {
-  title?: string;
-  description?: string;
+    title?: string;
+    description?: string;
+    fullWidth?: boolean;
+    ogImage?: string;
+    ogImageAlt?: string;
+    ogType?: "website" | "article";
+    publishedTime?: string | Date;
+    modifiedTime?: string | Date;
+    articleTags?: string[];
 }
 
-const { title, description } = Astro.props;
+const {
+    title,
+    description,
+    fullWidth = false,
+    ogImage,
+    ogImageAlt,
+    ogType,
+    publishedTime,
+    modifiedTime,
+    articleTags,
+} = Astro.props;
 
 const seoConfig = getSeoConfig({
-  title,
-  description,
-  lang,
-  pathname: Astro.url.pathname,
+    title,
+    description,
+    lang,
+    pathname: Astro.url.pathname,
+    ogImage,
+    ogImageAlt,
+    ogType,
+    publishedTime,
+    modifiedTime,
+    articleTags,
 });
 ---
 
 <!doctype html>
 <html lang={lang} dir={dir} class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="generator" content={Astro.generator} />
-    <SEO {...seoConfig} />
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="generator" content={Astro.generator} />
+        <SEO {...seoConfig} />
 
-    <!-- Theme initialization -->
-    <script is:inline>
-      if (
-        localStorage.theme === "dark" ||
-        (!("theme" in localStorage) &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches)
-      ) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    </script>
-  </head>
-  <body
-    class="bg-page text-foreground antialiased overflow-x-hidden transition-colors duration-300"
-  >
-    <Navbar client:load lang={lang} />
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <slot />
-    </main>
-    <script is:inline>
-      // Intersection Observer for scroll-triggered animations
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("in-view");
+        <!-- Theme initialization -->
+        <script is:inline>
+            if (
+                localStorage.theme === "dark" ||
+                (!("theme" in localStorage) &&
+                    window.matchMedia("(prefers-color-scheme: dark)").matches)
+            ) {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
             }
-          });
-        },
-        { threshold: 0.1 }
-      );
+        </script>
+    </head>
+    <body
+        class="bg-page text-foreground antialiased overflow-x-hidden transition-colors duration-300"
+    >
+        <Navbar client:load lang={lang} />
+        <main
+            class={fullWidth
+                ? "w-full"
+                : "max-w-6xl mx-auto px-4 sm:px-6 lg:px-8"}
+        >
+            <slot />
+        </main>
+        <script is:inline>
+            // Intersection Observer for scroll-triggered animations
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("in-view");
+                        }
+                    });
+                },
+                { threshold: 0.1 },
+            );
 
-      document
-        .querySelectorAll(".animate-fade-in-up, .animate-fade-in-left")
-        .forEach((el) => {
-          observer.observe(el);
-        });
-    </script>
-  </body>
+            document
+                .querySelectorAll(".animate-fade-in-up, .animate-fade-in-left")
+                .forEach((el) => {
+                    observer.observe(el);
+                });
+        </script>
+    </body>
 </html>

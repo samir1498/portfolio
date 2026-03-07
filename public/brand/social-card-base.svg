@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Samir.Dev social card base">
+  <defs>
+    <linearGradient id="bgGradient" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#020617" />
+      <stop offset="1" stop-color="#0b1735" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bgGradient)" />
+  <circle cx="1080" cy="90" r="150" fill="#3b82f6" fill-opacity="0.18" />
+  <circle cx="130" cy="560" r="180" fill="#3b82f6" fill-opacity="0.12" />
+  <circle cx="720" cy="300" r="120" fill="#3b82f6" fill-opacity="0.10" />
+  <rect x="0" y="545" width="1200" height="85" fill="#1e40af" fill-opacity="0.28" />
+  <text x="72" y="92" fill="#93c5fd" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="32">samir-bettahar.dev</text>
+  <text x="72" y="206" fill="#f8fafc" font-family="Poppins, Segoe UI, Arial, sans-serif" font-size="88" font-weight="700">Build in Public</text>
+  <text x="72" y="286" fill="#60a5fa" font-family="Poppins, Segoe UI, Arial, sans-serif" font-size="88" font-weight="700">Ship with Clarity</text>
+</svg>
