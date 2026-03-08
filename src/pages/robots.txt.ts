@@ -3,13 +3,11 @@ import type { APIRoute } from "astro";
 const buildRobotsTxt = (site: URL | undefined) => {
   const base = site ?? new URL("https://samir-bettahar.dev");
   const sitemapIndex = new URL("/sitemap-index.xml", base).toString();
-  const sitemapAlias = new URL("/sitemap.xml", base).toString();
 
   return `User-agent: *
 Allow: /
 
 Sitemap: ${sitemapIndex}
-Sitemap: ${sitemapAlias}
 `;
 };
 
