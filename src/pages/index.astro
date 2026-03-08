@@ -12,12 +12,12 @@ import Layout from "@/layouts/Layout.astro";
 const lang = "en";
 ---
 
-<Layout title="Samir Bettahar - Portfolio">
-  <Hero lang={lang} />
-  <Experience lang={lang} />
-  <Skills lang={lang} />
-  <Academic lang={lang} />
-  <Portfolio lang={lang} />
-  <Contact lang={lang} client:visible />
-  <Footer />
+<Layout>
+    <Hero lang={lang} />
+    <Experience lang={lang} />
+    <Skills lang={lang} />
+    <Academic lang={lang} />
+    <Portfolio lang={lang} />
+    <Contact lang={lang} client:visible />
+    <Footer />
 </Layout>
