@@ -1,46 +1,46 @@
-# Astro Starter Kit: Basics
+# samir-bettahar.dev
 
-```sh
-pnpm create astro@latest -- --template basics
+Personal portfolio and blog built with Astro + React + Tailwind.
+
+## Tech Stack
+- Astro 5
+- React 19
+- Tailwind CSS 4
+- MDX + Astro Content Collections
+- Cloudflare Pages deployment
+
+## Features
+- Multilingual portfolio sections (`en`, `fr`, `ar`)
+- Blog powered by content collections (`src/content/blog`)
+- Per-page and per-post SEO metadata
+- Contact form integration via Web3Forms
+
+## Local Development
+```bash
+pnpm install
+pnpm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Site runs at `http://localhost:4321`.
 
-## 🚀 Project Structure
+## Commands
+- `pnpm run dev`: start local dev server
+- `pnpm run build`: production build
+- `pnpm run preview`: preview production build locally
+- `pnpm run check`: Astro type/content checks
+- `pnpm run audit:dev`: local Unlighthouse scan against `localhost:4321`
 
-Inside of your Astro project, you'll see the following folders and files:
+## Public Repo Safety
+Before making the repo public, verify:
+- No private API tokens/keys are committed
+- Deployment config contains no secrets (`wrangler.jsonc` is safe)
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+## Project Structure
+- `src/components`: UI components
+- `src/pages`: routes (`/`, `/blog`, etc.)
+- `src/content/blog`: blog posts (MDX)
+- `public`: static assets
+- `scripts`: helper scripts
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Deployment
+Configured for static output (`astro build`) and Cloudflare Pages.

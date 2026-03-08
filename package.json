@@ -9,16 +9,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
-    "prepare": "husky",
-    "audit:scan": "unlighthouse --output-path .unlighthouse --mobile --samples 3 --throttle --no-cache",
-    "audit:ci": "unlighthouse-ci --output-path .unlighthouse-ci --mobile --samples 2 --throttle --no-cache --reporter jsonExpanded --budget 80",
-    "audit:analyze": "bash scripts/analyze-unlighthouse.sh .unlighthouse-ci/ci-result.json .unlighthouse-ci/analysis",
-    "audit:scan:dev": "pnpm run audit:scan --site http://localhost:4321",
-    "audit:scan:prod": "pnpm run audit:scan --site https://samir-bettahar.dev",
-    "audit:ci:dev": "pnpm run audit:ci --site http://localhost:4321",
-    "audit:ci:prod": "pnpm run audit:ci --site https://samir-bettahar.dev",
-    "audit:full:dev": "sh -c 'pnpm run audit:ci:dev || true; pnpm run audit:analyze'",
-    "audit:full:prod": "sh -c 'pnpm run audit:ci:prod || true; pnpm run audit:analyze'"
+    "audit:dev": "unlighthouse --site http://localhost:4321 --output-path .unlighthouse --mobile --samples 2 --throttle --no-cache"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
@@ -38,7 +29,6 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "husky": "^9.1.7",
     "unlighthouse": "^0.17.7"
   }
 }

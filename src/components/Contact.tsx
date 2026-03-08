@@ -3,7 +3,6 @@ import { SOCIAL_LINKS } from "@/shared-data";
 import { Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { type Lang, getLocalizedData } from "@/data";
 
-// Web3Forms access key
 const WEB3FORMS_ACCESS_KEY = "96fbb359-4d6b-4c3e-a7c4-fa7ec80a7bda";
 const RATE_LIMIT_WINDOW_MS = 30_000;
 const MAX_NAME_LENGTH = 80;
@@ -44,7 +43,6 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Honeypot field should stay empty; bots often fill all inputs.
     if (formData.website.trim() !== "") {
       setStatus("success");
       setFormData({ name: "", email: "", message: "", website: "" });
@@ -107,7 +105,6 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
         );
         setStatus("success");
         setFormData({ name: "", email: "", message: "", website: "" });
-        // Reset to idle after 5 seconds
         setTimeout(() => setStatus("idle"), 5000);
       } else {
         setStatus("error");
@@ -268,7 +265,6 @@ const Contact: React.FC<ContactProps> = ({ lang }) => {
               />
             </div>
 
-            {/* Status Messages */}
             {status === "success" && (
               <div className="flex items-center gap-2 text-green-500 bg-green-500/10 p-3 rounded-lg">
                 <CheckCircle className="w-5 h-5 rtl:ml-2 ltr:mr-2" />

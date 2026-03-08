@@ -4,3 +4,4 @@ dist
 lighthouse-report.json
 .unlighthouse
 .unlighthouse-ci
+.DS_Store
