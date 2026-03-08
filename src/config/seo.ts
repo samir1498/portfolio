@@ -1,11 +1,8 @@
-// src/config/seo.ts
-// Shared SEO configuration for the portfolio
-
 export const siteConfig = {
   siteUrl: "https://samir-bettahar.dev",
-  defaultTitle: "Samir Bettahar - Software Engineer",
+  defaultTitle: "Samir.Dev | Full-Stack Software Engineer",
   defaultDescription:
-    "Full-stack software engineer specialized in React, TypeScript, Next.js, and modern web development. View my portfolio and get in touch.",
+    "Full-stack software engineer building modern web apps, scalable backend services, and practical engineering workflows.",
   ogImage: "/og/default.png",
   favicon: "/brand/favicon-brand.svg",
 };
@@ -43,7 +40,7 @@ export function getSeoConfig(options?: {
     articleTags = [],
   } = options || {};
 
-  const canonicalUrl = `${siteConfig.siteUrl}${pathname}`;
+  const canonicalUrl = new URL(pathname, siteConfig.siteUrl).toString();
   const ogImageUrl = toAbsoluteUrl(ogImage || siteConfig.ogImage);
   const openGraphImageAlt = ogImageAlt || `${title} preview image`;
 
@@ -61,7 +58,6 @@ export function getSeoConfig(options?: {
       optional: {
         description,
         locale: lang === "fr" ? "fr_FR" : lang === "ar" ? "ar_DZ" : "en_US",
-        siteName: "Samir Bettahar Portfolio",
       },
       image: {
         url: ogImageUrl,
@@ -87,8 +83,8 @@ export function getSeoConfig(options?: {
     },
     extend: {
       link: [
-        { rel: "icon", type: "image/png", href: siteConfig.favicon },
-        { rel: "apple-touch-icon", href: siteConfig.favicon },
+        { rel: "icon", type: "image/svg+xml", href: siteConfig.favicon },
+        { rel: "apple-touch-icon", href: "/brand/logo-mark-256.png" },
       ],
       meta: [],
     },

@@ -53,6 +53,13 @@ const seoConfig = getSeoConfig({
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="generator" content={Astro.generator} />
+        <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Samir.Dev Blog RSS"
+            href="/rss.xml"
+        />
         <SEO {...seoConfig} />
 
         <!-- Theme initialization -->

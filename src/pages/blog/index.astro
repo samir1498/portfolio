@@ -12,10 +12,8 @@ const estimateReadingTime = (text: string) => {
     return Math.max(1, Math.ceil(wordCount / 220));
 };
 
-// Get all unique tags
 const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 
-// Prepare data for React component (serialize if necessary, though Astro handles simple objects well)
 const serializedPosts = posts.map((post) => ({
     slug: post.slug,
     data: {
@@ -29,15 +27,14 @@ const serializedPosts = posts.map((post) => ({
 ---
 
 <Layout
-    title="Blog | Samir Bettahar"
-    description="Engineering notes, Java deep dives, random builds, and practical tool workflows."
+    title="Blog | Samir.Dev"
+    description="Engineering notes, Java deep dives, experiments, and practical software lessons."
     ogImage="/og/blog-index.png"
-    ogImageAlt="Samir Bettahar blog index preview image"
+    ogImageAlt="Samir.Dev blog index preview image"
     fullWidth={true}
 >
     <div class="min-h-screen w-full pb-20 pt-32">
         <div class="container mx-auto px-4 md:px-6">
-            {/* Hero Section */}
             <div class="mx-auto max-w-4xl text-center">
                 <div
                     class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary border border-border text-muted text-xs font-medium mb-6"
@@ -58,8 +55,26 @@ const serializedPosts = posts.map((post) => ({
                     A collection of technical deep dives, random experiments,
                     and notes on software engineering.
                 </p>
+                <div class="mt-6 flex justify-center">
+                    <a
+                        href="/rss.xml"
+                        class="inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground transition-colors hover:border-primary/50 hover:text-primary"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            class="h-4 w-4"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M6.18 17.82A1.64 1.64 0 1 1 6.18 21.1A1.64 1.64 0 0 1 6.18 17.82ZM3 10.14V13.5C6.95 13.5 10.5 17.05 10.5 21H13.86C13.86 15.19 8.81 10.14 3 10.14ZM3 3V6.36C11.62 6.36 18.64 13.38 18.64 22H22C22 11.56 13.44 3 3 3Z"
+                            ></path>
+                        </svg>
+                        RSS
+                    </a>
+                </div>
 
-                {/* React Blog List Component */}
                 <BlogList
                     client:load
                     initialPosts={serializedPosts}
