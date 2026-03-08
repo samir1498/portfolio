@@ -15,6 +15,10 @@ const { Content } = await post.render();
 const ogImage = post.data.ogImage || "/og/default.png";
 const ogImageAlt =
     post.data.ogImageAlt || `${post.data.title} social preview image`;
+const readingTimeMinutes = Math.max(
+    1,
+    Math.ceil(post.body.trim().split(/\s+/).filter(Boolean).length / 220),
+);
 
 const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("en", {
@@ -42,7 +46,9 @@ const formatDate = (date: Date) =>
         >
 
         <header class="mt-5">
-            <p class="text-sm text-muted">{formatDate(post.data.pubDate)}</p>
+            <p class="text-sm text-muted">
+                {formatDate(post.data.pubDate)} • {readingTimeMinutes} min read
+            </p>
             <h1
                 class="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-foreground leading-tight"
             >
@@ -51,6 +57,18 @@ const formatDate = (date: Date) =>
             <p class="mt-4 text-base md:text-lg text-muted leading-relaxed">
                 {post.data.description}
             </p>
+            {
+                post.data.tldr && (
+                    <div class="mt-5 rounded-xl border border-border bg-page p-4 text-left">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-muted">
+                            TL;DR
+                        </p>
+                        <p class="mt-2 text-sm leading-relaxed text-secondary-foreground">
+                            {post.data.tldr}
+                        </p>
+                    </div>
+                )
+            }
 
             {
                 post.data.tags.length > 0 && (

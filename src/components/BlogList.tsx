@@ -1,5 +1,12 @@
 import { useMemo, useState } from "react";
-import { Search, Calendar, Tag, XCircle, ArrowUpRight } from "lucide-react";
+import {
+  Search,
+  Calendar,
+  Clock3,
+  Tag,
+  XCircle,
+  ArrowUpRight,
+} from "lucide-react";
 
 interface Post {
   slug: string;
@@ -8,6 +15,7 @@ interface Post {
     description: string;
     pubDate: Date;
     tags: string[];
+    readingTime: number;
   };
 }
 
@@ -110,13 +118,19 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
             >
               <div className="relative z-10">
                 <div className="mb-4 flex items-center justify-between gap-2">
-                  <time
-                    dateTime={new Date(post.data.pubDate).toISOString()}
-                    className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted"
-                  >
-                    <Calendar className="h-3 w-3" />
-                    {formatDate(post.data.pubDate)}
-                  </time>
+                  <div className="flex items-center gap-3">
+                    <time
+                      dateTime={new Date(post.data.pubDate).toISOString()}
+                      className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted"
+                    >
+                      <Calendar className="h-3 w-3" />
+                      {formatDate(post.data.pubDate)}
+                    </time>
+                    <span className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted">
+                      <Clock3 className="h-3 w-3" />
+                      {post.data.readingTime} min read
+                    </span>
+                  </div>
                   <div className="mx-3 h-px flex-1 bg-border/40 transition-colors group-hover:bg-primary/35" />
                 </div>
 

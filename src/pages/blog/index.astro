@@ -7,6 +7,11 @@ const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
     (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
 );
 
+const estimateReadingTime = (text: string) => {
+    const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.ceil(wordCount / 220));
+};
+
 // Get all unique tags
 const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 
@@ -18,6 +23,7 @@ const serializedPosts = posts.map((post) => ({
         description: post.data.description,
         pubDate: post.data.pubDate,
         tags: post.data.tags,
+        readingTime: estimateReadingTime(post.body),
     },
 }));
 ---
