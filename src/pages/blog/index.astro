@@ -12,10 +12,8 @@ const estimateReadingTime = (text: string) => {
     return Math.max(1, Math.ceil(wordCount / 220));
 };
 
-// Get all unique tags
 const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 
-// Prepare data for React component (serialize if necessary, though Astro handles simple objects well)
 const serializedPosts = posts.map((post) => ({
     slug: post.slug,
     data: {
@@ -37,7 +35,6 @@ const serializedPosts = posts.map((post) => ({
 >
     <div class="min-h-screen w-full pb-20 pt-32">
         <div class="container mx-auto px-4 md:px-6">
-            {/* Hero Section */}
             <div class="mx-auto max-w-4xl text-center">
                 <div
                     class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary border border-border text-muted text-xs font-medium mb-6"
@@ -78,7 +75,6 @@ const serializedPosts = posts.map((post) => ({
                     </a>
                 </div>
 
-                {/* React Blog List Component */}
                 <BlogList
                     client:load
                     initialPosts={serializedPosts}
