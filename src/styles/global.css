@@ -24,7 +24,7 @@
     --page: #ffffff;
     --foreground: #0f172a;
     --primary: #2563eb;
-    --primary-foreground: #ffffff;
+    --primary-foreground: #0f172a;
     --secondary: #f1f5f9;
     --secondary-foreground: #334155;
     --muted: #475569; /* Increased contrast (Slate-600) from #64748b */
@@ -36,7 +36,7 @@
     --page: #020617;
     --foreground: #f8fafc;
     --primary: #3b82f6;
-    --primary-foreground: #ffffff;
+    --primary-foreground: #0f172a;
     --secondary: #1e293b;
     --secondary-foreground: #cbd5e1;
     --muted: #cbd5e1; /* Increased contrast (Slate-300) from #94a3b8 */

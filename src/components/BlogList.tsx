@@ -121,12 +121,12 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
                   <div className="flex items-center gap-3">
                     <time
                       dateTime={new Date(post.data.pubDate).toISOString()}
-                      className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted"
+                      className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-secondary-foreground/80"
                     >
                       <Calendar className="h-3 w-3" />
                       {formatDate(post.data.pubDate)}
                     </time>
-                    <span className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted">
+                    <span className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-secondary-foreground/80">
                       <Clock3 className="h-3 w-3" />
                       {post.data.readingTime} min read
                     </span>
@@ -134,7 +134,7 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
                   <div className="mx-3 h-px flex-1 bg-border/40 transition-colors group-hover:bg-primary/35" />
                 </div>
 
-                <h3
+                <h2
                   className={`font-bold leading-tight text-foreground transition-colors group-hover:text-primary ${
                     isSinglePost ? "text-4xl" : "text-2xl"
                   }`}
@@ -145,10 +145,10 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
                   >
                     {post.data.title}
                   </a>
-                </h3>
+                </h2>
 
                 <p
-                  className={`mt-4 line-clamp-3 leading-relaxed text-muted transition-colors group-hover:text-secondary-foreground/85 ${
+                  className={`mt-4 line-clamp-3 leading-relaxed text-secondary-foreground/85 transition-colors group-hover:text-secondary-foreground ${
                     isSinglePost ? "text-lg" : "text-sm"
                   }`}
                 >
@@ -176,7 +176,7 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
 
                 <a
                   href={`/blog/${post.slug}/`}
-                  className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition-colors hover:text-primary/85"
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-secondary-foreground transition-colors hover:text-foreground"
                 >
                   Read
                   <ArrowUpRight className="h-4 w-4" />
