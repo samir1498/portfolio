@@ -15,7 +15,7 @@ tags: ["java", "jep", "release cadence"]
 I went looking for how Java decides and ships features; it is orderly and fast once you know the map.
 
 ## What I learned
-- Treat JEPs (JDK Enhancement Proposals) as the public proposal and implementation plan; “Targeted” means it is slated for a specific JDK train. [JEP index](https://openjdk.org/jeps/0)
+- Treat JEPs (JDK Enhancement Proposals) as the public proposal and implementation plan; Targeted means it is slated for a specific JDK train. [JEP index](https://openjdk.org/jeps/0)
 - Expect CSR (Compatibility and Specification Review) to vet every new public API for spec, Javadoc, and compatibility before code lands. [OpenJDK guide](https://openjdk.org/guide/)
 - Use the platform JSR (Java Specification Request) for that release (e.g., JSR 397 for Java SE 21) as the formal spec sign-off under the JCP (Java Community Process). [JCP JSR 397](https://jcp.org/en/jsr/detail?id=397)
 - Plan for releases every March and September; LTS (Long-Term Support) every three years (11, 17, 21, 25). [OpenJDK JDK project](https://openjdk.org/projects/jdk/)
@@ -24,7 +24,7 @@ I went looking for how Java decides and ships features; it is orderly and fast o
 - Compile/run preview language features with `--enable-preview --release <jdk>`.
 - Load incubator modules with `--add-modules jdk.incubator.<name>` (and `--enable-preview` if required).
 - Read the JEP’s “Risks and Assumptions” and the linked CSR to see API edges before touching prod code.
-- Stick to GA features for production; treat preview as learning or guarded experiments.
+- Stick to GA (general availability) features for production; treat preview as learning or guarded experiments.
 
 ## Takeaway
 Tracking JEP status plus CSR notes tells you when a feature is real, how to enable it, and what might break. Upgrading on the 6-month train gets easier when you follow that checklist.
