@@ -1,7 +1,8 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
-import { getRelatedPosts, getSeriesContext, validateSeries } from "@/lib/blogSeries";
+import { getRelatedPosts } from "@/lib/blogRelated";
+import { getSeriesContext, validateSeries } from "@/lib/blogSeries";
 import { siteConfig } from "@/config/seo";
 
 export async function getStaticPaths() {
