@@ -2,10 +2,12 @@
 import Layout from "@/layouts/Layout.astro";
 import BlogList from "@/components/BlogList";
 import { getCollection } from "astro:content";
+import { validateSeries } from "@/lib/blogSeries";
 
 const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
     (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
 );
+validateSeries(posts);
 
 const estimateReadingTime = (text: string) => {
     const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
@@ -22,6 +24,9 @@ const serializedPosts = posts.map((post) => ({
         pubDate: post.data.pubDate,
         tags: post.data.tags,
         readingTime: estimateReadingTime(post.body),
+        series: post.data.series,
+        seriesTitle: post.data.seriesTitle,
+        seriesOrder: post.data.seriesOrder,
     },
 }));
 ---
@@ -58,7 +63,7 @@ const serializedPosts = posts.map((post) => ({
                 <div class="mt-6 flex justify-center">
                     <a
                         href="/rss.xml"
-                        class="inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground transition-colors hover:border-primary/50 hover:text-primary"
+                        class="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-page/40 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-primary transition-colors hover:border-primary/70 hover:bg-primary/10"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
