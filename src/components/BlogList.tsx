@@ -9,6 +9,9 @@ interface Post {
     pubDate: Date;
     tags: string[];
     readingTime: number;
+    series?: string;
+    seriesTitle?: string;
+    seriesOrder?: number;
   };
 }
 
@@ -126,6 +129,16 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
                   </div>
                   <div className="mx-3 h-px flex-1 bg-border/40 transition-colors group-hover:bg-primary/35" />
                 </div>
+
+                {post.data.seriesTitle &&
+                  post.data.seriesOrder !== undefined && (
+                    <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-border/70 bg-secondary/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-secondary-foreground/80">
+                      <span>{post.data.seriesTitle}</span>
+                      <span className="text-primary/80">
+                        Part {post.data.seriesOrder}
+                      </span>
+                    </div>
+                  )}
 
                 <h2
                   className={`font-bold leading-tight text-foreground transition-colors group-hover:text-primary ${

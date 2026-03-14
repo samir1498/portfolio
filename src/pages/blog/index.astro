@@ -2,10 +2,12 @@
 import Layout from "@/layouts/Layout.astro";
 import BlogList from "@/components/BlogList";
 import { getCollection } from "astro:content";
+import { validateSeries } from "@/lib/blogSeries";
 
 const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
     (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
 );
+validateSeries(posts);
 
 const estimateReadingTime = (text: string) => {
     const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
@@ -22,6 +24,9 @@ const serializedPosts = posts.map((post) => ({
         pubDate: post.data.pubDate,
         tags: post.data.tags,
         readingTime: estimateReadingTime(post.body),
+        series: post.data.series,
+        seriesTitle: post.data.seriesTitle,
+        seriesOrder: post.data.seriesOrder,
     },
 }));
 ---
