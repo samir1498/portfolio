@@ -67,7 +67,7 @@ const seriesJsonLd = seriesContext
         <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px]">
             <article class="max-w-3xl">
         {seriesJsonLd && (
-            <script type="application/ld+json">
+            <script type="application/ld+json" is:inline>
                 {JSON.stringify(seriesJsonLd)}
             </script>
         )}
