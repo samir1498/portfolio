@@ -1,12 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  Search,
-  Calendar,
-  Clock3,
-  Tag,
-  XCircle,
-  ArrowUpRight,
-} from "lucide-react";
+import { Search, Calendar, Clock3, XCircle, ArrowUpRight } from "lucide-react";
 
 interface Post {
   slug: string;
@@ -78,10 +71,10 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
       <div className="mt-8 flex flex-wrap justify-center gap-2">
         <button
           onClick={() => setActiveTag("all")}
-          className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+          className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-all ${
             activeTag === "all"
-              ? "border-primary/60 bg-page text-primary"
-              : "border-border bg-secondary text-muted hover:bg-page hover:text-foreground"
+              ? "border-primary/50 bg-primary/10 text-primary shadow-sm"
+              : "border-border/70 bg-page/60 text-secondary-foreground/80 hover:border-primary/40 hover:text-foreground"
           }`}
         >
           All
@@ -90,10 +83,10 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
           <button
             key={tag}
             onClick={() => setActiveTag(tag)}
-            className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+            className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-all ${
               activeTag === tag
-                ? "border-primary/60 bg-page text-primary"
-                : "border-border bg-secondary text-muted hover:bg-page hover:text-foreground"
+                ? "border-primary/50 bg-primary/10 text-primary shadow-sm"
+                : "border-border/70 bg-page/60 text-secondary-foreground/80 hover:border-primary/40 hover:text-foreground"
             }`}
           >
             {tag}
@@ -112,7 +105,7 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
           {filteredPosts.map((post) => (
             <article
               key={post.slug}
-              className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-border bg-secondary transition-colors hover:border-primary/50 ${
+              className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-border/60 bg-page/70 backdrop-blur-[2px] transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 ${
                 isSinglePost ? "p-8 md:p-9" : "p-6"
               }`}
             >
@@ -161,14 +154,13 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
                   {post.data.tags.slice(0, 3).map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center gap-1 rounded-md border border-border bg-page px-2.5 py-1 text-xs font-medium text-secondary-foreground/85"
+                      className="inline-flex items-center rounded-full border border-border/70 bg-secondary/40 px-2.5 py-1 text-[11px] font-medium tracking-wide text-secondary-foreground/85"
                     >
-                      <Tag className="h-3 w-3" />
                       {tag}
                     </span>
                   ))}
                   {post.data.tags.length > 3 && (
-                    <span className="inline-flex items-center rounded-md border border-border bg-page px-2.5 py-1 text-xs font-medium text-secondary-foreground/85">
+                    <span className="inline-flex items-center rounded-full border border-border/70 bg-secondary/40 px-2.5 py-1 text-[11px] font-medium tracking-wide text-secondary-foreground/85">
                       +{post.data.tags.length - 3}
                     </span>
                   )}
@@ -176,7 +168,7 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
 
                 <a
                   href={`/blog/${post.slug}/`}
-                  className="inline-flex items-center gap-1 text-sm font-semibold text-secondary-foreground transition-colors hover:text-foreground"
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-primary/80 transition-colors hover:text-primary"
                 >
                   Read
                   <ArrowUpRight className="h-4 w-4" />
