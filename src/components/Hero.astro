@@ -1,5 +1,5 @@
 ---
-import { ArrowRight, ArrowLeft, Download } from "lucide-react";
+import { Download } from "lucide-react";
 import { Image } from "astro:assets";
 import { getLocalizedData, type Lang } from "@/data";
 import { PERSONAL_INFO as CONTACT_INFO } from "@/shared-data";
@@ -71,19 +71,6 @@ const cvReleaseUrls: Record<Lang, string> = {
                     class="flex flex-wrap gap-4 animate-fade-in-up"
                     style="animation-delay: 400ms"
                 >
-                    <a
-                        href="#contact"
-                        class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-medium text-primary-foreground bg-primary rounded-lg transition-all hover:opacity-90 active:scale-95"
-                    >
-                        {PERSONAL_INFO.contactMe}
-                        {
-                            lang === "ar" ? (
-                                <ArrowLeft className="me-2 w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                            ) : (
-                                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            )
-                        }
-                    </a>
                     <a
                         href={cvReleaseUrls[lang]}
                         target="_blank"

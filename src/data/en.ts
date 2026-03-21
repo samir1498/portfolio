@@ -6,7 +6,6 @@ export const PERSONAL_INFO = {
   summary:
     "Full-stack software engineer specialized in modern web and mobile application development with React, React Native, Next.js, TypeScript, and Tailwind CSS. Experienced in designing and integrating REST APIs using NestJS and Fastify, implementing authentication, and building fast, maintainable, and user-friendly interfaces.",
   available: "Available for opportunities",
-  contactMe: "Contact Me",
   downloadCV: "Download CV",
 };
 
@@ -111,17 +110,4 @@ export const SECTIONS = {
   academicProjects: "Research & Academic Projects",
   portfolio: "Portfolio",
   portfolioSubtitle: "Check back soon for featured projects!",
-  contact: "Get in Touch",
-  contactSubtitle:
-    "Have a project in mind or want to discuss opportunities? Let's connect!",
-};
-
-export const CONTACT_FORM = {
-  name: "Your Name",
-  email: "Your Email",
-  message: "Your Message",
-  send: "Send Message",
-  placeholderName: "John Doe",
-  placeholderEmail: "john@example.com",
-  placeholderMessage: "Tell me about your project...",
 };

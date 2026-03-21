@@ -4,7 +4,6 @@ import Experience from "@/components/Experience.astro";
 import Skills from "@/components/Skills.astro";
 import Academic from "@/components/Academic.astro";
 import Portfolio from "@/components/Portfolio.astro";
-import Contact from "@/components/Contact";
 import Footer from "@/components/Footer.astro";
 import Layout from "@/layouts/Layout.astro";
 import { languages } from "@/i18n/ui";
@@ -25,6 +24,5 @@ const { lang } = Astro.params as { lang: Lang };
     <Skills lang={lang} />
     <Academic lang={lang} />
     <Portfolio lang={lang} />
-    <Contact lang={lang} client:visible />
     <Footer />
 </Layout>

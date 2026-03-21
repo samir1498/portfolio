@@ -6,7 +6,6 @@ export const PERSONAL_INFO = {
   summary:
     "Ingénieur logiciel full-stack spécialisé dans le développement d'applications web et mobiles modernes avec React, React Native, Next.js, TypeScript et Tailwind CSS. Expérimenté dans la conception et l'intégration d'API REST avec NestJS et Fastify, l'implémentation d'authentification, et la création d'interfaces rapides, maintenables et conviviales.",
   available: "Disponible pour opportunités",
-  contactMe: "Contactez-moi",
   downloadCV: "Télécharger CV",
 };
 
@@ -111,17 +110,7 @@ export const SECTIONS = {
   academicProjects: "Recherche & Projets Académiques",
   portfolio: "Portfolio",
   portfolioSubtitle: "Des projets seront bientôt présentés !",
-  contact: "Me Contacter",
   contactSubtitle:
     "Vous avez un projet en tête ou souhaitez discuter d'opportunités ? Contactez-moi !",
 };
 
-export const CONTACT_FORM = {
-  name: "Votre Nom",
-  email: "Votre Email",
-  message: "Votre Message",
-  send: "Envoyer",
-  placeholderName: "Jean Dupont",
-  placeholderEmail: "jean@exemple.com",
-  placeholderMessage: "Parlez-moi de votre projet...",
-};

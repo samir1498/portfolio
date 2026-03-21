@@ -6,7 +6,6 @@ export const PERSONAL_INFO = {
   summary:
     "مهندس برمجيات متكامل متخصص في تطوير تطبيقات الويب والهاتف الحديثة باستخدام React و React Native و Next.js و TypeScript و Tailwind CSS. لدي خبرة في تصميم ودمج واجهات برمجة التطبيقات REST باستخدام NestJS و Fastify، وتنفيذ المصادقة، وبناء واجهات سريعة وقابلة للصيانة وسهلة الاستخدام.",
   available: "متاح للفرص",
-  contactMe: "تواصل معي",
   downloadCV: "تحميل السيرة الذاتية",
 };
 
@@ -110,16 +109,6 @@ export const SECTIONS = {
   academicProjects: "البحث والمشاريع الأكاديمية",
   portfolio: "أعمالي",
   portfolioSubtitle: "ترقبوا المشاريع المميزة قريباً!",
-  contact: "تواصل معي",
   contactSubtitle: "هل لديك مشروع في ذهنك أو تريد مناقشة الفرص؟ لنتواصل!",
 };
 
-export const CONTACT_FORM = {
-  name: "اسمك",
-  email: "بريدك الإلكتروني",
-  message: "رسالتك",
-  send: "إرسال الرسالة",
-  placeholderName: "محمد أحمد",
-  placeholderEmail: "mohamed@example.com",
-  placeholderMessage: "أخبرني عن مشروعك...",
-};

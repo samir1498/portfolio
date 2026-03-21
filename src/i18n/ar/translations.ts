@@ -3,9 +3,7 @@ export default {
   "nav.experience": "الخبرة",
   "nav.skills": "المهارات",
   "nav.education": "التعليم",
-  "nav.contact": "تواصل",
   "hero.title": "مهندس برمجيات",
-  "hero.contact": "تواصل معي",
   "experience.omnivya1.title": "مطور",
   "experience.omnivya1.description":
     "تطوير واجهات العميل والمسؤول باستخدام React.js مع TanStack Router. دمج مكون ثلاثي الأبعاد باستخدام Three.js. بناء صفحة هبوط عالية الأداء باستخدام AstroJS. بناء REST API باستخدام Spring Boot مع Clean Architecture.",
