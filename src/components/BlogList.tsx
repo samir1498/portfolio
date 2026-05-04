@@ -134,7 +134,7 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
                   post.data.seriesOrder !== undefined && (
                     <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-border/70 bg-secondary/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-secondary-foreground/80">
                       <span>{post.data.seriesTitle}</span>
-                      <span className="text-primary/80">
+                      <span className="text-primary">
                         Part {post.data.seriesOrder}
                       </span>
                     </div>
@@ -181,7 +181,7 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
 
                 <a
                   href={`/blog/${post.slug}/`}
-                  className="inline-flex items-center gap-1 text-sm font-semibold text-primary/80 transition-colors hover:text-primary"
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
                 >
                   Read
                   <ArrowUpRight className="h-4 w-4" />
@@ -203,7 +203,7 @@ export default function BlogList({ initialPosts, allTags }: BlogListProps) {
               setSearchQuery("");
               setActiveTag("all");
             }}
-            className="mt-4 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+            className="mt-4 text-sm font-medium text-primary transition-colors hover:text-primary"
           >
             Clear search filters
           </button>
