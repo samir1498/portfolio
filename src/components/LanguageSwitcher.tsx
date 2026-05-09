@@ -71,7 +71,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         className={`flex items-center gap-1.5 rounded-full bg-secondary text-muted hover:text-primary transition-colors focus:outline-none ${
           compact ? "px-2 py-1.5 text-xs" : "px-2.5 py-1.5 text-sm"
         } font-medium`}
-        aria-label="Switch language"
+        aria-label={`${currentLang.toUpperCase()} - Switch language`}
         aria-expanded={isOpen}
       >
         <Globe className={compact ? "w-3.5 h-3.5" : "w-4 h-4"} />

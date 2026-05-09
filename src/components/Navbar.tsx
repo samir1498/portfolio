@@ -108,7 +108,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
             href={homeHref}
             onClick={() => setIsOpen(false)}
             className="flex-shrink-0 flex items-center gap-2 group"
-            aria-label="Go to homepage"
+            aria-label="Samir.Dev homepage"
           >
             <img
               src="/brand/logo-mark.svg"

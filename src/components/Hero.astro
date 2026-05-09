@@ -1,6 +1,6 @@
 ---
 import { Download } from "lucide-react";
-import { Image } from "astro:assets";
+import { Picture } from "astro:assets";
 import { getLocalizedData, type Lang } from "@/data";
 import { PERSONAL_INFO as CONTACT_INFO } from "@/shared-data";
 import profileImage from "@/assets/me.jpeg";
@@ -139,11 +139,15 @@ const cvReleaseUrls: Record<Lang, string> = {
                         <div
                             class="relative w-64 h-64 md:w-80 md:h-80 lg:w-[26rem] lg:h-[26rem] rounded-full overflow-hidden border-[6px] border-secondary shadow-xl z-10 bg-secondary animate-float"
                         >
-                            <Image
+                            <Picture
                                 src={profileImage}
                                 alt={PERSONAL_INFO.name}
                                 class="w-full h-full object-cover"
                                 loading="eager"
+                                fetchpriority="high"
+                                formats={["avif", "webp"]}
+                                widths={[400, 800, 1200]}
+                                sizes="(max-width: 768px) 256px, (max-width: 1024px) 320px, 416px"
                             />
                         </div>
                     </div>
