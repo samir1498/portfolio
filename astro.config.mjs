@@ -23,6 +23,12 @@ export default defineConfig({
       },
     },
   },
+  image: {
+    service: {
+      entrypoint: "astro/assets/services/sharp",
+    },
+    quality: "mid",
+  },
   integrations: [mdx(), react(), sitemap()],
   output: "static",
   i18n: {

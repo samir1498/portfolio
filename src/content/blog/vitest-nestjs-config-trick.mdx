@@ -1,0 +1,80 @@
+---
+title: "Vitest: One Framework, Two Test Types"
+description: "Run unit and integration tests from the same codebase with separate Vitest configs and file suffix conventions."
+tldr: "Use separate config files with different include patterns to run unit and integration tests independently."
+pubDate: 2026-05-18
+draft: false
+ogImage: "/og/blog/vitest-nestjs-config-trick.png"
+ogImageAlt: "Vitest config trick blog post preview image"
+tags: ["vitest", "testing", "typescript"]
+---
+
+Vitest doesn't have a built-in way to run different test types with different settings. Jest has `--testPathPattern`. Vitest has something simpler: separate config files.
+
+## The setup
+
+One base config:
+
+```typescript
+// vitest.base.ts
+import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  test: {
+    globals: true,
+    passWithNoTests: true,
+  },
+})
+```
+
+Two project configs that extend it:
+
+```typescript
+// vitest.unit.config.ts
+import { defineConfig, mergeConfig } from 'vitest/config'
+import baseConfig from './vitest.base'
+
+export default mergeConfig(baseConfig, defineConfig({
+  test: {
+    include: ['src/**/*.unit.spec.ts'],
+    environment: 'node',
+  },
+}))
+```
+
+```typescript
+// vitest.it.config.ts
+import { defineConfig, mergeConfig } from 'vitest/config'
+import baseConfig from './vitest.base'
+
+export default mergeConfig(baseConfig, defineConfig({
+  test: {
+    include: ['test/**/*.it.spec.ts'],
+    environment: 'node',
+    testTimeout: 120_000,
+    pool: 'forks',
+  },
+}))
+```
+
+File names do the filtering. `*.unit.spec.ts` for unit tests, `*.it.spec.ts` for integration tests. No projects feature, no regex patterns — just `include`.
+
+## Scripts
+
+```json
+{
+  "test": "vitest run --config vitest.unit.config.ts && vitest run --config vitest.it.config.ts",
+  "test:unit": "vitest run --config vitest.unit.config.ts",
+  "test:it": "vitest run --config vitest.it.config.ts"
+}
+```
+
+## Why this works
+
+Each config is a complete Vitest instance. The `include` pattern tells Vitest which files to pick up. Unit tests run fast in parallel. Integration tests run with `pool: 'forks'` and a longer timeout. They don't interfere with each other.
+
+## When to use it
+
+- Unit tests need different globals, mocks, or environment than integration tests
+- Integration tests need longer timeouts or single-thread execution
+- You want to run one type without filtering with `--testNamePattern`

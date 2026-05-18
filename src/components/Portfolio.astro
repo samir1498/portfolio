@@ -1,6 +1,7 @@
 ---
-import { Construction, Rocket } from "lucide-react";
 import { getLocalizedData, type Lang } from "@/data";
+import { getCollection } from "astro:content";
+import { ArrowUpRight, Construction } from "lucide-react";
 
 interface Props {
   lang: Lang;
@@ -8,6 +9,13 @@ interface Props {
 
 const { lang } = Astro.props;
 const { SECTIONS } = getLocalizedData(lang);
+
+const projects = await getCollection("projects");
+const statusLabels: Record<string, string> = {
+  "in-development": lang === "fr" ? "En développement" : "In Development",
+  live: lang === "fr" ? "En ligne" : "Live",
+  archived: lang === "fr" ? "Archivé" : "Archived",
+};
 ---
 
 <section id="showcase" class="py-24 bg-page border-t border-border">
@@ -20,28 +28,82 @@ const { SECTIONS } = getLocalizedData(lang);
     </div>
   </div>
 
-  <div class="animate-fade-in-up" style="animation-delay: 200ms;">
-    <div
-      class="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden border-2 border-dashed border-border bg-page flex flex-col items-center justify-center text-center p-8"
-    >
-      <div class="p-6 rounded-full bg-primary/10 mb-6 text-primary">
-        <Rocket className="w-10 h-10" />
-      </div>
-
-      <h3 class="text-2xl font-bold text-foreground mb-4">
-        {lang === "fr" ? "Projets en cours..." : "Projects Loading..."}
-      </h3>
-
-      <p class="text-muted max-w-lg mx-auto mb-8 text-lg">
-        {SECTIONS.portfolioSubtitle}
-      </p>
-
-      <div
-        class="flex gap-2 items-center text-sm font-semibold text-primary bg-primary/10 px-4 py-2 rounded-full"
+  <div class="max-w-5xl mx-auto space-y-6">
+    {projects.map((project, i) => (
+      <a
+        href={`/projects/${project.slug}`}
+        class="animate-fade-in-up block group"
+        style={`animation-delay: ${200 + i * 100}ms;`}
       >
-        <Construction className="w-4 h-4" />
-        <span>{lang === "fr" ? "En cours" : "Work in Progress"}</span>
+        <div
+          class="flex items-start gap-6 p-6 rounded-xl border border-border bg-card hover:border-primary/50 transition-colors"
+        >
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-2">
+              <h3
+                class="text-xl font-semibold text-foreground group-hover:text-primary transition-colors"
+              >
+                {project.data.title}
+              </h3>
+                <span
+                  class={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                    project.data.status === "in-development"
+                      ? "bg-primary/10 text-primary"
+                      : project.data.status === "live"
+                        ? "bg-emerald-500/10 text-emerald-500 dark:bg-emerald-400/10 dark:text-emerald-400"
+                        : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                {statusLabels[project.data.status]}
+              </span>
+            </div>
+            <p class="text-muted text-sm mb-3">
+              {project.data.subtitle}
+            </p>
+            <div class="flex flex-wrap gap-2">
+              {project.data.techStack.slice(0, 6).map((tech) => (
+                <span
+                  class="text-xs px-2 py-1 rounded-md bg-secondary text-secondary-foreground"
+                >
+                  {tech}
+                </span>
+              ))}
+              {project.data.techStack.length > 6 && (
+                <span
+                  class="text-xs px-2 py-1 rounded-md bg-secondary text-secondary-foreground"
+                >
+                  +{project.data.techStack.length - 6}
+                </span>
+              )}
+            </div>
+          </div>
+          <ArrowUpRight className="w-5 h-5 text-muted group-hover:text-primary transition-colors shrink-0 mt-1" />
+        </div>
+      </a>
+    ))}
+
+    {projects.length === 0 && (
+      <div
+        class="animate-fade-in-up relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden border-2 border-dashed border-border bg-page flex flex-col items-center justify-center text-center p-8"
+        style="animation-delay: 200ms;"
+      >
+        <div class="p-6 rounded-full bg-primary/10 mb-6 text-primary">
+          <Construction className="w-10 h-10" />
+        </div>
+
+        <h3 class="text-2xl font-bold text-foreground mb-4">
+          {lang === "fr" ? "Projets en cours..." : "Projects Loading..."}
+        </h3>
+
+        <p class="text-muted max-w-lg mx-auto mb-8 text-lg">
+          {SECTIONS.portfolioSubtitle}
+        </p>
+
+        <div class="flex gap-2 items-center text-sm font-semibold text-primary bg-primary/10 px-4 py-2 rounded-full">
+          <Construction className="w-4 h-4" />
+          <span>{lang === "fr" ? "En cours" : "Work in Progress"}</span>
+        </div>
       </div>
-    </div>
+    )}
   </div>
 </section>
