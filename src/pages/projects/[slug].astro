@@ -2,6 +2,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import { ArrowLeft, ArrowUpRight, CheckCircle2, Circle } from "lucide-react";
+import { getLangFromUrl } from "@/i18n/utils";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
@@ -12,17 +13,39 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props as { project: CollectionEntry<"projects"> };
+const lang = getLangFromUrl(Astro.url);
+const backHref = lang === "fr" || lang === "ar" ? `/${lang}/#showcase` : "/#showcase";
+
+const statusLabels: Record<string, Record<string, string>> = {
+  "in-development": { en: "In Development", fr: "En développement", ar: "قيد التطوير" },
+  live: { en: "Live", fr: "En ligne", ar: "مباشر" },
+  archived: { en: "Archived", fr: "Archivé", ar: "مؤرشف" },
+};
+
+function t(key: string) {
+  return statusLabels[key]?.[lang] ?? statusLabels[key]?.en ?? key;
+}
+
+const linkLabels: Record<string, Record<string, string>> = {
+  github: { en: "View on GitHub", fr: "Voir sur GitHub", ar: "عرض على GitHub" },
+  demo: { en: "Live Demo", fr: "Démo en direct", ar: "عرض مباشر" },
+  back: { en: "Back to projects", fr: "Retour aux projets", ar: "العودة إلى المشاريع" },
+};
+
+function tl(key: string) {
+  return linkLabels[key]?.[lang] ?? linkLabels[key]?.en ?? key;
+}
 ---
 
 <Layout title={project.data.title} description={project.data.description}>
   <article class="min-h-screen bg-page">
     <div class="max-w-3xl mx-auto px-6 py-16">
       <a
-        href="/#showcase"
+        href={backHref}
         class="inline-flex items-center gap-2 text-muted hover:text-foreground transition-colors mb-8"
       >
         <ArrowLeft className="w-4 h-4" />
-        <span class="text-sm">Back to projects</span>
+        <span class="text-sm">{tl("back")}</span>
       </a>
 
       <header class="mb-12">
@@ -39,11 +62,7 @@ const { project } = Astro.props as { project: CollectionEntry<"projects"> };
                   : "bg-secondary text-secondary-foreground"
             }`}
           >
-            {project.data.status === "in-development"
-              ? "In Development"
-              : project.data.status === "live"
-                ? "Live"
-                : "Archived"}
+            {t(project.data.status)}
           </span>
         </div>
         <p class="text-lg text-muted">{project.data.subtitle}</p>
@@ -55,17 +74,30 @@ const { project } = Astro.props as { project: CollectionEntry<"projects"> };
         </p>
       </section>
 
-      {project.data.github && (
-        <div class="mb-12">
-          <a
-            href={project.data.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
-          >
-            View on GitHub
-            <ArrowUpRight className="w-4 h-4" />
-          </a>
+      {(project.data.github || project.data.demo) && (
+        <div class="mb-12 flex flex-wrap gap-4">
+          {project.data.github && (
+            <a
+              href={project.data.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+            >
+              {tl("github")}
+              <ArrowUpRight className="w-4 h-4" />
+            </a>
+          )}
+          {project.data.demo && (
+            <a
+              href={project.data.demo}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+            >
+              {tl("demo")}
+              <ArrowUpRight className="w-4 h-4" />
+            </a>
+          )}
         </div>
       )}
 

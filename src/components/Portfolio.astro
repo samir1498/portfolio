@@ -11,11 +11,15 @@ const { lang } = Astro.props;
 const { SECTIONS } = getLocalizedData(lang);
 
 const projects = await getCollection("projects");
-const statusLabels: Record<string, string> = {
-  "in-development": lang === "fr" ? "En développement" : "In Development",
-  live: lang === "fr" ? "En ligne" : "Live",
-  archived: lang === "fr" ? "Archivé" : "Archived",
+const statusLabels: Record<string, Record<string, string>> = {
+  "in-development": { en: "In Development", fr: "En développement", ar: "قيد التطوير" },
+  live: { en: "Live", fr: "En ligne", ar: "مباشر" },
+  archived: { en: "Archived", fr: "Archivé", ar: "مؤرشف" },
 };
+
+function t(key: string) {
+  return statusLabels[key]?.[lang] ?? statusLabels[key]?.en ?? key;
+}
 ---
 
 <section id="showcase" class="py-24 bg-page border-t border-border">
@@ -54,7 +58,7 @@ const statusLabels: Record<string, string> = {
                         : "bg-secondary text-secondary-foreground"
                   }`}
                 >
-                {statusLabels[project.data.status]}
+                {t(project.data.status)}
               </span>
             </div>
             <p class="text-muted text-sm mb-3">
@@ -92,7 +96,7 @@ const statusLabels: Record<string, string> = {
         </div>
 
         <h3 class="text-2xl font-bold text-foreground mb-4">
-          {lang === "fr" ? "Projets en cours..." : "Projects Loading..."}
+          {lang === "ar" ? "المشاريع قيد التحميل..." : lang === "fr" ? "Projets en cours..." : "Projects Loading..."}
         </h3>
 
         <p class="text-muted max-w-lg mx-auto mb-8 text-lg">
@@ -101,7 +105,7 @@ const statusLabels: Record<string, string> = {
 
         <div class="flex gap-2 items-center text-sm font-semibold text-primary bg-primary/10 px-4 py-2 rounded-full">
           <Construction className="w-4 h-4" />
-          <span>{lang === "fr" ? "En cours" : "Work in Progress"}</span>
+          <span>{lang === "ar" ? "قيد التنفيذ" : lang === "fr" ? "En cours" : "Work in Progress"}</span>
         </div>
       </div>
     )}

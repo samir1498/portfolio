@@ -26,8 +26,14 @@ export default defineConfig({
   image: {
     service: {
       entrypoint: "astro/assets/services/sharp",
+      entrypointConfig: {
+        quality: {
+          jpeg: 75,
+          webp: 75,
+          avif: 65,
+        },
+      },
     },
-    quality: "mid",
   },
   integrations: [mdx(), react(), sitemap()],
   output: "static",
