@@ -1,0 +1,48 @@
+---
+title: "Green Algeria Map"
+subtitle: "Reforestation tracking platform"
+description: "Map-based platform for tracking reforestation and cleanup efforts across Algeria. Replaces scattered video updates with a real platform where volunteers, donors, and organizers can track progress and coordinate action."
+status: "in-development"
+github: "https://github.com/samir1498/green-algeria-map"
+techStack:
+  - React 19
+  - TanStack Router
+  - Tailwind CSS v4
+  - shadcn/ui
+  - Leaflet
+  - NestJS 11
+  - CQRS
+  - TypeORM
+  - PostgreSQL 18
+  - BetterAuth
+  - Vitest
+  - testcontainers
+features:
+  - Interactive Leaflet map with color-coded zones
+  - Zone CRUD API with CQRS pattern
+  - Email/password authentication via BetterAuth
+  - Clean architecture with domain/application/infrastructure layers
+  - TypeORM migrations with strict schema management
+  - 71 tests across unit and integration suites
+  - CI pipeline with path filters
+  - Swagger and Scalar API documentation
+plannedFeatures:
+  - Damage reporting with photo evidence
+  - Tree species info with Wikipedia links
+  - Photo upload to RustFS
+  - Volunteer CTA per location
+  - Mobile-responsive polish
+  - Spring Boot backend benchmark
+highlights:
+  - title: "CQRS Pattern"
+    description: "Commands, queries, and domain events for clean separation of read and write paths."
+  - title: "Testcontainers"
+    description: "Isolated PostgreSQL per test run with zero shared state between suites."
+  - title: "Vitest Migration"
+    description: "Replaced Jest to handle ESM-only packages natively with separate unit and integration configs."
+  - title: "Clean Architecture"
+    description: "Domain entities, repository interfaces, and TypeORM adapters keep layers decoupled."
+pubDate: 2026-05-18
+ogImage: "/og/projects/green-algeria-map.png"
+ogImageAlt: "Green Algeria Map project preview image"
+---

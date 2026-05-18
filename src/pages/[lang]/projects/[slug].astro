@@ -1,0 +1,172 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import { ArrowLeft, ArrowUpRight, CheckCircle2, Circle } from "lucide-react";
+
+const locales = ["en", "fr", "ar"] as const;
+type Locale = (typeof locales)[number];
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return locales.flatMap((lang) =>
+    projects.map((project) => ({
+      params: { lang, slug: project.slug },
+      props: { project, lang },
+    })),
+  );
+}
+
+const { project, lang } = Astro.props as { project: CollectionEntry<"projects">; lang: Locale };
+const backHref = lang === "en" ? "/#showcase" : `/${lang}/#showcase`;
+
+const statusLabels: Record<string, Record<string, string>> = {
+  "in-development": { en: "In Development", fr: "En développement", ar: "قيد التطوير" },
+  live: { en: "Live", fr: "En ligne", ar: "مباشر" },
+  archived: { en: "Archived", fr: "Archivé", ar: "مؤرشف" },
+};
+
+function t(key: string) {
+  return statusLabels[key]?.[lang] ?? statusLabels[key]?.en ?? key;
+}
+
+const linkLabels: Record<string, Record<string, string>> = {
+  github: { en: "View on GitHub", fr: "Voir sur GitHub", ar: "عرض على GitHub" },
+  demo: { en: "Live Demo", fr: "Démo en direct", ar: "عرض مباشر" },
+  back: { en: "Back to projects", fr: "Retour aux projets", ar: "العودة إلى المشاريع" },
+};
+
+function tl(key: string) {
+  return linkLabels[key]?.[lang] ?? linkLabels[key]?.en ?? key;
+}
+
+const sectionLabels: Record<string, Record<string, string>> = {
+  techStack: { en: "Tech Stack", fr: "Technologies", ar: "التقنيات" },
+  implemented: { en: "Implemented", fr: "Implémenté", ar: "منفذ" },
+  planned: { en: "Planned", fr: "Planifié", ar: "مخطط" },
+  highlights: { en: "Technical Highlights", fr: "Points techniques", ar: "النقاط التقنية" },
+};
+
+function ts(key: string) {
+  return sectionLabels[key]?.[lang] ?? sectionLabels[key]?.en ?? key;
+}
+---
+
+<Layout title={project.data.title} description={project.data.description}>
+  <article class="min-h-screen bg-page">
+    <div class="max-w-3xl mx-auto px-6 py-16">
+      <a
+        href={backHref}
+        class="inline-flex items-center gap-2 text-muted hover:text-foreground transition-colors mb-8"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span class="text-sm">{tl("back")}</span>
+      </a>
+
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-4">
+          <h1 class="text-3xl md:text-5xl font-bold text-foreground">
+            {project.data.title}
+          </h1>
+          <span
+            class={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${
+              project.data.status === "in-development"
+                ? "bg-primary/10 text-primary"
+                : project.data.status === "live"
+                  ? "bg-emerald-500/10 text-emerald-500 dark:bg-emerald-400/10 dark:text-emerald-400"
+                  : "bg-secondary text-secondary-foreground"
+            }`}
+          >
+            {t(project.data.status)}
+          </span>
+        </div>
+        <p class="text-lg text-muted">{project.data.subtitle}</p>
+      </header>
+
+      <section class="mb-12">
+        <p class="text-foreground/80 leading-relaxed">
+          {project.data.description}
+        </p>
+      </section>
+
+      {(project.data.github || project.data.demo) && (
+        <div class="mb-12 flex flex-wrap gap-4">
+          {project.data.github && (
+            <a
+              href={project.data.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+            >
+              {tl("github")}
+              <ArrowUpRight className="w-4 h-4" />
+            </a>
+          )}
+          {project.data.demo && (
+            <a
+              href={project.data.demo}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+            >
+              {tl("demo")}
+              <ArrowUpRight className="w-4 h-4" />
+            </a>
+          )}
+        </div>
+      )}
+
+      <section class="mb-12">
+        <h2 class="text-xl font-semibold text-foreground mb-4">{ts("techStack")}</h2>
+        <div class="flex flex-wrap gap-2">
+          {project.data.techStack.map((tech) => (
+            <span class="text-sm px-3 py-1.5 rounded-md bg-secondary text-secondary-foreground">
+              {tech}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      <section class="mb-12">
+        <h2 class="text-xl font-semibold text-foreground mb-4">
+          {ts("implemented")}
+        </h2>
+        <ul class="space-y-2">
+          {project.data.features.map((feature) => (
+            <li class="flex items-start gap-3 text-foreground/80">
+              <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="mb-12">
+        <h2 class="text-xl font-semibold text-foreground mb-4">{ts("planned")}</h2>
+        <ul class="space-y-2">
+          {project.data.plannedFeatures.map((feature) => (
+            <li class="flex items-start gap-3 text-muted">
+              <Circle className="w-5 h-5 shrink-0 mt-0.5" />
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="mb-12">
+        <h2 class="text-xl font-semibold text-foreground mb-4">
+          {ts("highlights")}
+        </h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+          {project.data.highlights.map((highlight) => (
+            <div class="p-4 rounded-lg border border-border bg-card">
+              <h3 class="font-medium text-foreground mb-1">
+                {highlight.title}
+              </h3>
+              <p class="text-sm text-muted">{highlight.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  </article>
+</Layout>

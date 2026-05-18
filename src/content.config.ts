@@ -53,4 +53,28 @@ const blog = defineCollection({
     }),
 });
 
-export const collections = { blog };
+const projects = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    subtitle: z.string(),
+    description: z.string(),
+    status: z.enum(["in-development", "live", "archived"]),
+    github: z.string().url().optional(),
+    demo: z.string().url().optional(),
+    techStack: z.array(z.string()),
+    features: z.array(z.string()),
+    plannedFeatures: z.array(z.string()),
+    highlights: z.array(
+      z.object({
+        title: z.string(),
+        description: z.string(),
+      }),
+    ),
+    pubDate: z.date(),
+    ogImage: z.string().optional(),
+    ogImageAlt: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, projects };
