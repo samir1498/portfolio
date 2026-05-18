@@ -2,19 +2,22 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import { ArrowLeft, ArrowUpRight, CheckCircle2, Circle } from "lucide-react";
-import { getLangFromUrl } from "@/i18n/utils";
+
+const locales = ["en", "fr", "ar"] as const;
+type Locale = (typeof locales)[number];
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
-  return projects.map((project) => ({
-    params: { slug: project.slug },
-    props: { project },
-  }));
+  return locales.flatMap((lang) =>
+    projects.map((project) => ({
+      params: { lang, slug: project.slug },
+      props: { project, lang },
+    })),
+  );
 }
 
-const { project } = Astro.props as { project: CollectionEntry<"projects"> };
-const lang = getLangFromUrl(Astro.url);
-const backHref = lang === "fr" || lang === "ar" ? `/${lang}/#showcase` : "/#showcase";
+const { project, lang } = Astro.props as { project: CollectionEntry<"projects">; lang: Locale };
+const backHref = lang === "en" ? "/#showcase" : `/${lang}/#showcase`;
 
 const statusLabels: Record<string, Record<string, string>> = {
   "in-development": { en: "In Development", fr: "En développement", ar: "قيد التطوير" },
@@ -34,6 +37,17 @@ const linkLabels: Record<string, Record<string, string>> = {
 
 function tl(key: string) {
   return linkLabels[key]?.[lang] ?? linkLabels[key]?.en ?? key;
+}
+
+const sectionLabels: Record<string, Record<string, string>> = {
+  techStack: { en: "Tech Stack", fr: "Technologies", ar: "التقنيات" },
+  implemented: { en: "Implemented", fr: "Implémenté", ar: "منفذ" },
+  planned: { en: "Planned", fr: "Planifié", ar: "مخطط" },
+  highlights: { en: "Technical Highlights", fr: "Points techniques", ar: "النقاط التقنية" },
+};
+
+function ts(key: string) {
+  return sectionLabels[key]?.[lang] ?? sectionLabels[key]?.en ?? key;
 }
 ---
 
@@ -102,7 +116,7 @@ function tl(key: string) {
       )}
 
       <section class="mb-12">
-        <h2 class="text-xl font-semibold text-foreground mb-4">Tech Stack</h2>
+        <h2 class="text-xl font-semibold text-foreground mb-4">{ts("techStack")}</h2>
         <div class="flex flex-wrap gap-2">
           {project.data.techStack.map((tech) => (
             <span class="text-sm px-3 py-1.5 rounded-md bg-secondary text-secondary-foreground">
@@ -114,7 +128,7 @@ function tl(key: string) {
 
       <section class="mb-12">
         <h2 class="text-xl font-semibold text-foreground mb-4">
-          Implemented
+          {ts("implemented")}
         </h2>
         <ul class="space-y-2">
           {project.data.features.map((feature) => (
@@ -127,7 +141,7 @@ function tl(key: string) {
       </section>
 
       <section class="mb-12">
-        <h2 class="text-xl font-semibold text-foreground mb-4">Planned</h2>
+        <h2 class="text-xl font-semibold text-foreground mb-4">{ts("planned")}</h2>
         <ul class="space-y-2">
           {project.data.plannedFeatures.map((feature) => (
             <li class="flex items-start gap-3 text-muted">
@@ -140,7 +154,7 @@ function tl(key: string) {
 
       <section class="mb-12">
         <h2 class="text-xl font-semibold text-foreground mb-4">
-          Technical Highlights
+          {ts("highlights")}
         </h2>
         <div class="grid gap-4 sm:grid-cols-2">
           {project.data.highlights.map((highlight) => (
