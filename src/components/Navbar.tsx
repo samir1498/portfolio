@@ -89,8 +89,11 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
     },
   ];
 
-  const withPrefix = (href: string) =>
-    isBlogPage && href.startsWith("#") ? `/${href}` : href;
+  const withPrefix = (href: string) => {
+    if (!href.startsWith("#")) return href;
+    const prefix = isBlogPage ? homeHref : "";
+    return `${prefix}${href}`;
+  };
   const homeHref =
     currentLang === "fr" || currentLang === "ar" ? `/${currentLang}` : "/";
 
