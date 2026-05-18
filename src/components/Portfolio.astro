@@ -113,13 +113,7 @@ const te = createTranslator(emptyStateTranslations, lang);
 
           <div class="flex gap-2 items-center text-sm font-semibold text-primary bg-primary/10 px-4 py-2 rounded-full">
             <Construction className="w-4 h-4" />
-            <span>
-              {lang === "ar"
-                ? "قيد التنفيذ"
-                : lang === "fr"
-                  ? "En cours"
-                  : "Work in Progress"}
-            </span>
+            <span>{te("workInProgress")}</span>
           </div>
         </div>
       )
