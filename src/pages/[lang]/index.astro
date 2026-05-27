@@ -10,19 +10,19 @@ import { languages } from "@/i18n/ui";
 import type { Lang } from "@/data";
 
 export async function getStaticPaths() {
-    return Object.keys(languages).map((lang) => ({
-        params: { lang },
-    }));
+  return Object.keys(languages).map((lang) => ({
+    params: { lang },
+  }));
 }
 
 const { lang } = Astro.params as { lang: Lang };
 ---
 
 <Layout>
-    <Hero lang={lang} />
-    <Experience lang={lang} />
-    <Skills lang={lang} />
-    <Academic lang={lang} />
-    <Portfolio lang={lang} />
-    <Footer />
+  <Hero lang={lang} />
+  <Experience lang={lang} />
+  <Skills lang={lang} />
+  <Academic lang={lang} />
+  <Portfolio lang={lang} />
+  <Footer />
 </Layout>

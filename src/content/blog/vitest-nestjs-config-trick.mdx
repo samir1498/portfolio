@@ -17,44 +17,50 @@ One base config:
 
 ```typescript
 // vitest.base.ts
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
     globals: true,
     passWithNoTests: true,
   },
-})
+});
 ```
 
 Two project configs that extend it:
 
 ```typescript
 // vitest.unit.config.ts
-import { defineConfig, mergeConfig } from 'vitest/config'
-import baseConfig from './vitest.base'
+import { defineConfig, mergeConfig } from "vitest/config";
+import baseConfig from "./vitest.base";
 
-export default mergeConfig(baseConfig, defineConfig({
-  test: {
-    include: ['src/**/*.unit.spec.ts'],
-    environment: 'node',
-  },
-}))
+export default mergeConfig(
+  baseConfig,
+  defineConfig({
+    test: {
+      include: ["src/**/*.unit.spec.ts"],
+      environment: "node",
+    },
+  }),
+);
 ```
 
 ```typescript
 // vitest.it.config.ts
-import { defineConfig, mergeConfig } from 'vitest/config'
-import baseConfig from './vitest.base'
+import { defineConfig, mergeConfig } from "vitest/config";
+import baseConfig from "./vitest.base";
 
-export default mergeConfig(baseConfig, defineConfig({
-  test: {
-    include: ['test/**/*.it.spec.ts'],
-    environment: 'node',
-    testTimeout: 120_000,
-    pool: 'forks',
-  },
-}))
+export default mergeConfig(
+  baseConfig,
+  defineConfig({
+    test: {
+      include: ["test/**/*.it.spec.ts"],
+      environment: "node",
+      testTimeout: 120_000,
+      pool: "forks",
+    },
+  }),
+);
 ```
 
 File names do the filtering. `*.unit.spec.ts` for unit tests, `*.it.spec.ts` for integration tests. No projects feature, no regex patterns — just `include`.
