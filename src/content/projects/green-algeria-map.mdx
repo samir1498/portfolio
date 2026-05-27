@@ -15,23 +15,27 @@ techStack:
   - TypeORM
   - PostgreSQL 18
   - BetterAuth
+  - RustFS (S3-compatible)
   - Vitest
   - testcontainers
+  - Playwright
+  - Cloudflare Pages
 features:
   - Interactive Leaflet map with color-coded zones
   - Zone CRUD API with CQRS pattern
+  - Damage reporting with photo evidence and red markers
+  - Tree species info via iNaturalist / GBIF integration
+  - Photo upload to RustFS (S3-compatible storage)
+  - Crowdsourced zone creation with volunteer CTA
   - Email/password authentication via BetterAuth
+  - Mobile-responsive design with clamp-based font scaling
   - Clean architecture with domain/application/infrastructure layers
   - TypeORM migrations with strict schema management
-  - 71 tests across unit and integration suites
+  - 130+ tests across unit, UI, integration, and E2E suites
   - CI pipeline with path filters
   - Swagger and Scalar API documentation
+  - Deployed on Cloudflare Pages + Render
 plannedFeatures:
-  - Damage reporting with photo evidence
-  - Tree species info with Wikipedia links
-  - Photo upload to RustFS
-  - Volunteer CTA per location
-  - Mobile-responsive polish
   - Spring Boot backend benchmark
 highlights:
   - title: "CQRS Pattern"

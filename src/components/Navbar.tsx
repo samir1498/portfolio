@@ -11,16 +11,11 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [currentLang, setCurrentLang] = useState<string>(lang);
-  const [isBlogPage, setIsBlogPage] = useState(false);
 
   useEffect(() => {
-    // Check initial theme
     setIsDark(document.documentElement.classList.contains("dark"));
-
-    // Sync state with prop if it changes (though usually page reloads)
     setCurrentLang(lang);
     const blogPath = window.location.pathname.startsWith("/blog");
-    setIsBlogPage(blogPath);
     setScrolled(blogPath || window.scrollY > 20);
 
     const handleScroll = () => {
@@ -89,13 +84,18 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
     },
   ];
 
-  const withPrefix = (href: string) => {
-    if (!href.startsWith("#")) return href;
-    const prefix = isBlogPage ? homeHref : "";
-    return `${prefix}${href}`;
-  };
   const homeHref =
     currentLang === "fr" || currentLang === "ar" ? `/${currentLang}` : "/";
+
+  const isHomePage =
+    window.location.pathname === "/" ||
+    /^\/(fr|ar)\/?$/.test(window.location.pathname);
+
+  const withPrefix = (href: string) => {
+    if (!href.startsWith("#")) return href;
+    const prefix = isHomePage ? "" : homeHref;
+    return `${prefix}${href}`;
+  };
 
   return (
     <nav
