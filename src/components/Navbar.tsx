@@ -11,10 +11,15 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [currentLang, setCurrentLang] = useState<string>(lang);
+  const [isHomePage, setIsHomePage] = useState(false);
 
   useEffect(() => {
-    setIsDark(document.documentElement.classList.contains("dark"));
     setCurrentLang(lang);
+    setIsDark(document.documentElement.classList.contains("dark"));
+    setIsHomePage(
+      window.location.pathname === "/" ||
+        /^\/(fr|ar)\/?$/.test(window.location.pathname),
+    );
     const blogPath = window.location.pathname.startsWith("/blog");
     setScrolled(blogPath || window.scrollY > 20);
 
@@ -86,10 +91,6 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
 
   const homeHref =
     currentLang === "fr" || currentLang === "ar" ? `/${currentLang}` : "/";
-
-  const isHomePage =
-    window.location.pathname === "/" ||
-    /^\/(fr|ar)\/?$/.test(window.location.pathname);
 
   const withPrefix = (href: string) => {
     if (!href.startsWith("#")) return href;
