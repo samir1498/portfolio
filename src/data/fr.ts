@@ -113,4 +113,3 @@ export const SECTIONS = {
   contactSubtitle:
     "Vous avez un projet en tête ou souhaitez discuter d'opportunités ? Contactez-moi !",
 };
-

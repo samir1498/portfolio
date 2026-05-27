@@ -111,4 +111,3 @@ export const SECTIONS = {
   portfolioSubtitle: "ترقبوا المشاريع المميزة قريباً!",
   contactSubtitle: "هل لديك مشروع في ذهنك أو تريد مناقشة الفرص؟ لنتواصل!",
 };
-
