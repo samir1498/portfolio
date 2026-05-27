@@ -4,17 +4,21 @@ import LanguageSwitcher from "./LanguageSwitcher";
 
 interface NavbarProps {
   lang?: string;
+  pathname?: string;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
+const Navbar: React.FC<NavbarProps> = ({
+  lang: currentLang = "en",
+  pathname = "/",
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(false);
-  const [currentLang, setCurrentLang] = useState<string>(lang);
+
+  const isHomePage = pathname === "/" || /^\/(fr|ar)\/?$/.test(pathname);
 
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains("dark"));
-    setCurrentLang(lang);
     const blogPath = window.location.pathname.startsWith("/blog");
     setScrolled(blogPath || window.scrollY > 20);
 
@@ -23,7 +27,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lang]);
+  }, []);
 
   const toggleTheme = () => {
     const newIsDark = !isDark;
@@ -86,10 +90,6 @@ const Navbar: React.FC<NavbarProps> = ({ lang = "en" }) => {
 
   const homeHref =
     currentLang === "fr" || currentLang === "ar" ? `/${currentLang}` : "/";
-
-  const isHomePage =
-    window.location.pathname === "/" ||
-    /^\/(fr|ar)\/?$/.test(window.location.pathname);
 
   const withPrefix = (href: string) => {
     if (!href.startsWith("#")) return href;
