@@ -47,6 +47,10 @@ const Navbar: React.FC<NavbarProps> = ({
       href: "#about",
     },
     {
+      name: currentLang === "ar" ? "المدونة" : "Blog",
+      href: "/blog",
+    },
+    {
       name:
         currentLang === "ar"
           ? "المهارات"
@@ -81,10 +85,6 @@ const Navbar: React.FC<NavbarProps> = ({
             ? "Projets"
             : "Projects",
       href: "#showcase",
-    },
-    {
-      name: currentLang === "ar" ? "المدونة" : "Blog",
-      href: "/blog",
     },
   ];
 
