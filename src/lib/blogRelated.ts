@@ -5,14 +5,14 @@ export function getRelatedPosts(
   slug: string,
   limit = 3,
 ) {
-  const current = posts.find((post) => post.slug === slug);
+  const current = posts.find((post) => post.id === slug);
   if (!current) return [];
 
   const currentTags = new Set(current.data.tags ?? []);
   if (currentTags.size === 0) return [];
 
   const scored = posts
-    .filter((post) => post.slug !== slug)
+    .filter((post) => post.id !== slug)
     .map((post) => {
       const overlap = post.data.tags.filter((tag) => currentTags.has(tag));
       return {
@@ -28,7 +28,7 @@ export function getRelatedPosts(
     });
 
   return scored.slice(0, limit).map(({ post, overlap }) => ({
-    slug: post.slug,
+    slug: post.id,
     title: post.data.title,
     description: post.data.description,
     pubDate: post.data.pubDate,

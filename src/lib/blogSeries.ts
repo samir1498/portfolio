@@ -28,7 +28,7 @@ export function validateSeries(posts: CollectionEntry<"blog">[]) {
     const orders = seen.get(seriesId) ?? new Set<number>();
     if (orders.has(order)) {
       throw new Error(
-        `Duplicate seriesOrder ${order} in series "${seriesId}" (post: ${post.slug})`,
+        `Duplicate seriesOrder ${order} in series "${seriesId}" (post: ${post.id})`,
       );
     }
     orders.add(order);
@@ -40,7 +40,7 @@ export function getSeriesContext(
   posts: CollectionEntry<"blog">[],
   slug: string,
 ): SeriesContext | null {
-  const current = posts.find((post) => post.slug === slug);
+  const current = posts.find((post) => post.id === slug);
   if (!current || !hasSeries(current)) return null;
 
   const seriesId = current.data.series!;
@@ -49,7 +49,7 @@ export function getSeriesContext(
   const seriesPosts = posts
     .filter((post) => post.data.series === seriesId)
     .map((post) => ({
-      slug: post.slug,
+      slug: post.id,
       title: post.data.title,
       seriesOrder: post.data.seriesOrder!,
     }))

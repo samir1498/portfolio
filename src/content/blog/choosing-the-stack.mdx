@@ -1,0 +1,61 @@
+---
+title: "Choosing the Stack"
+description: "Why Green Algeria Map uses React 19, TanStack Router, NestJS, and Tailwind v4."
+tldr: "A map-based SPA doesn't need SSR. TanStack Router gives file-based routing without it. NestJS brings structure."
+pubDate: 2026-06-06
+draft: false
+tags: ["green-algeria-map", "react", "nestjs", "tailwind", "architecture"]
+series: "building-gam"
+seriesTitle: "Building Green Algeria Map"
+seriesOrder: 1
+---
+
+I started Green Algeria Map to track reforestation across Algeria. First question: what stack fits a map dashboard?
+
+I didn't need SSR. This isn't a content site. It's an interactive map -- Leaflet, not a document layout. TypeScript everywhere. Conventions over ceremony.
+
+From the start I wanted React plus either Spring Boot or NestJS. I was also weighing TypeORM vs Spring Data, and thinking about trying Spring Boot 4.
+
+## Frontend
+
+TanStack Router gives file-based routing (`src/routes/index.tsx` → `/`) like Next.js, but without the server. Automatic routes, type-safe params, built-in loaders. No Node server to deploy.
+
+The scaffold was one commit on May 2:
+
+```
+feat: scaffold frontend with TanStack Router + React 19 + Tailwind 4
+```
+
+One command. Vite on 3000, Vitest ready, pnpm monorepo from day one.
+
+## Styling
+
+Tailwind v4 dropped the JS config. No `tailwind.config.js`, no `@apply`. Just:
+
+```css
+@import "tailwindcss";
+```
+
+Palette, spacing, breakpoints -- all CSS. With the Vite plugin, it just works. No build friction I can see.
+
+## Backend
+
+NestJS handles the boring parts. Modules, decorators, DI, test infrastructure that works. Scaffolded the backend on May 16:
+
+```
+feat: scaffold NestJS backend with Zone CRUD and PostgreSQL
+```
+
+A module, a controller, a service. TypeORM, migrations from commit one, Postgres in Docker. One template to follow.
+
+Spring Boot was the other path. Same structure, different ecosystem. Still on the list to try.
+
+## Why this works for me
+
+Frontend deploys anywhere static. No server to manage.
+
+Backend has one pattern: module → controller → service. New routes just follow it.
+
+Both TypeScript. Share types, no context switching.
+
+Not the right stack for everything. For a map SPA with a structured API, it hits the balance.

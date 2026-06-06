@@ -1,6 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { getCollection, type CollectionEntry } from "astro:content";
+import { getCollection, render, type CollectionEntry } from "astro:content";
 import { getRelatedPosts } from "@/lib/blogRelated";
 import { getSeriesContext, validateSeries } from "@/lib/blogSeries";
 import { siteConfig } from "@/config/seo";
@@ -9,7 +9,7 @@ export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
   validateSeries(posts);
   return posts.map((post) => ({
-    params: { slug: post.slug },
+    params: { slug: post.id },
     props: { post },
   }));
 }
@@ -17,15 +17,15 @@ export async function getStaticPaths() {
 const { post } = Astro.props as { post: CollectionEntry<"blog"> };
 const allPosts = await getCollection("blog", ({ data }) => !data.draft);
 validateSeries(allPosts);
-const seriesContext = getSeriesContext(allPosts, post.slug);
-const relatedPosts = getRelatedPosts(allPosts, post.slug, 3);
-const { Content } = await post.render();
+const seriesContext = getSeriesContext(allPosts, post.id);
+const relatedPosts = getRelatedPosts(allPosts, post.id, 3);
+const { Content } = await render(post);
 const ogImage = post.data.ogImage || "/og/default.png";
 const ogImageAlt =
   post.data.ogImageAlt || `${post.data.title} social preview image`;
 const readingTimeMinutes = Math.max(
   1,
-  Math.ceil(post.body.trim().split(/\s+/).filter(Boolean).length / 220),
+  Math.ceil((post.body ?? "").trim().split(/\s+/).filter(Boolean).length / 220),
 );
 
 const formatDate = (date: Date) =>
@@ -44,7 +44,7 @@ const seriesJsonLd = seriesContext
       dateModified: post.data.updatedDate
         ? new Date(post.data.updatedDate).toISOString()
         : undefined,
-      url: `${siteConfig.siteUrl}/blog/${post.slug}/`,
+      url: `${siteConfig.siteUrl}/blog/${post.id}/`,
       isPartOf: {
         "@type": "CreativeWorkSeries",
         name: seriesContext.seriesTitle,
@@ -138,7 +138,7 @@ const seriesJsonLd = seriesContext
                 <ul class="mt-3 space-y-2">
                   {seriesContext.posts.map((entry) => (
                     <li>
-                      {entry.slug === post.slug ? (
+                      {entry.slug === post.id ? (
                         <span class="text-sm font-semibold text-primary">
                           Part {entry.seriesOrder} · {entry.title}
                         </span>
