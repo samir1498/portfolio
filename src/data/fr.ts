@@ -4,7 +4,7 @@ export const PERSONAL_INFO = {
   name: "Bettahar Samir",
   title: "Ingénieur Logiciel",
   summary:
-    "Ingénieur logiciel full-stack spécialisé dans le développement d'applications web et mobiles modernes avec React, React Native, Next.js, TypeScript et Tailwind CSS. Expérimenté dans la conception et l'intégration d'API REST avec NestJS et Fastify, l'implémentation d'authentification, et la création d'interfaces rapides, maintenables et conviviales.",
+    "Ingénieur logiciel full-stack spécialisé dans le développement d'applications web et mobiles modernes avec React, React Native, Next.js, TypeScript et Tailwind CSS. Expérimenté dans la conception et l'intégration d'API REST avec NestJS, l'implémentation d'authentification, et la création d'interfaces rapides, maintenables et conviviales.",
   available: "Disponible pour opportunités",
   downloadCV: "Télécharger CV",
 };
@@ -16,11 +16,13 @@ export const EXPERIENCE: Experience[] = [
     period: "Nov. 2025 – Présent",
     location: "Télétravail",
     description: [
-      "Migration d'un backend Express.js monolithique vers une architecture orientée services (SOA) évolutive, découplant les services principaux vers une couche d'accès aux données (DAL).",
-      "Architecture et optimisation d'un dashboard Next.js haute performance, intégrant des mises à jour temps réel via SSE et refactorisant les composants UI complexes.",
-      "Développement d'une CLI TypeScript robuste pour la gestion automatisée du monitoring, intégrant des flux d'authentification sécurisés.",
-      "Mise en place d'une infrastructure de test complète avec Vitest et Playwright, atteignant >80% de couverture sur l'ensemble de la stack (Frontend, Backend et CLI).",
-      "Conception de pipelines de tests de charge à haut volume avec K6 pour valider la fiabilité du système.",
+      "Refonte et développement de fonctionnalités sur le frontend React (Vite) — UI autopilot, pipeline d'enregistrement de démos, extraction de composants, mocks de développement, tests e2e.",
+      "Développement de fonctionnalités pour la CLI TypeScript (package npm) — rotation de clés API, intégration CI de suites, gestion d'incidents, export/import, multiples versions.",
+      "Contributions au backend Express.js — audit de sécurité complet (politiques RLS Supabase, durcissement RPC), refactoring autopilot, partage de ressources d'équipe, APIs de suites.",
+      "Développement du site marketing Next.js — tokens de couleurs sémantiques, composants de marque, corrections mode clair, sous-page /workers.",
+      "Architecture d'un moteur de monitoring distribué auto-hébergé en Bun/Hono — 8 types de sondes, architecture maître-agent multi-régions, bus SSE via Redis.",
+      "Création d'un panneau d'administration React — dashboard d'indexation Google, gestion créateurs/invitations, historique d'alertes, codes secrets de démos.",
+      "Développement d'un pipeline de génération vidéo programmatique avec Remotion — stratégie de zoom contextuelle, transitions par clip, effets sonores.",
     ],
   },
   {
@@ -29,7 +31,7 @@ export const EXPERIENCE: Experience[] = [
     period: "Sept. 2025 – Présent",
     location: "Télétravail / Alger",
     description: [
-      "Développement d'applications mobiles avec React Native et d'applications web avec Next.js, intégrées à des API backend Fastify.",
+      "Développement d'applications mobiles avec React Native et d'applications web avec Next.js, intégrées à des API backend.",
       "Création de composants UI réutilisables et performants, axés sur des expériences utilisateur réactives et intuitives.",
     ],
   },

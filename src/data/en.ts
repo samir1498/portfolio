@@ -4,7 +4,7 @@ export const PERSONAL_INFO = {
   name: "Bettahar Samir",
   title: "Software Engineer",
   summary:
-    "Full-stack software engineer specialized in modern web and mobile application development with React, React Native, Next.js, TypeScript, and Tailwind CSS. Experienced in designing and integrating REST APIs using NestJS and Fastify, implementing authentication, and building fast, maintainable, and user-friendly interfaces.",
+    "Full-stack software engineer specialized in modern web and mobile application development with React, React Native, Next.js, TypeScript, and Tailwind CSS. Experienced in designing and integrating REST APIs using NestJS, implementing authentication, and building fast, maintainable, and user-friendly interfaces.",
   available: "Available for opportunities",
   downloadCV: "Download CV",
 };
@@ -16,11 +16,13 @@ export const EXPERIENCE: Experience[] = [
     period: "Nov. 2025 – Present",
     location: "Remote",
     description: [
-      "Led the migration of a monolithic Express.js backend to a scalable Service-Oriented Architecture (SOA), decoupling core services like `apiCheck` and `browser` into a dedicated Data Access Layer (DAL).",
-      "Architected and optimized a high-performance Next.js dashboard, implementing real-time updates via SSE and refactoring complex UI components for improved maintainability.",
-      "Developed a robust TypeScript CLI tool for automated monitoring management, featuring secure authentication flows and direct API integration.",
-      "Engineered a comprehensive testing infrastructure using Vitest and Playwright, achieving >80% coverage across the full stack (Frontend, Backend, and CLI).",
-      "Designed high-volume load testing pipelines using K6 to validate system reliability under stress.",
+      "Refactored and shipped features across the React (Vite) frontend — autopilot UI, demo recording pipeline, component extraction, dev mocks, and e2e test suites.",
+      "Built features for the TypeScript CLI (npm package) — API key rotation, suite CI integration, incident management, lossless export/import, and multiple releases.",
+      "Contributed to the Express.js backend — comprehensive security audit (Supabase RLS policies, RPC hardening), autopilot refactor, team resource sharing, and suite APIs.",
+      "Developed a Next.js marketing site with semantic color tokens, branded component library, light-mode fixes, and a /workers sub-landing page.",
+      "Architected a self-hosted distributed monitoring engine in Bun/Hono — 8 probe types, multi-region master-agent architecture, Redis pub/sub SSE replacing dashboard polling.",
+      "Built an admin dashboard (React) — Google indexing dashboard, creators/invites management, alerts history, and demo secret code system.",
+      "Built a programmatic video generation pipeline with Remotion — story-aware zoom strategy, per-clip transitions, and click sound effects.",
     ],
   },
   {
@@ -29,7 +31,7 @@ export const EXPERIENCE: Experience[] = [
     period: "Sep. 2025 – Present",
     location: "Remote / Algiers",
     description: [
-      "Developed mobile applications using React Native and web applications with Next.js, integrating with Fastify backend APIs.",
+      "Developed mobile applications using React Native and web applications with Next.js, integrating with backend APIs.",
       "Built reusable and performant UI components, focusing on responsive and intuitive user experiences.",
     ],
   },

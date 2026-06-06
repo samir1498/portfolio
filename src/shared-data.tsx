@@ -23,7 +23,7 @@ export const PERSONAL_INFO = {
   name: "Bettahar Samir",
   title: "Software Engineer",
   summary:
-    "Full-stack software engineer specialized in modern web and mobile application development with React, React Native, Next.js, TypeScript, and Tailwind CSS. Experienced in designing and integrating REST APIs using NestJS and Fastify, implementing authentication, and building fast, maintainable, and user-friendly interfaces.",
+    "Full-stack software engineer specialized in modern web and mobile application development with React, React Native, Next.js, TypeScript, and Tailwind CSS. Experienced in designing and integrating REST APIs using NestJS, implementing authentication, and building fast, maintainable, and user-friendly interfaces.",
   contact: {
     phone: "(+213) 675 24 84 41",
     email: "contact@samir-bettahar.dev",
@@ -57,13 +57,18 @@ export const SOCIAL_LINKS = [
 
 export const EXPERIENCE: Experience[] = [
   {
-    company: "Self-Employed",
-    role: "Freelance Full-Stack / Mobile Developer",
-    period: "Sep. 2025 – Present",
-    location: "Remote / Algiers",
+    company: "ObserveOne",
+    role: "Full-Stack Engineer",
+    period: "Nov. 2025 – Present",
+    location: "Remote",
     description: [
-      "Developed mobile applications using React Native and web applications with Next.js, integrating with Fastify backend APIs.",
-      "Built reusable and performant UI components, focusing on responsive and intuitive user experiences.",
+      "Refactored and shipped features across the React (Vite) frontend — autopilot UI, demo recording pipeline, component extraction, dev mocks, and e2e test suites.",
+      "Built features for the TypeScript CLI (npm package) — API key rotation, suite CI integration, incident management, lossless export/import, and multiple releases.",
+      "Contributed to the Express.js backend — comprehensive security audit (Supabase RLS policies, RPC hardening), autopilot refactor, team resource sharing, and suite APIs.",
+      "Developed a Next.js marketing site with semantic color tokens, branded component library, light-mode fixes, and a /workers sub-landing page.",
+      "Architected a self-hosted distributed monitoring engine in Bun/Hono — 8 probe types, multi-region master-agent architecture, Redis pub/sub SSE replacing dashboard polling.",
+      "Built an admin dashboard (React) — Google indexing dashboard, creators/invites management, alerts history, and demo secret code system.",
+      "Built a programmatic video generation pipeline with Remotion — story-aware zoom strategy, per-clip transitions, and click sound effects.",
     ],
   },
   {
@@ -158,9 +163,8 @@ export const SKILLS: SkillCategory[] = [
     name: "Backend",
     skills: [
       { name: "NestJS", icon: "/icons/nestjs.svg" },
-      { name: "Fastify", icon: "/icons/fastify.svg" },
       { name: "Spring Boot", icon: "/icons/springboot.svg" },
-      { name: "Go (API)", icon: "/icons/go.svg" },
+      { name: "Go", icon: "/icons/go.svg" },
     ],
   },
   {
@@ -185,7 +189,6 @@ export const SKILLS: SkillCategory[] = [
       { name: "Zitadel", icon: "/icons/zitadel.svg" },
       { name: "Clerk", icon: "/icons/clerk.svg" },
       { name: "BetterAuth", icon: "/icons/betterauth.svg" },
-      { name: "Fastify OAuth", icon: "/icons/fastify.svg" },
     ],
   },
   {
