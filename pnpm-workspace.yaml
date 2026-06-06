@@ -5,3 +5,4 @@ allowBuilds:
   puppeteer: true
   sharp: true
   vue-demi: true
+  workerd: true
