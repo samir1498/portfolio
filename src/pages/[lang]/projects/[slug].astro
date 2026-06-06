@@ -8,7 +8,7 @@ export async function getStaticPaths() {
   const locales = ["en", "fr", "ar"] as const;
   return locales.flatMap((lang) =>
     projects.map((project) => ({
-      params: { lang, slug: project.slug },
+      params: { lang, slug: project.id },
       props: { project, lang },
     })),
   );

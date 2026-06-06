@@ -51,7 +51,7 @@ const te = createTranslator(emptyStateTranslations, lang);
     {
       projects.map((project, i) => (
         <a
-          href={`/${lang}/projects/${project.slug}`}
+          href={`/${lang}/projects/${project.id}`}
           class="animate-fade-in-up block group"
           style={`animation-delay: ${200 + i * 100}ms;`}
         >
