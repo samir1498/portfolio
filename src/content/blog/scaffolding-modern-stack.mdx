@@ -1,0 +1,121 @@
+---
+title: "Scaffolding a Modern Stack"
+description: "What it looks like to start a real project with React 19, TanStack Router, Tailwind CSS v4, shadcn/ui, and GitHub Actions from day one."
+tldr: "Frontend scaffolding is infrastructure. Invest in tooling (ESLint, husky, CI) before writing a single feature component."
+pubDate: 2026-05-09
+draft: false
+ogImage: "/og/blog/scaffolding-modern-stack.png"
+ogImageAlt: "Scaffolding a Modern Stack blog post preview image"
+tags: ["react", "tanstack-router", "tailwind", "typescript", "tooling"]
+---
+
+Green Algeria Map started with a `pnpm create vite` and a question: _how do you set up a project so it stays maintainable past week one?_
+
+Here's what went into the initial scaffold.
+
+## The Stack
+
+- **React 19** — Concurrent features, improved server components (not used here), `use()` hook
+- **TanStack Router** — Type-safe routing with loaders, search params, and file-based route generation
+- **Tailwind CSS v4** — CSS-first config via `@theme`, OKLCH colors, no `tailwind.config.ts`
+- **shadcn/ui** — Copy-paste primitives (button, dialog, input, toast) styled with Tailwind
+- **Leaflet + react-leaflet** — Map rendering with 10 demo zones
+- **ESLint + Prettier** — Format-on-save, consistent imports via `eslint-plugin-import`
+- **husky + lint-staged** — Pre-commit hooks that run check, lint, format
+- **GitHub Actions** — CI from commit one, split by path (frontend vs backend)
+
+## TanStack Router
+
+The killer feature: **type-safe routes**. No more string matching route names.
+
+```typescript
+const router = createRouter({
+  routeTree,
+  defaultPreload: "intent",
+  context: { queryClient },
+});
+```
+
+Route files are co-located with features:
+
+```
+src/routes/
+├── __root.tsx
+├── index.tsx
+├── dashboard.tsx
+├── zones/
+│   ├── index.tsx
+│   └── $zoneId.tsx
+└── auth/
+    ├── signin.tsx
+    └── signup.tsx
+```
+
+Loaders run before the component renders and can return typed data:
+
+```typescript
+export const Route = createFileRoute("/zones/")({
+  loader: async ({ context }) => {
+    const zones = await context.queryClient.fetchQuery({
+      queryKey: ["zones"],
+      queryFn: () => api.getZones(),
+    });
+    return { zones };
+  },
+  component: ZonesPage,
+});
+```
+
+## Tailwind v4: CSS-first Config
+
+No more `tailwind.config.ts`. Colors and breakpoints go in your CSS file:
+
+```css
+@import "tailwindcss";
+
+@theme {
+  --color-primary: oklch(0.55 0.18 160);
+  --color-primary-hover: oklch(0.5 0.18 160);
+  --color-surface: oklch(0.97 0 0);
+  --color-surface-dark: oklch(0.18 0 0);
+}
+```
+
+OKLCH colors are perceptually uniform — they look right in both light and dark mode without manual tuning.
+
+## shadcn/ui
+
+It's not a package you install. You run `npx shadcn@latest add button` and it copies the source into `src/shared/components/ui/`. You own every pixel. No version pinning, no breaking updates.
+
+## CI from Day One
+
+Every push runs the quality gate:
+
+```yaml
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install
+      - run: pnpm check
+      - run: pnpm lint
+      - run: pnpm build
+```
+
+Path filters keep it fast — backend changes only trigger backend jobs, frontend changes trigger frontend jobs.
+
+## What This Unlocked
+
+With this scaffold in place, adding features became mechanical:
+
+- New route → write route file → done
+- New API call → write TanStack Query hook → done
+- New UI pattern → `npx shadcn add` → done
+
+No build config drift. No lint rule disagreements. No "works on my machine".
+
+## Lesson
+
+The most productive decision was spending the first 2 days on tooling, not features. Every hour spent on CI, lint, and type safety saved about 5 hours of debugging later.
