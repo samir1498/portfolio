@@ -12,6 +12,8 @@
     "audit:dev": "unlighthouse --site http://localhost:4321 --output-path .unlighthouse --mobile --samples 2 --throttle --no-cache",
     "prepare": "husky",
     "fallow": "fallow",
+    "fallow:health": "fallow health",
+    "fallow:dupes": "fallow dupes",
     "lint": "prettier --check \"src/**/*.{astro,ts,tsx,mdx}\"",
     "format": "prettier --write \"src/**/*.{astro,ts,tsx,mdx}\""
   },

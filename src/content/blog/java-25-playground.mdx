@@ -1,7 +1,7 @@
 ---
 title: "Java 25 Playground"
-description: "A hands-on tour of Java 25's headline features — flexible constructors, scoped values, and primitive patterns."
-tldr: "Java 25 LTS ships three notable preview features: flexible constructor bodies, scoped values, and primitive patterns. Here's what each does and why they matter."
+description: "A hands-on tour of Java 25: flexible constructors, scoped values, and primitive patterns."
+tldr: "Java 25 LTS ships flexible constructor bodies, scoped values, module import declarations, and primitive types in patterns. Here's what each does."
 pubDate: 2026-06-12
 draft: false
 ogImage: "/og/blog/java-25-playground.png"
@@ -14,17 +14,16 @@ tags: ["java", "java25", "jep"]
 
 import JavaWasmRunner from "@/components/JavaWasmRunner.astro";
 
-Java 25 (LTS) shipped a few preview features worth kicking the tires on. Each
-demo below is real Java bytecode compiled to WasmGC via GraalVM Web Image and
-runs right in your browser. Hit **Run** to see it execute.
+Java 25 (LTS) shipped a few new features. Each
+demo below is compiled to WasmGC via GraalVM Web Image and
+runs in your browser. Hit **Run** to see it execute.
 
 ## Flexible Constructor Bodies (JEP 513)
 
 Before Java 25, the first statement in a constructor **had** to be `super()` or
-`this()`. You couldn't validate parameters before delegating to the parent —
-you had to resort to static helper methods or ugly workarounds.
+`this()`. You couldn't validate parameters before delegating to the parent.
 
-JEP 513 (second preview) lifts that restriction. You can now write:
+JEP 513 lifts that restriction:
 
 ```java
 ChildClass(String name) {
@@ -57,7 +56,7 @@ results.add("--- JEP 513: Flexible Constructor Bodies ---");
         }
 
         for (String line : results)
-            System.out.println(line);
+            IO.println(line);
     }
 
     static class ChildClass extends BaseClass {
@@ -78,14 +77,9 @@ results.add("--- JEP 513: Flexible Constructor Bodies ---");
 }`}
 />
 
-This is the one I'm most excited about — it eliminates a whole category of
-"defensive copy + static factory" patterns.
-
 ## Scoped Values (JEP 506)
 
-Scoped values replace `ThreadLocal` with an immutable, scope-bound alternative
-that's safe with virtual threads. You bind a value for the duration of a block
-— no `remove()` calls, no memory leaks.
+`ScopedValue` is an immutable, scope-bound alternative to `ThreadLocal`. You bind a value for the duration of a block.
 
 <JavaWasmRunner
   id="scoped-values"
@@ -98,33 +92,31 @@ that's safe with virtual threads. You bind a value for the duration of a block
     public static void main(String[] args) {
         ScopedValue.where(CONTEXT, "Lab_User_Session")
             .run(() -> {
-                System.out.println("CONTEXT = " + CONTEXT.get());
+                IO.println("CONTEXT = " + CONTEXT.get());
                 performAction();
             });
 
-        System.out.println("Bound? " + CONTEXT.isBound());
+        IO.println("Bound? " + CONTEXT.isBound());
     }
 
     static void performAction() {
-        System.out.println("Action: " + CONTEXT.get());
+        IO.println("Action: " + CONTEXT.get());
         nestedCall();
     }
 
     static void nestedCall() {
-        System.out.println("Nested: " + CONTEXT.get());
+        IO.println("Nested: " + CONTEXT.get());
     }
 
 }`}
 />
 
-The kicker: virtual threads can have millions of concurrent scoped values
-without the memory overhead of `ThreadLocal`. Perfect for request-scoped
-context in high-concurrency servers.
+Virtual threads can have millions of concurrent scoped values
+without the memory overhead of `ThreadLocal`.
 
-## Primitive Types in Patterns (JEP 507)
+## Primitive Types in Patterns (JEP 507, Third Preview)
 
 Pattern matching (`instanceof`, `switch`) now works with primitive types.
-No more boxing to `Integer`/`Double` just to use pattern guards.
 
 <JavaWasmRunner
   id="primitive-patterns"
@@ -142,23 +134,23 @@ No more boxing to `Integer`/`Double` just to use pattern guards.
 
     static void testInstanceOf(Object obj) {
         if (obj instanceof int i)
-            System.out.println("int: " + i);
+            IO.println("int: " + i);
         else if (obj instanceof double d)
-            System.out.println("double: " + d);
+            IO.println("double: " + d);
     }
 
     static void testSwitch(Object obj) {
         switch (obj) {
             case int i when i > 100 ->
-                System.out.println("Large int " + i);
+                IO.println("Large int " + i);
             case int i ->
-                System.out.println("Small int " + i);
+                IO.println("Small int " + i);
             case long l ->
-                System.out.println("Long " + l);
+                IO.println("Long " + l);
             case double d ->
-                System.out.println("Double " + d);
+                IO.println("Double " + d);
             default ->
-                System.out.println("Unknown");
+                IO.println("Unknown");
         }
     }
 
@@ -167,8 +159,7 @@ No more boxing to `Integer`/`Double` just to use pattern guards.
 
 ## Java 25 On-Ramp (JEP 511 + 512)
 
-Three quality-of-life JEPs make Java feel less ceremonious — module import
-declarations, implicitly declared classes, and instance main methods. Combined,
+Module import declarations, implicitly declared classes, and instance main methods. Combined,
 you can write small programs without the usual boilerplate.
 
 <JavaWasmRunner
@@ -186,11 +177,11 @@ var features = List.of(
 "Instance Main Methods (JEP 512)"
 );
 
-        System.out.println("Java version: " +
+        IO.println("Java version: " +
             System.getProperty("java.version"));
-        System.out.println("Date: " + LocalDate.now());
+        IO.println("Date: " + LocalDate.now());
         features.forEach(f ->
-            System.out.println("  - " + f));
+            IO.println("  - " + f));
     }
 
 }`}
