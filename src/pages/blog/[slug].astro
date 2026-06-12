@@ -66,7 +66,7 @@ const seriesJsonLd = seriesContext
 >
   <div class="pt-28 pb-20 max-w-6xl mx-auto">
     <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px]">
-      <article class="max-w-3xl">
+      <article class="min-w-0 max-w-3xl">
         {
           seriesJsonLd && (
             <script
@@ -178,7 +178,7 @@ const seriesJsonLd = seriesContext
         </header>
 
         <section
-          class="mt-8 rounded-2xl border border-border/80 bg-secondary/20 p-6 md:p-8 text-base leading-8 text-secondary-foreground [&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:leading-tight [&_h2]:text-foreground [&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-foreground [&_p]:mt-4 [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mt-2 [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-4 [&_strong]:font-bold [&_strong]:text-foreground"
+          class="mt-8 rounded-2xl border border-border/80 bg-secondary/20 p-6 md:p-8 text-base leading-8 text-secondary-foreground [&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:leading-tight [&_h2]:text-foreground [&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-foreground [&_p]:mt-4 [&_p]:break-words [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:break-words [&_li]:mt-2 [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-4 [&_a]:break-words [&_strong]:font-bold [&_strong]:text-foreground [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-[#1e1e1e] [&_pre]:p-4 [&_pre]:text-sm [&_pre]:leading-relaxed [&_pre]:max-w-full [&_pre]:w-full [&_code]:text-sm [&_code]:break-words"
         >
           <Content />
         </section>
@@ -186,7 +186,7 @@ const seriesJsonLd = seriesContext
 
       {
         relatedPosts.length >= 2 && (
-          <aside class="lg:sticky lg:top-28 h-fit">
+          <aside class="lg:sticky lg:top-28 h-fit min-w-0">
             <div class="rounded-2xl border border-border/70 bg-page/70 p-5">
               <p class="text-xs font-semibold uppercase tracking-wide text-muted">
                 Related posts

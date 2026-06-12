@@ -16,6 +16,9 @@ const highlighterStyles = {
   fontSize: "0.75rem",
   lineHeight: "1.5",
   background: "transparent",
+  overflowX: "auto",
+  maxWidth: "100%",
+  minWidth: 0,
 };
 
 export default function JavaWasmRunner({
@@ -28,15 +31,17 @@ export default function JavaWasmRunner({
   const [showCode, setShowCode] = useState(false);
 
   return (
-    <div className="my-6 overflow-hidden rounded-xl border border-border bg-page">
-      <div className="flex items-center justify-between border-b border-border bg-secondary/30 px-4 py-2.5">
-        <div className="flex items-center gap-2">
+    <div className="my-6 rounded-xl border border-border bg-page">
+      <div className="flex flex-wrap items-center gap-2 border-b border-border bg-secondary/30 px-4 py-2.5">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
           <span aria-hidden="true" className="shrink-0 text-primary">
             &gt;_
           </span>
-          <span className="text-sm font-semibold text-foreground">{label}</span>
+          <span className="truncate text-xs font-semibold text-foreground sm:text-sm">
+            {label}
+          </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={() => setShowCode(!showCode)}
             className="rounded-md px-2.5 py-1 text-xs font-medium text-secondary-foreground transition-colors hover:text-foreground"
