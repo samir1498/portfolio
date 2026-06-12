@@ -15,6 +15,28 @@ const toAbsoluteUrl = (url: string) =>
 const toIsoDate = (value?: string | Date) =>
   value ? new Date(value).toISOString() : undefined;
 
+const locales: Record<string, string> = {
+  en: "en_US",
+  fr: "fr_FR",
+  ar: "ar_DZ",
+};
+
+const getLocale = (lang: string) => locales[lang] ?? "en_US";
+
+const buildArticleMeta = (
+  ogType: string | undefined,
+  publishedTime?: string | Date,
+  modifiedTime?: string | Date,
+  articleTags?: string[],
+) =>
+  ogType === "article"
+    ? {
+        publishedTime: toIsoDate(publishedTime),
+        modifiedTime: toIsoDate(modifiedTime),
+        tags: articleTags && articleTags.length > 0 ? articleTags : undefined,
+      }
+    : undefined;
+
 export function getSeoConfig(options?: {
   title?: string;
   description?: string;
@@ -57,7 +79,7 @@ export function getSeoConfig(options?: {
       },
       optional: {
         description,
-        locale: lang === "fr" ? "fr_FR" : lang === "ar" ? "ar_DZ" : "en_US",
+        locale: getLocale(lang),
       },
       image: {
         url: ogImageUrl,
@@ -65,14 +87,12 @@ export function getSeoConfig(options?: {
         height: 630,
         alt: openGraphImageAlt,
       },
-      article:
-        ogType === "article"
-          ? {
-              publishedTime: toIsoDate(publishedTime),
-              modifiedTime: toIsoDate(modifiedTime),
-              tags: articleTags.length > 0 ? articleTags : undefined,
-            }
-          : undefined,
+      article: buildArticleMeta(
+        ogType,
+        publishedTime,
+        modifiedTime,
+        articleTags,
+      ),
     },
     twitter: {
       card: "summary_large_image" as const,
