@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Globe, Check } from "lucide-react";
+import { useLanguageRouter } from "@/hooks/useLanguageRouter";
 
 const languages = [
   { code: "en", label: "English", flag: "🇬🇧" },
@@ -11,32 +12,49 @@ interface LanguageSwitcherProps {
   compact?: boolean;
 }
 
-const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
-  compact = false,
-}) => {
-  const [currentLang, setCurrentLang] = useState("en");
+function LangMenu({
+  currentLang,
+  onSelect,
+  onClose,
+}: {
+  currentLang: string;
+  onSelect: (code: string) => void;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="absolute right-0 mt-2 p-1 bg-page border border-border rounded-lg shadow-xl min-w-[140px] z-[100]"
+      style={{ top: "100%" }}
+    >
+      {languages.map((lang) => (
+        <button
+          key={lang.code}
+          onClick={() => {
+            onSelect(lang.code);
+            onClose();
+          }}
+          className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
+            lang.code === currentLang
+              ? "bg-primary/10 text-primary"
+              : "text-muted hover:bg-secondary hover:text-foreground"
+          }`}
+        >
+          <span className="text-base">{lang.flag}</span>
+          <span className="flex-1 text-left">{lang.label}</span>
+          {lang.code === currentLang && <Check className="w-4 h-4" />}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function useDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const path = window.location.pathname;
-    const match = path.match(/^\/(en|fr|ar)\//);
-    if (match) {
-      setCurrentLang(match[1]);
-    } else if (path.startsWith("/fr")) {
-      setCurrentLang("fr");
-    } else if (path.startsWith("/ar")) {
-      setCurrentLang("ar");
-    }
-  }, []);
-
-  // Close on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -44,28 +62,17 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const switchLanguage = (newLang: string) => {
-    if (newLang === currentLang) {
-      setIsOpen(false);
-      return;
-    }
+  return { isOpen, setIsOpen, ref };
+}
 
-    const currentPath = window.location.pathname;
-    const hash = window.location.hash;
-    let newPath: string;
-
-    const langPattern = /^\/(en|fr|ar)(\/|$)/;
-    if (langPattern.test(currentPath)) {
-      newPath = currentPath.replace(langPattern, `/${newLang}/`);
-    } else {
-      newPath = `/${newLang}/`;
-    }
-
-    window.location.href = newPath + hash;
-  };
+const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
+  compact = false,
+}) => {
+  const { currentLang, switchLanguage } = useLanguageRouter();
+  const { isOpen, setIsOpen, ref } = useDropdown();
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative" ref={ref}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center gap-1.5 rounded-full bg-secondary text-muted hover:text-primary transition-colors focus:outline-none ${
@@ -79,26 +86,11 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
       </button>
 
       {isOpen && (
-        <div
-          className="absolute right-0 mt-2 p-1 bg-page border border-border rounded-lg shadow-xl min-w-[140px] z-[100]"
-          style={{ top: "100%" }}
-        >
-          {languages.map((lang) => (
-            <button
-              key={lang.code}
-              onClick={() => switchLanguage(lang.code)}
-              className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
-                lang.code === currentLang
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted hover:bg-secondary hover:text-foreground"
-              }`}
-            >
-              <span className="text-base">{lang.flag}</span>
-              <span className="flex-1 text-left">{lang.label}</span>
-              {lang.code === currentLang && <Check className="w-4 h-4" />}
-            </button>
-          ))}
-        </div>
+        <LangMenu
+          currentLang={currentLang}
+          onSelect={switchLanguage}
+          onClose={() => setIsOpen(false)}
+        />
       )}
     </div>
   );

@@ -1,0 +1,200 @@
+---
+title: "Java 25 Playground"
+description: "A hands-on tour of Java 25: flexible constructors, scoped values, and primitive patterns."
+tldr: "Java 25 LTS ships flexible constructor bodies, scoped values, module import declarations, and primitive types in patterns. Here's what each does."
+pubDate: 2026-06-12
+draft: false
+ogImage: "/og/blog/java-25-playground.png"
+ogImageAlt: "Java 25 Playground blog post preview image"
+series: "java-journey"
+seriesTitle: "Java Journey"
+seriesOrder: 3
+tags: ["java", "java25", "jep"]
+---
+
+import JavaWasmRunner from "@/components/JavaWasmRunner.astro";
+
+Java 25 (LTS) shipped a few new features. Each
+demo below is compiled to WasmGC via GraalVM Web Image and
+runs in your browser. Hit **Run** to see it execute.
+
+## Flexible Constructor Bodies (JEP 513)
+
+Before Java 25, the first statement in a constructor **had** to be `super()` or
+`this()`. You couldn't validate parameters before delegating to the parent.
+
+JEP 513 lifts that restriction:
+
+```java
+ChildClass(String name) {
+    if (name == null || name.isBlank()) {
+        throw new IllegalArgumentException("Name cannot be empty or null");
+    }
+    super(name);
+}
+```
+
+<JavaWasmRunner
+  id="flexible-constructors"
+  label="JEP 513: Flexible Constructor Bodies"
+  wasmJsUrl="/wasm-demos/flexible-constructors.js"
+  sourceCode={`import java.util.ArrayList;
+import java.util.List;
+
+public class FlexibleConstructors {
+public static void main(String[] args) {
+List<String> results = new ArrayList<>();
+results.add("--- JEP 513: Flexible Constructor Bodies ---");
+
+        var child = new ChildClass("Valid Name");
+        results.add("Child created: " + child.getName());
+
+        try {
+            new ChildClass("");
+        } catch (IllegalArgumentException e) {
+            results.add("Caught expected error: " + e.getMessage());
+        }
+
+        for (String line : results)
+            IO.println(line);
+    }
+
+    static class ChildClass extends BaseClass {
+        ChildClass(String name) {
+            if (name == null || name.isBlank())
+                throw new IllegalArgumentException(
+                    "Name cannot be empty or null");
+            super(name);
+        }
+    }
+
+    static class BaseClass {
+        private final String name;
+        BaseClass(String name) { this.name = name; }
+        public String getName() { return name; }
+    }
+
+}`}
+/>
+
+## Scoped Values (JEP 506)
+
+`ScopedValue` is an immutable, scope-bound alternative to `ThreadLocal`. You bind a value for the duration of a block.
+
+<JavaWasmRunner
+  id="scoped-values"
+  label="JEP 506: Scoped Values"
+  wasmJsUrl="/wasm-demos/scoped-values.js"
+  sourceCode={`public class ScopedValues {
+    private static final ScopedValue<String> CONTEXT =
+        ScopedValue.newInstance();
+
+    public static void main(String[] args) {
+        ScopedValue.where(CONTEXT, "Lab_User_Session")
+            .run(() -> {
+                IO.println("CONTEXT = " + CONTEXT.get());
+                performAction();
+            });
+
+        IO.println("Bound? " + CONTEXT.isBound());
+    }
+
+    static void performAction() {
+        IO.println("Action: " + CONTEXT.get());
+        nestedCall();
+    }
+
+    static void nestedCall() {
+        IO.println("Nested: " + CONTEXT.get());
+    }
+
+}`}
+/>
+
+Virtual threads can have millions of concurrent scoped values
+without the memory overhead of `ThreadLocal`.
+
+## Primitive Types in Patterns (JEP 507, Third Preview)
+
+Pattern matching (`instanceof`, `switch`) now works with primitive types.
+
+<JavaWasmRunner
+  id="primitive-patterns"
+  label="JEP 507: Primitive Patterns"
+  wasmJsUrl="/wasm-demos/primitive-patterns.js"
+  sourceCode={`public class PrimitivePatterns {
+    public static void main(String[] args) {
+        testInstanceOf(100);
+        testInstanceOf(100.50);
+
+        testSwitch(42);
+        testSwitch(123456L);
+        testSwitch(3.14159);
+    }
+
+    static void testInstanceOf(Object obj) {
+        if (obj instanceof int i)
+            IO.println("int: " + i);
+        else if (obj instanceof double d)
+            IO.println("double: " + d);
+    }
+
+    static void testSwitch(Object obj) {
+        switch (obj) {
+            case int i when i > 100 ->
+                IO.println("Large int " + i);
+            case int i ->
+                IO.println("Small int " + i);
+            case long l ->
+                IO.println("Long " + l);
+            case double d ->
+                IO.println("Double " + d);
+            default ->
+                IO.println("Unknown");
+        }
+    }
+
+}`}
+/>
+
+## Java 25 On-Ramp (JEP 511 + 512)
+
+Module import declarations, implicitly declared classes, and instance main methods. Combined,
+you can write small programs without the usual boilerplate.
+
+<JavaWasmRunner
+  id="on-ramp"
+  label="Java 25 On-Ramp (JEP 511 + 512)"
+  wasmJsUrl="/wasm-demos/on-ramp.js"
+  sourceCode={`import java.util.List;
+import java.time.LocalDate;
+
+public class OnRamp {
+public static void main(String[] args) {
+var features = List.of(
+"Module Import Declarations (JEP 511)",
+"Implicitly Declared Classes (JEP 512)",
+"Instance Main Methods (JEP 512)"
+);
+
+        IO.println("Java version: " +
+            System.getProperty("java.version"));
+        IO.println("Date: " + LocalDate.now());
+        features.forEach(f ->
+            IO.println("  - " + f));
+    }
+
+}`}
+/>
+
+## Try It Yourself
+
+The full lab (Maven project + WASM build pipeline) is in the repo:
+
+```bash
+git clone https://github.com/samir1498/java-learning
+cd java-learning/versions/labs/java25-playground   # Maven project
+cd java-learning/wasm-demos                        # WASM build (GraalVM Web Image)
+```
+
+Or just hit **Run** above.

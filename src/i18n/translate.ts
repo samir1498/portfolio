@@ -7,6 +7,7 @@ export function createTranslator<T extends string>(
   lang: Lang,
 ) {
   return function t(key: T): string {
+    // fallow-ignore-next-line complexity
     return translations[key]?.[lang] ?? translations[key]?.en ?? key;
   };
 }

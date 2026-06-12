@@ -46,21 +46,8 @@ export function getSeriesContext(
   const seriesId = current.data.series!;
   const seriesTitle = current.data.seriesTitle!;
   const seriesOrder = current.data.seriesOrder!;
-  const seriesPosts = posts
-    .filter((post) => post.data.series === seriesId)
-    .map((post) => ({
-      slug: post.id,
-      title: post.data.title,
-      seriesOrder: post.data.seriesOrder!,
-    }))
-    .sort((a, b) => a.seriesOrder - b.seriesOrder);
-
-  const index = seriesPosts.findIndex((post) => post.slug === slug);
-  const previous = index > 0 ? seriesPosts[index - 1] : undefined;
-  const next =
-    index >= 0 && index < seriesPosts.length - 1
-      ? seriesPosts[index + 1]
-      : undefined;
+  const seriesPosts = getSeriesPosts(posts, seriesId);
+  const ctx = getAdjacentPosts(seriesPosts, slug);
 
   return {
     series: seriesId,
@@ -68,7 +55,37 @@ export function getSeriesContext(
     seriesOrder,
     total: seriesPosts.length,
     posts: seriesPosts,
-    previous,
-    next,
+    ...ctx,
+  };
+}
+
+function getSeriesPosts(
+  posts: CollectionEntry<"blog">[],
+  seriesId: string,
+): Array<{ slug: string; title: string; seriesOrder: number }> {
+  return posts
+    .filter((post) => post.data.series === seriesId)
+    .map((post) => ({
+      slug: post.id,
+      title: post.data.title,
+      seriesOrder: post.data.seriesOrder!,
+    }))
+    .sort((a, b) => a.seriesOrder - b.seriesOrder);
+}
+
+function getAdjacentPosts(
+  seriesPosts: Array<{ slug: string; title: string; seriesOrder: number }>,
+  slug: string,
+): {
+  previous?: { slug: string; title: string; seriesOrder: number };
+  next?: { slug: string; title: string; seriesOrder: number };
+} {
+  const index = seriesPosts.findIndex((post) => post.slug === slug);
+  return {
+    previous: index > 0 ? seriesPosts[index - 1] : undefined,
+    next:
+      index >= 0 && index < seriesPosts.length - 1
+        ? seriesPosts[index + 1]
+        : undefined,
   };
 }

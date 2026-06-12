@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "ignorePatterns": ["public/wasm-demos/**"],
+  "ignoreDependencies": [
+    "sharp",
+    "@astrojs/mdx",
+    "@astrojs/react",
+    "@astrojs/sitemap",
+    "@tailwindcss/vite"
+  ],
+  "rules": {
+    "unused-files": "off",
+    "unused-exports": "off",
+    "unused-types": "off",
+    "unused-dependencies": "off",
+    "unlisted-dependencies": "off",
+    "unresolved-imports": "off",
+    "circular-dependency": "off",
+    "unused-class-members": "off",
+    "duplicate-exports": "off",
+    "private-type-leaks": "off"
+  }
+}

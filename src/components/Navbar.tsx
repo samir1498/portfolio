@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
+import NavThemeToggle from "./NavThemeToggle";
+import { getNavLinks, getHomeHref, withPrefix } from "@/lib/navLinks";
 
 interface NavbarProps {
   lang?: string;
@@ -16,15 +18,15 @@ const Navbar: React.FC<NavbarProps> = ({
   const [isDark, setIsDark] = useState(false);
 
   const isHomePage = pathname === "/" || /^\/(fr|ar)\/?$/.test(pathname);
+  const navLinks = getNavLinks(currentLang);
+  const homeHref = getHomeHref(currentLang);
 
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains("dark"));
     const blogPath = window.location.pathname.startsWith("/blog");
     setScrolled(blogPath || window.scrollY > 20);
 
-    const handleScroll = () => {
-      setScrolled(blogPath || window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(blogPath || window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -34,67 +36,6 @@ const Navbar: React.FC<NavbarProps> = ({
     setIsDark(newIsDark);
     document.documentElement.classList.toggle("dark", newIsDark);
     localStorage.setItem("theme", newIsDark ? "dark" : "light");
-  };
-
-  const navLinks = [
-    {
-      name:
-        currentLang === "ar"
-          ? "نبذة عني"
-          : currentLang === "fr"
-            ? "À propos"
-            : "About",
-      href: "#about",
-    },
-    {
-      name: currentLang === "ar" ? "المدونة" : "Blog",
-      href: "/blog",
-    },
-    {
-      name:
-        currentLang === "ar"
-          ? "المهارات"
-          : currentLang === "fr"
-            ? "Compétences"
-            : "Skills",
-      href: "#skills",
-    },
-    {
-      name:
-        currentLang === "ar"
-          ? "الخبرة"
-          : currentLang === "fr"
-            ? "Expérience"
-            : "Experience",
-      href: "#experience",
-    },
-    {
-      name:
-        currentLang === "ar"
-          ? "التعليم"
-          : currentLang === "fr"
-            ? "Formation"
-            : "Academic",
-      href: "#academic",
-    },
-    {
-      name:
-        currentLang === "ar"
-          ? "المشاريع"
-          : currentLang === "fr"
-            ? "Projets"
-            : "Projects",
-      href: "#showcase",
-    },
-  ];
-
-  const homeHref =
-    currentLang === "fr" || currentLang === "ar" ? `/${currentLang}` : "/";
-
-  const withPrefix = (href: string) => {
-    if (!href.startsWith("#")) return href;
-    const prefix = isHomePage ? "" : homeHref;
-    return `${prefix}${href}`;
   };
 
   return (
@@ -127,47 +68,21 @@ const Navbar: React.FC<NavbarProps> = ({
               {navLinks.map((link) => (
                 <a
                   key={link.name}
-                  href={withPrefix(link.href)}
+                  href={withPrefix(link.href, isHomePage, homeHref)}
                   className="text-muted hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   {link.name}
                 </a>
               ))}
             </div>
-
-            {/* Language Switcher */}
             <LanguageSwitcher />
-
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full bg-secondary text-muted hover:text-primary transition-colors focus:outline-none"
-              aria-label="Toggle theme"
-            >
-              {isDark ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
+            <NavThemeToggle isDark={isDark} onToggle={toggleTheme} />
           </div>
 
           {/* Mobile Controls */}
           <div className="-mr-2 flex md:hidden items-center gap-2">
             <LanguageSwitcher compact />
-
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full bg-secondary text-muted hover:text-primary transition-colors focus:outline-none"
-              aria-label="Toggle theme"
-            >
-              {isDark ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
-
+            <NavThemeToggle isDark={isDark} onToggle={toggleTheme} />
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-muted hover:text-primary hover:bg-secondary focus:outline-none"
@@ -193,7 +108,7 @@ const Navbar: React.FC<NavbarProps> = ({
           {navLinks.map((link) => (
             <a
               key={link.name}
-              href={withPrefix(link.href)}
+              href={withPrefix(link.href, isHomePage, homeHref)}
               onClick={() => setIsOpen(false)}
               className="text-muted hover:text-primary block px-3 py-2 rounded-md text-base font-medium"
             >

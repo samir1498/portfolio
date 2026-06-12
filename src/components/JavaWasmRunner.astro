@@ -1,0 +1,12 @@
+---
+import JavaWasmRunnerReact from "./JavaWasmRunner.tsx";
+export type Props = {
+  id: string;
+  label: string;
+  sourceCode: string;
+  wasmJsUrl: string;
+};
+const { id, label, sourceCode, wasmJsUrl } = Astro.props;
+---
+
+<JavaWasmRunnerReact client:load {id} {label} {sourceCode} {wasmJsUrl} />
