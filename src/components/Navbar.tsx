@@ -80,7 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Mobile Controls */}
-          <div className="-mr-2 flex md:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-2">
             <LanguageSwitcher compact />
             <NavThemeToggle isDark={isDark} onToggle={toggleTheme} />
             <button
