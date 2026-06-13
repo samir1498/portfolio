@@ -182,6 +182,25 @@ const seriesJsonLd = seriesContext
         >
           <Content />
         </section>
+
+        {
+          seriesContext?.next && (
+            <div class="mt-8 text-right">
+              <a
+                href={`/blog/${seriesContext.next.slug}/`}
+                class="inline-flex items-center gap-2 rounded-xl border border-border bg-page px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/40"
+              >
+                <span class="text-left">
+                  <span class="block text-xs font-normal text-muted">
+                    Next in series
+                  </span>
+                  <span class="block">{seriesContext.next.title}</span>
+                </span>
+                <span class="shrink-0 text-lg">&rarr;</span>
+              </a>
+            </div>
+          )
+        }
       </article>
 
       {

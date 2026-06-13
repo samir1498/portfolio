@@ -1,0 +1,106 @@
+---
+title: "From Bash to CLI: When a Quick Benchmark Gets Serious"
+description: "How the Green Algeria Map benchmark pipeline started as a quick comparison between two backends and grew into something that needed a real CLI."
+tldr: "The benchmark started as a bash script. Then more backends, scenarios, and features kept piling on. The scripts grew with the ambition."
+pubDate: 2026-06-13
+draft: false
+tags: ["green-algeria-map", "cli", "bash", "benchmark"]
+series: "benchmark-cli"
+seriesTitle: "From Bash to CLI"
+seriesOrder: 1
+---
+
+Green Algeria Map's benchmark pipeline started as a simple comparison between two backends. A bash script, a k6 file, some results.
+
+Then I added Go as a baseline to see how NestJS and Spring Boot compared. Then sequential runs, shared Postgres, a compare script. The scripts grew because the benchmark kept growing.
+
+## The First Script
+
+The original `run.sh` took a backend name and ran k6 against it:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+BACKEND="${1:-nestjs}"
+if [ "$BACKEND" != "nestjs" ] && [ "$BACKEND" != "springboot" ]; then
+  echo "Usage: $0 {nestjs|springboot}"
+  exit 1
+fi
+
+if [ "$BACKEND" = "nestjs" ]; then
+  BASE_URL="http://localhost:8080"
+else
+  BASE_URL="http://localhost:8081"
+fi
+
+OUTDIR="results/$(date +%Y%m%d-%H%M)-$BACKEND"
+mkdir -p "$OUTDIR"
+
+for SCENARIO in auth zones mix; do
+  k6 run \
+    --out json="$OUTDIR/$SCENARIO.json" \
+    --summary-export="$OUTDIR/$SCENARIO-summary.json" \
+    -e BASE_URL="$BASE_URL" \
+    "benchmark/$SCENARIO.js"
+done
+```
+
+Positional args, hardcoded ports, a for loop. It worked.
+
+## The Pipeline Script
+
+The `pipeline.sh` had to orchestrate everything: start Docker, run migrations, seed data, wait for health checks, run benchmarks, clean up.
+
+```bash
+wait_for() {
+  local url="$1" label="$2" max=60
+  for i in $(seq 1 $max); do
+    if curl -sf "$url" >/dev/null 2>&1; then
+      return
+    fi
+    sleep 2
+  done
+  exit 1
+}
+
+run_nestjs() {
+  docker compose --profile nestjs up -d postgres rustfs
+  wait_for "http://localhost:5432" "PostgreSQL"
+  cd backend-nestjs
+  node scripts/create-bucket.mjs
+  pnpm migration:run
+  pnpm seed
+  cd ..
+  docker compose --profile nestjs up -d nestjs-app
+  wait_for "http://localhost:8080/api/health/live" "NestJS"
+  ./benchmark/run.sh nestjs
+  docker compose --profile nestjs down -v
+}
+```
+
+Two functions (`run_nestjs`, `run_springboot`), same pattern, different ports. No error recovery.
+
+## The Compare Script
+
+The compare script used inline Python to dig into k6's JSON output:
+
+```bash
+nest_avg=$(python3 -c "
+import json
+d = json.load(open('$nest_json'))
+print(d['metrics']['http_req_duration']['avg'])
+")
+```
+
+Four of these per backend per scenario, wrapped in a function. A winner-takes-all ranking built from bash + Python strings.
+
+## What the Growth Looked Like
+
+The pipeline script had three backends, each with its own copy of the same orchestration logic. A compare script that ranked results using inline Python.
+
+The rewrite came when the benchmark outgrew the script format entirely.
+
+## The Breaking Point
+
+The Go backend was the third backend. The script kept growing. Multiple backends, shared Postgres, sequential runs, a compare script.

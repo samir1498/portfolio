@@ -1,0 +1,156 @@
+---
+title: "Building a CLI With Bun and Citty"
+description: "How the benchmark pipeline was rewritten from bash to a Bun CLI with typed subcommands, config, and a full pipeline orchestrator."
+tldr: "Citty gives you subcommands with typed args, auto-generated help text, and clean error handling. The rest is just TypeScript organizing Docker, k6, and results."
+pubDate: 2026-06-13
+draft: false
+tags: ["green-algeria-map", "bun", "cli", "citty", "typescript"]
+series: "benchmark-cli"
+seriesTitle: "From Bash to CLI"
+seriesOrder: 3
+---
+
+The rewrite landed in one PR: 36 files, 1624 insertions, 4 subcommands.
+
+## The Entry Point
+
+```typescript
+#!/usr/bin/env bun
+import pkg from "../package.json" with { type: "json" };
+import { defineCommand, runMain } from "citty";
+
+import { cleanCommand } from "./commands/clean";
+import { compareCommand } from "./commands/compare";
+import { runCommand } from "./commands/run";
+
+const main = defineCommand({
+  meta: {
+    name: "bench",
+    version: pkg.version,
+    description: "Benchmark CLI for green-algeria-map backends",
+  },
+  subCommands: {
+    run: runCommand,
+    compare: compareCommand,
+    clean: cleanCommand,
+  },
+});
+
+runMain(main);
+```
+
+Three subcommands. `run` runs the full pipeline. `compare` ranks results. `clean` tears down Docker.
+
+## The Subcommand Pattern
+
+Each subcommand uses citty's `defineCommand`:
+
+```typescript
+export const runCommand = defineCommand({
+  meta: { name: "run", description: "Run benchmark pipeline" },
+  args: {
+    backends: {
+      type: "string",
+      alias: "b",
+      description: "Comma-separated backends (nestjs,springboot,go)",
+    },
+    scenarios: {
+      type: "string",
+      alias: "s",
+      description: "Comma-separated scenarios (auth,zones,mix)",
+    },
+    cpus: { type: "string", description: "CPU cores per container" },
+    "skip-warmup": { type: "boolean", description: "Skip warmup phase" },
+    "dry-run": { type: "boolean", description: "Validate config only" },
+  },
+  async run({ args }) {
+    const config = await loadConfig();
+    const opts = resolveRunOptions(config, args);
+    await runPipeline(opts);
+  },
+});
+```
+
+Citty handles arg parsing, type coercion, validation, and `--help`.
+
+## The Pipeline Orchestrator
+
+Same steps as the bash version, but in TypeScript:
+
+```typescript
+export async function runPipeline(opts: RunOptions) {
+  await cleanup();
+  await startInfra();
+  await limitResources();
+
+  for (const backend of opts.backends) {
+    await resetInfra();
+    await ensureDatabase(backend);
+    await preStart(backend);
+    await startBackend(backend);
+    await waitForHealth(backend);
+    await warmup(backend);
+
+    for (const scenario of opts.scenarios) {
+      for (let i = 0; i < opts.repeats; i++) {
+        await runScenario(backend, scenario, i);
+      }
+    }
+
+    await stopBackend(backend);
+  }
+
+  await cleanup();
+  printSummary();
+}
+```
+
+## The Config
+
+Ports and health URLs moved to `bench.config.json`:
+
+```json
+{
+  "backends": {
+    "nestjs": {
+      "port": 8080,
+      "apiPrefix": "/api",
+      "healthUrl": "/api/health/live",
+      "dbName": "greenalgeria_nestjs"
+    },
+    "springboot": {
+      "port": 8081,
+      "healthUrl": "/healthz",
+      "dbName": "greenalgeria_springboot"
+    },
+    "go": {
+      "port": 8082,
+      "healthUrl": "/readyz",
+      "dbName": "greenalgeria_go"
+    }
+  }
+}
+```
+
+Adding a backend is 5 lines in a JSON file. The orchestration stays the same.
+
+## Docker Lifecycle
+
+Docker commands wrapped in typed functions:
+
+```typescript
+await compose.up("infra");
+await compose.up("nestjs", { profile: "nestjs" });
+
+await limits.apply("nestjs-app", { cpus: 1, memory: "512m" });
+
+const stats = await stats.collect("nestjs-app", { interval: 5000 });
+```
+
+Errors propagate through promises.
+
+## What Changed
+
+The bash version was one 226-line file. The TypeScript version is 28 source files with 60+ tests.
+
+Adding a backend: 5 lines in config. The orchestration code doesn't change.
