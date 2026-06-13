@@ -1,4 +1,7 @@
-import { Calendar, Clock3, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import BlogMeta from "./BlogMeta";
+import SeriesBadge from "./SeriesBadge";
+import TagList from "./TagList";
 
 interface Post {
   slug: string;
@@ -13,13 +16,6 @@ interface Post {
     seriesOrder?: number;
   };
 }
-
-const formatDate = (date: Date) =>
-  new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(date));
 
 export default function BlogCard({
   post,
@@ -36,27 +32,18 @@ export default function BlogCard({
     >
       <div className="relative z-10">
         <div className="mb-4 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <time
-              dateTime={new Date(post.data.pubDate).toISOString()}
-              className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-secondary-foreground/80"
-            >
-              <Calendar className="h-3 w-3" />
-              {formatDate(post.data.pubDate)}
-            </time>
-            <span className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-secondary-foreground/80">
-              <Clock3 className="h-3 w-3" />
-              {post.data.readingTime} min read
-            </span>
-          </div>
+          <BlogMeta
+            pubDate={post.data.pubDate}
+            readingTime={post.data.readingTime}
+          />
           <div className="mx-3 h-px flex-1 bg-border/40 transition-colors group-hover:bg-primary/35" />
         </div>
 
         {post.data.seriesTitle && post.data.seriesOrder !== undefined && (
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-border/70 bg-secondary/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-secondary-foreground/80">
-            <span>{post.data.seriesTitle}</span>
-            <span className="text-primary">Part {post.data.seriesOrder}</span>
-          </div>
+          <SeriesBadge
+            title={post.data.seriesTitle}
+            order={post.data.seriesOrder}
+          />
         )}
 
         <h2
@@ -82,22 +69,7 @@ export default function BlogCard({
       </div>
 
       <div className="relative z-10 mt-7 flex items-end justify-between gap-4">
-        <div className="flex flex-wrap gap-2">
-          {post.data.tags.slice(0, 3).map((tag) => (
-            <span
-              key={tag}
-              className="inline-flex items-center rounded-full border border-border/70 bg-secondary/40 px-2.5 py-1 text-[11px] font-medium tracking-wide text-secondary-foreground/85"
-            >
-              {tag}
-            </span>
-          ))}
-          {post.data.tags.length > 3 && (
-            <span className="inline-flex items-center rounded-full border border-border/70 bg-secondary/40 px-2.5 py-1 text-[11px] font-medium tracking-wide text-secondary-foreground/85">
-              +{post.data.tags.length - 3}
-            </span>
-          )}
-        </div>
-
+        <TagList tags={post.data.tags} />
         <a
           href={`/blog/${post.slug}/`}
           className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition-colors hover:text-primary/80"

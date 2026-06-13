@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { useWasmRunner } from "@/hooks/useWasmRunner";
+import CodeView from "./CodeView";
+import OutputDisplay from "./OutputDisplay";
 
 interface JavaWasmRunnerProps {
   id: string;
@@ -10,16 +10,41 @@ interface JavaWasmRunnerProps {
   wasmJsUrl: string;
 }
 
-const highlighterStyles = {
-  margin: 0,
-  borderRadius: 0,
-  fontSize: "0.75rem",
-  lineHeight: "1.5",
-  background: "transparent",
-  overflowX: "auto",
-  maxWidth: "100%",
-  minWidth: 0,
-};
+function RunButton({
+  onClick,
+  running,
+}: {
+  onClick: () => void;
+  running: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={running}
+      className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+    >
+      {running ? (
+        <span
+          aria-hidden="true"
+          className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent"
+        />
+      ) : (
+        <span aria-hidden="true" className="inline-block text-white">
+          &rsaquo;
+        </span>
+      )}
+      {running ? "Running..." : "Run"}
+    </button>
+  );
+}
+
+function ErrorBanner({ message }: { message: string }) {
+  return (
+    <div className="border-t border-border bg-red-50/50 px-4 py-2 text-xs text-red-600 dark:bg-red-950/30 dark:text-red-400">
+      {message}
+    </div>
+  );
+}
 
 export default function JavaWasmRunner({
   id,
@@ -35,7 +60,7 @@ export default function JavaWasmRunner({
       <div className="flex flex-wrap items-center gap-2 border-b border-border bg-secondary/30 px-4 py-2.5">
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <span aria-hidden="true" className="shrink-0 text-primary">
-            &gt;_
+            {">_"}
           </span>
           <span className="truncate text-xs font-semibold text-foreground sm:text-sm">
             {label}
@@ -48,64 +73,13 @@ export default function JavaWasmRunner({
           >
             {showCode ? "Hide" : "Code"}
           </button>
-          <button
-            onClick={run}
-            disabled={running}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-          >
-            {running ? (
-              <span
-                aria-hidden="true"
-                className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent"
-              />
-            ) : (
-              <span aria-hidden="true" className="inline-block text-white">
-                &rsaquo;
-              </span>
-            )}
-            {running ? "Running..." : "Run"}
-          </button>
+          <RunButton onClick={run} running={running} />
         </div>
       </div>
 
-      {showCode && (
-        <div className="max-w-full overflow-x-auto border-b border-border">
-          <SyntaxHighlighter
-            language="java"
-            style={oneDark}
-            customStyle={highlighterStyles}
-            showLineNumbers={false}
-            wrapLines={false}
-          >
-            {sourceCode}
-          </SyntaxHighlighter>
-        </div>
-      )}
-
-      {error && !running && (
-        <div className="border-t border-border bg-red-50/50 px-4 py-2 text-xs text-red-600 dark:bg-red-950/30 dark:text-red-400">
-          {error}
-        </div>
-      )}
-
-      {output.length > 0 && !running && (
-        <div className="max-h-64 overflow-y-auto border-t border-border bg-black/10 p-4 font-mono text-xs leading-relaxed dark:bg-white/5">
-          {output.map((line, i) => (
-            <div
-              key={i}
-              className={
-                line.startsWith("Error")
-                  ? "text-red-500"
-                  : line.startsWith("---")
-                    ? "font-semibold text-primary"
-                    : "text-secondary-foreground"
-              }
-            >
-              {line}
-            </div>
-          ))}
-        </div>
-      )}
+      {showCode && <CodeView code={sourceCode} />}
+      {error && !running && <ErrorBanner message={error} />}
+      {output.length > 0 && !running && <OutputDisplay output={output} />}
     </div>
   );
 }
