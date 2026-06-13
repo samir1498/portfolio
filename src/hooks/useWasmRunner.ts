@@ -58,14 +58,19 @@ export function useWasmRunner(id: string, wasmJsUrl: string) {
       else if (err) setError(err);
     }
 
+    function addNoOutputMessage(err?: string) {
+      if (captured.length > 0) return;
+      if (hasError) return;
+      if (err) return;
+      captured.push(
+        "No output — WASM module may have loaded without console output.",
+      );
+    }
+
     function finalize(err?: string) {
       restoreLogs();
       if (!mountedRef.current) return;
-      if (captured.length === 0 && !hasError && !err) {
-        captured.push(
-          "No output — WASM module may have loaded without console output.",
-        );
-      }
+      addNoOutputMessage(err);
       setOutputFromCapture();
       setErrorIfNeeded(err);
       setRunning(false);
