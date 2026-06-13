@@ -1,5 +1,13 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 
+function captureConsole(args: unknown[]): string {
+  return args.map((a) => String(a)).join(" ");
+}
+
+function hasPendingScript(id: string): boolean {
+  return !!document.querySelector(`script[id^="wr-${id}"]`);
+}
+
 export function useWasmRunner(id: string, wasmJsUrl: string) {
   const [output, setOutput] = useState<string[]>([]);
   const [running, setRunning] = useState(false);
@@ -19,49 +27,31 @@ export function useWasmRunner(id: string, wasmJsUrl: string) {
     };
   }, []);
 
-  const run = useCallback(() => {
-    if (running) return;
-    setRunning(true);
-    setOutput([]);
-    setError(null);
-
-    const captured: string[] = [];
+  function createScriptRunner() {
+    let captured: string[] = [];
     let hasError = false;
 
     logRef.current = [console.log, console.error];
 
-    const capture = (args: unknown[]) =>
-      captured.push(args.map((a) => String(a)).join(" "));
-
-    console.log = (...args: unknown[]) => capture(args);
+    console.log = (...args: unknown[]) => {
+      captured.push(captureConsole(args));
+    };
     console.error = (...args: unknown[]) => {
-      capture(args);
+      captured.push(captureConsole(args));
       hasError = true;
     };
 
-    const restore = () => {
+    function restoreLogs() {
       if (logRef.current) {
         console.log = logRef.current[0];
         console.error = logRef.current[1];
         logRef.current = null;
       }
-    };
+    }
 
-    const prev = document.querySelector(`script[id^="wr-${id}"]`);
-    if (prev) prev.remove();
-
-    const script = document.createElement("script");
-    script.src = wasmJsUrl;
-    script.id = `wr-${id}-${Date.now()}`;
-
-    const t0 = performance.now();
-    let resolved = false;
-
-    const finish = (err?: string) => {
-      if (resolved) return;
-      resolved = true;
-      restore();
-      if (!mountedRef.current) return;
+    function complete(err?: string) {
+      restoreLogs();
+      if (!mountedRef.current) return false;
       if (captured.length === 0 && !hasError && !err) {
         captured.push(
           "No output — WASM module may have loaded without console output.",
@@ -70,30 +60,50 @@ export function useWasmRunner(id: string, wasmJsUrl: string) {
       setOutput([...captured]);
       if (hasError || err) setError(err || "Check console for details.");
       setRunning(false);
-    };
+      return true;
+    }
 
-    script.onload = () => {
+    function handleLoad() {
+      const t0 = performance.now();
       const poll = setInterval(() => {
-        if (performance.now() - t0 > 8000) {
+        const elapsed = performance.now() - t0;
+        if (elapsed > 8000 || captured.length > 0) {
           clearInterval(poll);
-          finish();
-        } else if (captured.length > 0) {
-          clearInterval(poll);
-          finish();
+          complete();
         }
       }, 100);
-    };
+    }
 
-    script.onerror = () => {
-      restore();
+    function handleError() {
+      restoreLogs();
       captured.push("Error: failed to load WASM module.");
       if (mountedRef.current) {
         setOutput([...captured]);
         setError("Script load failed");
         setRunning(false);
       }
-    };
+    }
 
+    return { captured, hasError: () => hasError, handleLoad, handleError };
+  }
+
+  const run = useCallback(() => {
+    if (running) return;
+    setRunning(true);
+    setOutput([]);
+    setError(null);
+
+    if (hasPendingScript(id)) {
+      const prev = document.querySelector(`script[id^="wr-${id}"]`);
+      if (prev) prev.remove();
+    }
+
+    const runner = createScriptRunner();
+    const script = document.createElement("script");
+    script.src = wasmJsUrl;
+    script.id = `wr-${id}-${Date.now()}`;
+    script.onload = runner.handleLoad;
+    script.onerror = runner.handleError;
     document.body.appendChild(script);
   }, [running, wasmJsUrl, id]);
 
