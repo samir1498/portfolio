@@ -57,7 +57,6 @@ export function useWasmRunner(id: string, wasmJsUrl: string) {
     const t0 = performance.now();
     let resolved = false;
 
-    // fallow-ignore-next-line complexity
     const finish = (err?: string) => {
       if (resolved) return;
       resolved = true;
