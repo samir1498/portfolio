@@ -1,0 +1,101 @@
+---
+title: "From v0.1.0 to v1.0.0: Refining a CLI"
+description: "The rewrite landed with 4 subcommands and consola. Three days later it had a live status bar, CPU pinning, profile system, and one less subcommand."
+tldr: "The first version had 4 subcommands and consola logging. Three days later it had 3 subcommands, a custom StatusBar UI, CPU pinning, and profile-based configs."
+pubDate: 2026-06-13
+draft: false
+tags: ["green-algeria-map", "bun", "cli", "citty", "benchmark"]
+series: "benchmark-cli"
+seriesTitle: "From Bash to CLI"
+seriesOrder: 4
+---
+
+The first Bun CLI had 4 subcommands and consola for logging. Over the next three days it gained a live status bar, CPU pinning, a profile system, and dropped a subcommand.
+
+## Removing a Subcommand
+
+The original CLI had a `single` command for running one backend outside the pipeline:
+
+```bash
+bun run bench run -b nestjs    # pipeline, one backend
+bun run bench single nestjs    # same thing, different args
+```
+
+It turned out `run -b` already did what `single` did. The `single` command was removed. 4 subcommands became 3.
+
+## Consola to StatusBar
+
+The first version used consola for structured log lines. A benchmark runs for 5-10 minutes with a live display. The StatusBar replaced consola with a persistent terminal UI that shows the current pipeline phase and live k6 metrics. A RingBuffer stores the last 50 status entries. If the pipeline fails, it dumps the entire history to stderr so you can see what led up to the crash. Pipeline logs are also written to disk alongside results.
+
+```typescript
+export class StatusBar {
+  private currentMode: "phase" | "metrics" | "warning" | "done" = "phase";
+
+  phase(label: string) {
+    /* shows current pipeline step */
+  }
+  metrics(data: Metrics) {
+    /* live k6 metrics: req/s, p95, fail% */
+  }
+  warning(msg: string) {
+    /* transient warnings */
+  }
+  done() {
+    /* final state, doesn't clear */
+  }
+}
+```
+
+## CPU Pinning
+
+Docker containers need CPU isolation for stable results. The CLI added `--cpuset-cpus` pinning:
+
+```typescript
+await limits.apply(container, {
+  cpus: "1",
+  cpusetCpus: cpuIds.slice(0, cpus).join(","),
+  memory: "512m",
+  memorySwap: "512m",
+});
+```
+
+Memory swap pinned to the same value as memory. Without it, a container hitting its limit swaps instead of failing, which makes benchmark results misleading.
+
+## The Profile System
+
+The first version had one config. Then we needed a longer run with 3 repeats and higher VUs. Instead of passing flags every time, the config grew profiles:
+
+```json
+{
+  "profiles": {
+    "default": {
+      "cpus": 1,
+      "memory": "512m",
+      "repeats": 1,
+      "scenarios": {
+        "auth": { "vus": 10, "holdDuration": "30s" }
+      }
+    },
+    "full": {
+      "cpus": 1,
+      "memory": "512m",
+      "repeats": 3,
+      "scenarios": {
+        "auth": { "vus": 50, "holdDuration": "60s" }
+      }
+    }
+  }
+}
+```
+
+```bash
+bun run bench run -P full
+```
+
+CLI flags override profile values, which override defaults.
+
+## v1.0.0
+
+Version 1.0.0 shipped three days after the rewrite. The tests covered the pipeline, the UI was stable, the config worked, and the single command was gone.
+
+The bash scripts it replaced had existed for five days.

@@ -1,0 +1,51 @@
+---
+title: "When a Benchmark Needs More Than a Script"
+description: "The benchmark kept growing. More backends, shared Postgres, sequential orchestration, a compare script. Each addition made sense. Together they outgrew the script."
+tldr: "The benchmark went from 2 backends to 3, from parallel to sequential, from separate Postgres containers to shared. Each feature made sense. Together they outgrew the script."
+pubDate: 2026-06-13
+draft: false
+tags: ["green-algeria-map", "go", "bash", "benchmark"]
+series: "benchmark-cli"
+seriesTitle: "From Bash to CLI"
+seriesOrder: 2
+---
+
+Green Algeria Map started with two backends: NestJS and Spring Boot. The pipeline script worked fine. Then I added Go as a baseline, switched to sequential runs, consolidated Postgres, built a compare script. Each change made sense. Together they pushed past what a script could manage.
+
+## The Go Backend Template
+
+The Go backend needed the same benchmark treatment as the other two. In bash, that meant a new function:
+
+```bash
+run_go() {
+  docker compose --profile go up -d postgres
+  wait_for "http://localhost:5432" "PostgreSQL"
+
+  cd backend-go
+  make migrate-up
+  cd ..
+
+  docker compose --profile go up -d go-app
+  wait_for "http://localhost:8082/readyz" "Go"
+
+  ./benchmark/run.sh go
+
+  docker compose --profile go down -v
+}
+```
+
+Different port (8082) and DB tool (Goose). Same pattern as the other two, just written out again.
+
+## The Infra Changes
+
+Adding Go forced two infrastructure changes:
+
+Parallel runs were fine with two backends. With three, CPU and memory contention made results unreliable. The pipeline went sequential.
+
+Three separate Postgres containers became one shared instance with per-backend databases (`greenalgeria_nestjs`, `greenalgeria_springboot`, `greenalgeria_go`).
+
+## When Ambition Outgrows the Script
+
+The pipeline script worked. But every new backend meant another function with the same pattern. Every config change meant editing the same values in three places. On top of that, a compare script that needed its own Python-based JSON parsing.
+
+The benchmark had grown past what a shell script should reasonably manage.
