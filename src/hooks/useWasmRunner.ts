@@ -49,18 +49,26 @@ export function useWasmRunner(id: string, wasmJsUrl: string) {
       }
     }
 
-    function complete(err?: string) {
+    function setOutputFromCapture() {
+      setOutput([...captured]);
+    }
+
+    function setErrorIfNeeded(err?: string) {
+      if (hasError) setError("Check console for details.");
+      else if (err) setError(err);
+    }
+
+    function finalize(err?: string) {
       restoreLogs();
-      if (!mountedRef.current) return false;
+      if (!mountedRef.current) return;
       if (captured.length === 0 && !hasError && !err) {
         captured.push(
           "No output — WASM module may have loaded without console output.",
         );
       }
-      setOutput([...captured]);
-      if (hasError || err) setError(err || "Check console for details.");
+      setOutputFromCapture();
+      setErrorIfNeeded(err);
       setRunning(false);
-      return true;
     }
 
     function handleLoad() {
@@ -69,7 +77,7 @@ export function useWasmRunner(id: string, wasmJsUrl: string) {
         const elapsed = performance.now() - t0;
         if (elapsed > 8000 || captured.length > 0) {
           clearInterval(poll);
-          complete();
+          finalize();
         }
       }, 100);
     }

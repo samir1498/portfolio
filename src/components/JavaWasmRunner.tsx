@@ -46,6 +46,25 @@ function ErrorBanner({ message }: { message: string }) {
   );
 }
 
+function FooterSection({
+  showCode,
+  sourceCode,
+  error,
+  output,
+  running,
+}: {
+  showCode: boolean;
+  sourceCode: string;
+  error: string | null;
+  output: string[];
+  running: boolean;
+}) {
+  if (showCode) return <CodeView code={sourceCode} />;
+  if (error && !running) return <ErrorBanner message={error} />;
+  if (output.length > 0 && !running) return <OutputDisplay output={output} />;
+  return null;
+}
+
 export default function JavaWasmRunner({
   id,
   label,
@@ -77,9 +96,13 @@ export default function JavaWasmRunner({
         </div>
       </div>
 
-      {showCode && <CodeView code={sourceCode} />}
-      {error && !running && <ErrorBanner message={error} />}
-      {output.length > 0 && !running && <OutputDisplay output={output} />}
+      <FooterSection
+        showCode={showCode}
+        sourceCode={sourceCode}
+        error={error}
+        output={output}
+        running={running}
+      />
     </div>
   );
 }
