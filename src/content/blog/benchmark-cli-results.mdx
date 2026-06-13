@@ -1,0 +1,80 @@
+---
+title: "The Numbers After All the Fixes"
+description: "Baseline comparison across NestJS, Spring Boot, and Go at 1 CPU / 512MiB. Plus Express vs Fastify, virtual threads, and what surprised me."
+tldr: "Go dominates auth (6,804 req/s) with 58MiB memory. Spring Boot competitive on auth (3,226 req/s) but struggles on zones at 512MiB. Express vs Fastify is identical. Virtual threads don't help."
+pubDate: 2026-06-14
+draft: false
+ogImage: "/og/blog/benchmark-cli-results.png"
+ogImageAlt: "The Numbers After All the Fixes - blog post preview"
+tags: ["green-algeria-map", "benchmark", "go", "spring-boot", "nestjs"]
+series: "benchmark-cli"
+seriesTitle: "From Bash to CLI"
+seriesOrder: 6
+---
+
+After fixing the [six bugs](/blog/benchmark-cli-bugs/), here's what the benchmark actually measured.
+
+## Baseline: 3 Backends at 1 CPU / 512MiB
+
+All scenarios at 0% failure. Three repeats per scenario, median reported. 90s holds per run.
+
+### Auth (20 VUs, 30s hold)
+
+| Rank | Backend    | avg  | p95  | req/s | Mem    |
+| ---- | ---------- | ---- | ---- | ----- | ------ |
+| 1    | go         | 2ms  | 4ms  | 6,804 | 58MiB  |
+| 2    | springboot | 4ms  | 10ms | 3,226 | 392MiB |
+| 3    | nestjs     | 11ms | 36ms | 1,241 | 390MiB |
+
+### Zones (40 VUs, 30s hold)
+
+| Rank | Backend    | avg   | p95     | req/s | Mem    |
+| ---- | ---------- | ----- | ------- | ----- | ------ |
+| 1    | go         | 154ms | 366ms   | 174   | 58MiB  |
+| 2    | nestjs     | 288ms | 775ms   | 94    | 390MiB |
+| 3    | springboot | 497ms | 1,298ms | 54    | 392MiB |
+
+### Mix (30 VUs, 1m ramp + 30s hold)
+
+| Rank | Backend    | avg   | p95     | req/s | Mem    |
+| ---- | ---------- | ----- | ------- | ----- | ------ |
+| 1    | go         | 163ms | 391ms   | 112   | 58MiB  |
+| 2    | nestjs     | 302ms | 1,017ms | 60    | 390MiB |
+| 3    | springboot | 503ms | 1,498ms | 37    | 392MiB |
+
+**Notes:** All three backends peaked at ~100% CPU under load (1 CPU limit). Go sips memory at 58MiB while NestJS and Spring Boot settle at ~390MiB due to runtime overhead. Spring Boot's zones/mix latency is impacted by thread-per-request model at 512MiB - with heap limited to 154MiB, the remaining memory goes to native thread stacks.
+
+## Express vs Fastify
+
+Swapping `@nestjs/platform-express` for `@nestjs/platform-fastify` made no meaningful difference:
+
+| Scenario    | Express | Fastify | Delta |
+| ----------- | ------- | ------- | ----- |
+| Auth avg    | 10ms    | 10ms    | +0ms  |
+| Zones avg   | 319ms   | 324ms   | +5ms  |
+| Mix avg     | 157ms   | 152ms   | -5ms  |
+| Auth req/s  | 1,330   | 1,354   | +2%   |
+| Zones req/s | 106     | 104     | -2%   |
+| Mix req/s   | 116     | 127     | +9%   |
+
+All within run-to-run noise. The bottleneck is application logic: DB queries, serialization, auth. Not the HTTP adapter. Fastify uses slightly less memory (~10-30MiB), but the difference is marginal.
+
+## Spring Boot Virtual Threads
+
+`spring.threads.virtual.enabled=true` changed nothing. At 40 VUs with a 1 CPU limit, the bottleneck was CPU-bound request processing. Not thread stacks, not the DB pool.
+
+Commit: [`dc0eaed2`](https://github.com/samir1498/green-algeria-map/commit/dc0eaed2)
+
+## What's Planned
+
+The current benchmark tests everything together: framework, DB, auth, serialization. It can't isolate where the bottleneck actually is. The next phase will run isolated scenarios:
+
+- `GET /ping`: raw framework overhead
+- `POST /echo`: JSON serialization cost
+- `POST /validate`: validation cost
+- In-memory CRUD: business logic without DB
+- CRUD with PostgreSQL: DB layer isolation
+
+Each layer measured separately to answer: is it the framework, the runtime, the ORM, the DB pool, the validation, or the auth?
+
+Per-backend optimization posts will follow once the bottleneck is identified. The goal isn't a winner. It's understanding where each stack spends its time.

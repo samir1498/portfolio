@@ -1,0 +1,75 @@
+---
+title: "6 Bugs That Made My Benchmark Wrong"
+description: "The benchmark pipeline ran. The numbers looked reasonable. They were wrong six different ways."
+tldr: "Six bugs - missing CPU pinning, a memory-swap trap, a JVM blindspot, a typo, a pool mismatch, and a hidden auth guard - all invalidating the results before the benchmark even started."
+pubDate: 2026-06-14
+draft: false
+ogImage: "/og/blog/benchmark-cli-bugs.png"
+ogImageAlt: "6 Bugs That Made My Benchmark Wrong - blog post preview"
+tags: ["green-algeria-map", "benchmark", "testing", "bun", "cli"]
+series: "benchmark-cli"
+seriesTitle: "From Bash to CLI"
+seriesOrder: 5
+---
+
+The benchmark pipeline ran. The numbers looked reasonable. NestJS was 9x slower than Go on auth, Spring Boot was in between. Clean tables, tidy comparisons.
+
+Every single one of those numbers was wrong.
+
+I spent more time finding bugs than running benchmarks. Here are the six.
+
+## 1. The Missing CPU Pin
+
+Docker's `--cpus=1` limits total CPU time but doesn't pin to a specific core. Without `--cpuset-cpus`, the kernel schedules the container across all cores, and results vary depending on which core the process lands on and what else is running there.
+
+The fix: pin each backend to specific cores with `--cpuset-cpus`. Combined with `--cpus`, every run gets the same physical CPU resource.
+
+Commit: [`9457944e`](https://github.com/samir1498/green-algeria-map/commit/9457944e)
+
+## 2. The Memory-Swap Trap
+
+Docker's `--memory` and `--memory-swap` are coupled. Set one without the other and `docker update` fails silently. The container hit swap instead of respecting the 512MiB limit.
+
+The fix: pin `--memory-swap` to the same value as `--memory`.
+
+Commit: [`4ae7a7a4`](https://github.com/samir1498/green-algeria-map/commit/4ae7a7a4)
+
+## 3. The JVM Blindspot
+
+The JVM reads cgroup limits at startup. The pipeline created containers with unlimited RAM, then applied limits with `docker update`. The JVM had already seen 15GiB of host RAM and allocated 4GiB of heap. Spring Boot got OOM-killed 10 seconds into every zones run.
+
+The first fix: `docker restart` so the JVM starts again with the correct cgroup. The real fix: create the container, apply limits, _then_ start it.
+
+Commit: [`4138a80a`](https://github.com/samir1498/green-algeria-map/commit/4138a80a), then [`8a979f3a`](https://github.com/samir1498/green-algeria-map/commit/8a979f3a)
+
+## 4. The Typo
+
+`JAVA_TOOLS_SB` instead of `JAVA_TOOL_OPTIONS`. The entire Spring Boot JVM configuration was never applied. Heap limits, GC settings were all ignored.
+
+Commit: [`5e7721f8`](https://github.com/samir1498/green-algeria-map/commit/5e7721f8)
+
+## 5. The Connection Pool (Red Herring)
+
+TypeORM's connection pool defaulted to 10. Spring Boot and Go were at 50. Obvious bias. Fix it.
+
+`extra: { max: 50 }` went in. But at 1 CPU, those 50 connections just contended harder. Failure rate went up, not down. The bottleneck wasn't pool connections. It was the single CPU core. Pool size was a red herring.
+
+The config was reverted. The real fix came from eliminating unnecessary auth work per request. That's the next item.
+
+Commit: [`c763cd43`](https://github.com/samir1498/green-algeria-map/commit/c763cd43) (added), later reverted
+
+## 6. The 99.7% Failure Rate
+
+NestJS zones was failing 99.7% of requests. It wasn't the app. BetterAuth's internal global guard called `auth.api.getSession()` on every request, including public endpoints. Every zones request did a DB call just to fail authentication.
+
+A `SmartAuthGuard` existed that checked `@Public()` first, but BetterAuth's guard was running instead. The fix: `disableGlobalAuthGuard: true` on the BetterAuth module, register `SmartAuthGuard` as `APP_GUARD`.
+
+Commit: [`c763cd43`](https://github.com/samir1498/green-algeria-map/commit/c763cd43)
+
+## What Worked After All That
+
+After the six fixes, all three backends hit 0% failure at 1 CPU / 512MiB. The benchmark was finally measuring what I thought it was measuring.
+
+Then I ran the actual comparisons: Express vs Fastify, Spring Boot virtual threads, read path optimizations. Those results are for the next post.
+
+The takeaway I didn't expect: building a fair benchmark is harder than building the thing you're benchmarking. Six bugs in a pipeline that looked correct. Every one of them silently producing plausible-looking wrong numbers.
