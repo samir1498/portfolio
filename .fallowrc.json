@@ -8,6 +8,9 @@
     "@astrojs/sitemap",
     "@tailwindcss/vite"
   ],
+  "health": {
+    "maxCrap": 80
+  },
   "rules": {
     "unused-files": "off",
     "unused-exports": "off",
