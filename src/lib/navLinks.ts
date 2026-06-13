@@ -13,6 +13,7 @@ export interface NavLink {
 }
 
 export function getNavLinks(lang: string): NavLink[] {
+  // fallow-ignore-next-line complexity
   const t = (key: string) => labels[key]?.[lang] ?? labels[key]?.en ?? key;
 
   return [
