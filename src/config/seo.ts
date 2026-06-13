@@ -37,7 +37,7 @@ const buildArticleMeta = (
       }
     : undefined;
 
-export function getSeoConfig(options?: {
+interface SeoOptions {
   title?: string;
   description?: string;
   lang?: string;
@@ -48,7 +48,58 @@ export function getSeoConfig(options?: {
   publishedTime?: string | Date;
   modifiedTime?: string | Date;
   articleTags?: string[];
-}) {
+}
+
+interface SeoInput {
+  title: string;
+  description: string;
+  canonicalUrl: string;
+  ogImageUrl: string;
+  ogType: "website" | "article";
+  lang: string;
+  ogImageAlt: string;
+  publishedTime?: string | Date;
+  modifiedTime?: string | Date;
+  articleTags: string[];
+  favicon: string;
+}
+
+function buildSeoOpenGraph({
+  title,
+  canonicalUrl,
+  ogImageUrl,
+  ogType,
+  lang,
+  ogImageAlt,
+  description,
+  publishedTime,
+  modifiedTime,
+  articleTags,
+}: SeoInput) {
+  return {
+    basic: { title, type: ogType, image: ogImageUrl, url: canonicalUrl },
+    optional: { description, locale: getLocale(lang) },
+    image: { url: ogImageUrl, width: 1200, height: 630, alt: ogImageAlt },
+    article: buildArticleMeta(ogType, publishedTime, modifiedTime, articleTags),
+  };
+}
+
+function buildSeoTweet({
+  title,
+  description,
+  ogImageUrl,
+  ogImageAlt,
+}: SeoInput) {
+  return {
+    card: "summary_large_image" as const,
+    title,
+    description,
+    image: ogImageUrl,
+    imageAlt: ogImageAlt,
+  };
+}
+
+export function getSeoConfig(options?: SeoOptions) {
   const {
     title = siteConfig.defaultTitle,
     description = siteConfig.defaultDescription,
@@ -66,41 +117,26 @@ export function getSeoConfig(options?: {
   const ogImageUrl = toAbsoluteUrl(ogImage || siteConfig.ogImage);
   const openGraphImageAlt = ogImageAlt || `${title} preview image`;
 
+  const input: SeoInput = {
+    title,
+    description,
+    canonicalUrl,
+    ogImageUrl,
+    ogType,
+    lang,
+    ogImageAlt: openGraphImageAlt,
+    publishedTime,
+    modifiedTime,
+    articleTags,
+    favicon: siteConfig.favicon,
+  };
+
   return {
     title,
     description,
     canonical: canonicalUrl,
-    openGraph: {
-      basic: {
-        title,
-        type: ogType,
-        image: ogImageUrl,
-        url: canonicalUrl,
-      },
-      optional: {
-        description,
-        locale: getLocale(lang),
-      },
-      image: {
-        url: ogImageUrl,
-        width: 1200,
-        height: 630,
-        alt: openGraphImageAlt,
-      },
-      article: buildArticleMeta(
-        ogType,
-        publishedTime,
-        modifiedTime,
-        articleTags,
-      ),
-    },
-    twitter: {
-      card: "summary_large_image" as const,
-      title,
-      description,
-      image: ogImageUrl,
-      imageAlt: openGraphImageAlt,
-    },
+    openGraph: buildSeoOpenGraph(input),
+    twitter: buildSeoTweet(input),
     extend: {
       link: [
         { rel: "icon", type: "image/svg+xml", href: siteConfig.favicon },

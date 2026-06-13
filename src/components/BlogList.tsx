@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
 import { Search, XCircle } from "lucide-react";
 import BlogCard from "./BlogCard";
 import TagFilters from "./TagFilters";
 import NoResults from "./NoResults";
+import { useBlogFilter } from "@/hooks/useBlogFilter";
 
 interface Post {
   slug: string;
@@ -21,32 +21,6 @@ interface Post {
 interface BlogListProps {
   initialPosts: Post[];
   allTags: string[];
-}
-
-function useBlogFilter(posts: Post[]) {
-  const [activeTag, setActiveTag] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredPosts = useMemo(
-    () =>
-      posts.filter((post) => {
-        const matchesSearch = post.data.title
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase());
-        const matchesTag =
-          activeTag === "all" || post.data.tags.includes(activeTag);
-        return matchesSearch && matchesTag;
-      }),
-    [posts, searchQuery, activeTag],
-  );
-
-  return {
-    activeTag,
-    setActiveTag,
-    searchQuery,
-    setSearchQuery,
-    filteredPosts,
-  };
 }
 
 export default function BlogList({ initialPosts, allTags }: BlogListProps) {
