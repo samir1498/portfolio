@@ -1,7 +1,7 @@
 ---
 title: "Green Algeria Map"
 subtitle: "Reforestation tracking platform"
-description: "Map-based platform for tracking reforestation and cleanup efforts across Algeria. Replaces scattered video updates with a real platform where volunteers, donors, and organizers can track progress and coordinate action."
+description: "Multi-backend map platform for tracking reforestation and cleanup efforts across Algeria. Three backend implementations (NestJS, Go, Spring Boot) with matching test suites, CI, and Docker Compose for benchmarking."
 status: "in-development"
 github: "https://github.com/samir1498/green-algeria-map"
 techStack:
@@ -11,21 +11,24 @@ techStack:
   - shadcn/ui
   - Leaflet
   - NestJS 11
+  - Go 1.26
+  - Spring Boot 4
   - CQRS
-  - TypeORM
+  - TypeORM (NestJS)
+  - pgx (Go)
   - PostgreSQL 18
   - BetterAuth
   - RustFS (S3-compatible)
   - Cloudflare R2
   - Vitest
   - testcontainers
+  - Go testing
   - Playwright
-  - Cloudflare R2
   - Cloudflare Pages
   - Render
 features:
   - Interactive Leaflet map with color-coded zones
-  - Zone CRUD API with CQRS pattern
+  - Zone CRUD API with CQRS pattern across 3 backends
   - Damage reporting with photo evidence and red markers
   - Tree species info via iNaturalist / GBIF integration
   - Photo upload to RustFS (S3-compatible storage)
@@ -34,21 +37,24 @@ features:
   - Mobile-responsive design with clamp-based font scaling
   - Clean architecture with domain/application/infrastructure layers
   - TypeORM migrations with strict schema management
-  - 130+ tests across unit, UI, integration, and E2E suites
-  - CI pipeline with path filters
+  - In-memory caching with per-id eviction (NestJS, Go, Spring Boot)
+  - Retry with exponential backoff for uploads (NestJS, Go)
+  - 180+ tests across unit, integration, and E2E suites
+  - CI pipeline with path filters per backend
   - Swagger and Scalar API documentation
   - Deployed on Cloudflare Pages + Render
+  - Docker Compose for multi-backend benchmarking
 plannedFeatures:
-  - Spring Boot backend benchmark
+  - CI matrix for Go backend
 highlights:
   - title: "CQRS Pattern"
-    description: "Commands, queries, and domain events for clean separation of read and write paths."
+    description: "Commands, queries, and domain events for clean separation of read and write paths — implemented identically in NestJS and Go."
   - title: "Testcontainers"
     description: "Isolated PostgreSQL per test run with zero shared state between suites."
-  - title: "Vitest Migration"
-    description: "Replaced Jest to handle ESM-only packages natively with separate unit and integration configs."
-  - title: "Clean Architecture"
-    description: "Domain entities, repository interfaces, and TypeORM adapters keep layers decoupled."
+  - title: "3-Backend Benchmark"
+    description: "NestJS, Go, and Spring Boot implementing the same API with matching caching configs and CI for fair performance comparison."
+  - title: "In-Memory Caching"
+    description: "LRU cache with 5 min TTL and per-id eviction, implemented consistently across all three backends."
 pubDate: 2026-05-18
 ogImage: "/og/projects/green-algeria-map.png"
 ogImageAlt: "Green Algeria Map project preview image"
