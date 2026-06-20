@@ -13,10 +13,16 @@ export function detectLanguage(path: string): string {
 export function switchLanguagePath(newLang: string): string {
   const currentPath = window.location.pathname;
   const hash = window.location.hash;
+  if (currentPath.startsWith("/blog/")) {
+    return currentPath + hash;
+  }
   if (LANG_PATTERN.test(currentPath)) {
+    const stripped = currentPath.replace(LANG_PATTERN, "/");
+    if (newLang === "en") return stripped + hash;
     return currentPath.replace(LANG_PATTERN, `/${newLang}/`) + hash;
   }
-  return `/${newLang}/` + hash;
+  if (currentPath === "/") return `/${newLang}/` + hash;
+  return `/${newLang}${currentPath}` + hash;
 }
 
 export function useLanguageRouter() {
