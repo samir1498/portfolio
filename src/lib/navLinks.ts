@@ -21,7 +21,7 @@ export interface NavLink {
 function translateLabel(key: string, lang: string): string {
   const entry = labels[key];
   if (!entry) return key;
-  return (entry as Record<string, string>)[lang] ?? entry.en;
+  return (entry as unknown as Record<string, string>)[lang] ?? entry.en;
 }
 
 export function getNavLinks(lang: string): NavLink[] {
