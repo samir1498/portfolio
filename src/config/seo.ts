@@ -113,7 +113,12 @@ export function getSeoConfig(options?: SeoOptions) {
     articleTags = [],
   } = options || {};
 
-  const canonicalUrl = new URL(pathname, siteConfig.siteUrl).toString();
+  const effectivePathname =
+    lang === "en" ? pathname.replace(/^\/en(?:\/|$)/, "/") : pathname;
+  const canonicalUrl = new URL(
+    effectivePathname,
+    siteConfig.siteUrl,
+  ).toString();
   const ogImageUrl = toAbsoluteUrl(ogImage || siteConfig.ogImage);
   const openGraphImageAlt = ogImageAlt || `${title} preview image`;
 

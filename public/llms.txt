@@ -1,0 +1,18 @@
+# Samir.Dev
+
+Full-stack software engineer portfolio and blog.
+
+## Pages
+
+- Home: https://samir-bettahar.dev/
+- Blog: https://samir-bettahar.dev/blog/
+- Projects: https://samir-bettahar.dev/#showcase
+
+## Projects
+
+- pc-ctx: Context management CLI and MCP for AI agents
+- Green Algeria Map: Multi-backend reforestation tracking platform
+
+## Blog topics
+
+Engineering, Java, NestJS, Go, Spring Boot, testing, benchmarking, CI/CD, web performance, toolkit construction.

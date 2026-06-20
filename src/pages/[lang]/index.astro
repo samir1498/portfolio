@@ -7,6 +7,7 @@ import Portfolio from "@/components/Portfolio.astro";
 import Footer from "@/components/Footer.astro";
 import Layout from "@/layouts/Layout.astro";
 import { languages } from "@/i18n/ui";
+import { siteConfig } from "@/config/seo";
 import type { Lang } from "@/data";
 
 export async function getStaticPaths() {
@@ -16,9 +17,22 @@ export async function getStaticPaths() {
 }
 
 const { lang } = Astro.params as { lang: Lang };
+
+const personLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Samir Bettahar",
+  url: siteConfig.siteUrl,
+  sameAs: [
+    "https://github.com/samir1498",
+    "https://www.linkedin.com/in/samir-bettahar/",
+  ],
+  jobTitle: "Software Engineer",
+};
 ---
 
 <Layout>
+  <script is:inline set:html={JSON.stringify(personLd)} />
   <Hero lang={lang} />
   <Experience lang={lang} />
   <Skills lang={lang} />

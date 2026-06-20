@@ -8,145 +8,100 @@ export async function getStaticPaths() {
     "projects",
     (p) => !/-(?:fr|ar)$/.test(p.id),
   );
-  const locales = ["en", "fr", "ar"] as const;
-  return locales.flatMap((lang) =>
-    projects.map((project) => ({
-      params: { lang, slug: project.id },
-      props: { project, lang },
-    })),
-  );
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
 }
 
-type Locale = "en" | "fr" | "ar";
-
-const { project, lang } = Astro.props as {
+const { project } = Astro.props as {
   project: CollectionEntry<"projects">;
-  lang: Locale;
 };
 
-const localizedProject = await getLocalizedProject(project.id, lang);
-const backHref = lang === "en" ? "/#showcase" : `/${lang}/#showcase`;
-
-async function getLocalizedProject(
-  slug: string,
-  locale: string,
-): Promise<CollectionEntry<"projects">> {
-  if (locale === "en") return project;
-  const localized = await getCollection(
-    "projects",
-    (p) => p.id === `${slug}-${locale}`,
-  );
-  return localized.length > 0 ? localized[0] : project;
-}
-
-const statusLabels: Record<string, Record<string, string>> = {
-  "in-development": {
-    en: "In Development",
-    fr: "En développement",
-    ar: "قيد التطوير",
-  },
-  live: { en: "Live", fr: "En ligne", ar: "مباشر" },
-  archived: { en: "Archived", fr: "Archivé", ar: "مؤرشف" },
+const statusLabels: Record<string, string> = {
+  "in-development": "In Development",
+  live: "Live",
+  archived: "Archived",
 };
 
-function t(key: string) {
-  return statusLabels[key]?.[lang] ?? statusLabels[key]?.en ?? key;
-}
-
-const linkLabels: Record<string, Record<string, string>> = {
-  github: { en: "View on GitHub", fr: "Voir sur GitHub", ar: "عرض على GitHub" },
-  demo: { en: "Live Demo", fr: "Démo en direct", ar: "عرض مباشر" },
-  back: {
-    en: "Back to projects",
-    fr: "Retour aux projets",
-    ar: "العودة إلى المشاريع",
-  },
+const linkLabels: Record<string, string> = {
+  github: "View on GitHub",
+  demo: "Live Demo",
+  back: "Back to projects",
 };
 
-function tl(key: string) {
-  return linkLabels[key]?.[lang] ?? linkLabels[key]?.en ?? key;
-}
-
-const sectionLabels: Record<string, Record<string, string>> = {
-  techStack: { en: "Tech Stack", fr: "Technologies", ar: "التقنيات" },
-  implemented: { en: "Implemented", fr: "Implémenté", ar: "منفذ" },
-  planned: { en: "Planned", fr: "Planifié", ar: "مخطط" },
-  highlights: {
-    en: "Technical Highlights",
-    fr: "Points techniques",
-    ar: "النقاط التقنية",
-  },
+const sectionLabels: Record<string, string> = {
+  techStack: "Tech Stack",
+  implemented: "Implemented",
+  planned: "Planned",
+  highlights: "Technical Highlights",
 };
-
-function ts(key: string) {
-  return sectionLabels[key]?.[lang] ?? sectionLabels[key]?.en ?? key;
-}
 ---
 
 <Layout
-  title={localizedProject.data.title}
-  description={localizedProject.data.description}
-  ogImage={localizedProject.data.ogImage}
-  ogImageAlt={localizedProject.data.ogImageAlt}
+  title={project.data.title}
+  description={project.data.description}
+  ogImage={project.data.ogImage}
+  ogImageAlt={project.data.ogImageAlt}
 >
   <article class="min-h-screen bg-page">
     <div class="max-w-3xl mx-auto px-6 py-16">
       <a
-        href={backHref}
+        href="/#showcase"
         class="inline-flex items-center gap-2 text-muted hover:text-foreground transition-colors mb-8"
       >
         <ArrowLeft className="w-4 h-4" />
-        <span class="text-sm">{tl("back")}</span>
+        <span class="text-sm">{linkLabels.back}</span>
       </a>
 
       <header class="mb-12">
         <div class="flex items-center gap-3 mb-4">
           <h1 class="text-3xl md:text-5xl font-bold text-foreground">
-            {localizedProject.data.title}
+            {project.data.title}
           </h1>
           <span
             class={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${
-              localizedProject.data.status === "in-development"
+              project.data.status === "in-development"
                 ? "bg-primary/10 text-primary"
-                : localizedProject.data.status === "live"
+                : project.data.status === "live"
                   ? "bg-emerald-500/10 text-emerald-500 dark:bg-emerald-400/10 dark:text-emerald-400"
                   : "bg-secondary text-secondary-foreground"
             }`}
           >
-            {t(localizedProject.data.status)}
+            {statusLabels[project.data.status] || project.data.status}
           </span>
         </div>
-        <p class="text-lg text-muted">{localizedProject.data.subtitle}</p>
+        <p class="text-lg text-muted">{project.data.subtitle}</p>
       </header>
 
       <section class="mb-12">
         <p class="text-foreground/80 leading-relaxed">
-          {localizedProject.data.description}
+          {project.data.description}
         </p>
       </section>
 
       {
-        (localizedProject.data.github || localizedProject.data.demo) && (
+        (project.data.github || project.data.demo) && (
           <div class="mb-12 flex flex-wrap gap-4">
-            {localizedProject.data.github && (
+            {project.data.github && (
               <a
-                href={localizedProject.data.github}
+                href={project.data.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
               >
-                {tl("github")}
+                {linkLabels.github}
                 <ArrowUpRight className="w-4 h-4" />
               </a>
             )}
-            {localizedProject.data.demo && (
+            {project.data.demo && (
               <a
-                href={localizedProject.data.demo}
+                href={project.data.demo}
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
               >
-                {tl("demo")}
+                {linkLabels.demo}
                 <ArrowUpRight className="w-4 h-4" />
               </a>
             )}
@@ -156,11 +111,11 @@ function ts(key: string) {
 
       <section class="mb-12">
         <h2 class="text-xl font-semibold text-foreground mb-4">
-          {ts("techStack")}
+          {sectionLabels.techStack}
         </h2>
         <div class="flex flex-wrap gap-2">
           {
-            localizedProject.data.techStack.map((tech) => (
+            project.data.techStack.map((tech) => (
               <span class="text-sm px-3 py-1.5 rounded-md bg-secondary text-secondary-foreground">
                 {tech}
               </span>
@@ -171,11 +126,11 @@ function ts(key: string) {
 
       <section class="mb-12">
         <h2 class="text-xl font-semibold text-foreground mb-4">
-          {ts("implemented")}
+          {sectionLabels.implemented}
         </h2>
         <ul class="space-y-2">
           {
-            localizedProject.data.features.map((feature) => (
+            project.data.features.map((feature) => (
               <li class="flex items-start gap-3 text-foreground/80">
                 <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                 <span>{feature}</span>
@@ -187,11 +142,11 @@ function ts(key: string) {
 
       <section class="mb-12">
         <h2 class="text-xl font-semibold text-foreground mb-4">
-          {ts("planned")}
+          {sectionLabels.planned}
         </h2>
         <ul class="space-y-2">
           {
-            localizedProject.data.plannedFeatures.map((feature) => (
+            project.data.plannedFeatures.map((feature) => (
               <li class="flex items-start gap-3 text-muted">
                 <Circle className="w-5 h-5 shrink-0 mt-0.5" />
                 <span>{feature}</span>
@@ -203,11 +158,11 @@ function ts(key: string) {
 
       <section class="mb-12">
         <h2 class="text-xl font-semibold text-foreground mb-4">
-          {ts("highlights")}
+          {sectionLabels.highlights}
         </h2>
         <div class="grid gap-4 sm:grid-cols-2">
           {
-            localizedProject.data.highlights.map((highlight) => (
+            project.data.highlights.map((highlight) => (
               <div class="p-4 rounded-lg border border-border bg-card">
                 <h3 class="font-medium text-foreground mb-1">
                   {highlight.title}
