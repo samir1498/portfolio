@@ -1,6 +1,6 @@
 ---
 import { getLocalizedData, type Lang } from "@/data";
-import { getCollection } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
 import { ArrowUpRight, Construction } from "lucide-react";
 import { createTranslator, type Translations } from "@/i18n/translate";
 
@@ -11,7 +11,27 @@ interface Props {
 const { lang } = Astro.props;
 const { SECTIONS } = getLocalizedData(lang);
 
-const projects = await getCollection("projects");
+const allProjects = await getCollection(
+  "projects",
+  (p) => !/-(?:fr|ar)$/.test(p.id),
+);
+
+interface ProjectCard {
+  id: string;
+  data: CollectionEntry<"projects">["data"];
+}
+
+const projects: ProjectCard[] = await Promise.all(
+  allProjects.map(async (p) => {
+    if (lang === "en") return { id: p.id, data: p.data };
+    const localized = await getCollection(
+      "projects",
+      (lp) => lp.id === `${p.id}-${lang}`,
+    );
+    const entry = localized.length > 0 ? localized[0] : p;
+    return { id: p.id, data: entry.data };
+  }),
+);
 
 const statusTranslations: Translations<"in-development" | "live" | "archived"> =
   {
@@ -51,7 +71,7 @@ const te = createTranslator(emptyStateTranslations, lang);
     {
       projects.map((project, i) => (
         <a
-          href={`/${lang}/projects/${project.id}`}
+          href={`${lang === "en" ? "/" : `/${lang}/`}projects/${project.id}`}
           class="animate-fade-in-up block group"
           style={`animation-delay: ${200 + i * 100}ms;`}
         >

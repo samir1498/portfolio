@@ -33,7 +33,9 @@ export default defineConfig({
       },
     },
   },
-  integrations: [mdx(), react(), sitemap()],
+  integrations: [mdx(), react(), sitemap({
+    filter: (page) => !page.includes("/en/"),
+  })],
   output: "static",
   i18n: {
     defaultLocale: "en",

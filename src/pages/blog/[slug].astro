@@ -35,23 +35,31 @@ const formatDate = (date: Date) =>
     day: "2-digit",
   }).format(date);
 
-const seriesJsonLd = seriesContext
-  ? {
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      headline: post.data.title,
-      datePublished: post.data.pubDate.toISOString(),
-      dateModified: post.data.updatedDate
-        ? new Date(post.data.updatedDate).toISOString()
-        : undefined,
-      url: `${siteConfig.siteUrl}/blog/${post.id}/`,
-      isPartOf: {
-        "@type": "CreativeWorkSeries",
-        name: seriesContext.seriesTitle,
-      },
-      position: seriesContext.seriesOrder,
-    }
-  : null;
+const blogPostLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: post.data.updatedDate
+    ? new Date(post.data.updatedDate).toISOString()
+    : undefined,
+  url: `${siteConfig.siteUrl}/blog/${post.id}/`,
+  author: {
+    "@type": "Person",
+    name: "Samir Bettahar",
+    url: siteConfig.siteUrl,
+  },
+  ...(seriesContext
+    ? {
+        isPartOf: {
+          "@type": "CreativeWorkSeries",
+          name: seriesContext.seriesTitle,
+        },
+        position: seriesContext.seriesOrder,
+      }
+    : {}),
+};
 ---
 
 <Layout
@@ -67,15 +75,11 @@ const seriesJsonLd = seriesContext
   <div class="pt-28 pb-20 max-w-6xl mx-auto">
     <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px]">
       <article class="min-w-0 max-w-3xl">
-        {
-          seriesJsonLd && (
-            <script
-              type="application/ld+json"
-              is:inline
-              set:html={JSON.stringify(seriesJsonLd)}
-            />
-          )
-        }
+        <script
+          type="application/ld+json"
+          is:inline
+          set:html={JSON.stringify(blogPostLd)}
+        />
         <a
           href="/blog/"
           class="inline-flex items-center text-sm font-medium text-primary hover:underline"

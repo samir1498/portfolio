@@ -1,0 +1,8 @@
+/* TEAM */
+Developer: Samir Bettahar
+Site: https://samir-bettahar.dev
+GitHub: https://github.com/samir1498
+
+/* THANKS */
+Built with Astro, React, TypeScript
+Deployed on Cloudflare Pages

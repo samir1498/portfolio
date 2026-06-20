@@ -4,10 +4,11 @@ import { SEO } from "astro-seo";
 import Navbar from "../components/Navbar";
 import { getLangFromUrl } from "../i18n/utils";
 import { isRtl } from "../i18n/ui";
-import { getSeoConfig } from "../config/seo";
+import { getSeoConfig, siteConfig } from "../config/seo";
 
 const lang = getLangFromUrl(Astro.url);
 const dir = isRtl(lang) ? "rtl" : "ltr";
+const pathname = Astro.url.pathname;
 
 interface Props {
   title?: string;
@@ -37,7 +38,7 @@ const seoConfig = getSeoConfig({
   title,
   description,
   lang,
-  pathname: Astro.url.pathname,
+  pathname,
   ogImage,
   ogImageAlt,
   ogType,
@@ -45,6 +46,34 @@ const seoConfig = getSeoConfig({
   modifiedTime,
   articleTags,
 });
+
+const isBlogOrEnglishOnly =
+  pathname.startsWith("/blog/") || pathname === "/blog";
+
+const currentPrefix = pathname.match(/^\/([a-z]{2})\//)?.[1];
+
+function hreflangUrl(targetLang: string): string | null {
+  if (isBlogOrEnglishOnly) return null;
+  if (targetLang === "en") {
+    const stripped = currentPrefix
+      ? pathname.replace(/^\/[a-z]{2}/, "")
+      : pathname;
+    return `${siteConfig.siteUrl}${stripped}`;
+  }
+  if (!currentPrefix) {
+    return `${siteConfig.siteUrl}/${targetLang}${pathname === "/" ? "/" : pathname}`;
+  }
+  const replaced = pathname.replace(/^\/[a-z]{2}/, `/${targetLang}`);
+  return `${siteConfig.siteUrl}${replaced}`;
+}
+
+const alternativeLangs = ["en", "fr", "ar"].filter((l) => l !== lang);
+const hreflangLinks = alternativeLangs
+  .map((l) => {
+    const href = hreflangUrl(l);
+    return href ? { href, lang: l } : null;
+  })
+  .filter((x): x is { href: string; lang: string } => x !== null);
 ---
 
 <!doctype html>
@@ -60,6 +89,11 @@ const seoConfig = getSeoConfig({
       title="Samir.Dev Blog RSS"
       href="/rss.xml"
     />
+    {
+      hreflangLinks.map((link) => (
+        <link rel="alternate" hreflang={link.lang} href={link.href} />
+      ))
+    }
     <SEO {...seoConfig} />
 
     <!-- Theme initialization -->
@@ -85,7 +119,6 @@ const seoConfig = getSeoConfig({
       <slot />
     </main>
     <script is:inline>
-      // Intersection Observer for scroll-triggered animations
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {

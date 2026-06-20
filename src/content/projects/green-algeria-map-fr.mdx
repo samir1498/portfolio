@@ -1,0 +1,47 @@
+---
+title: "Green Algeria Map"
+subtitle: "Plateforme de suivi du reboisement"
+description: "Plateforme cartographique multi-backend pour suivre les efforts de reboisement en Algérie. NestJS, Go et Spring Boot avec tests et CI pour le benchmarking."
+status: "in-development"
+github: "https://github.com/samir1498/green-algeria-map"
+techStack:
+  - React 19
+  - TanStack Router
+  - Tailwind CSS v4
+  - Leaflet
+  - NestJS 11
+  - Go 1.26
+  - Spring Boot 4
+  - CQRS
+  - PostgreSQL 18
+  - BetterAuth
+  - Vitest
+  - testcontainers
+  - Playwright
+  - Cloudflare Pages
+features:
+  - "Carte Leaflet interactive avec zones colorées"
+  - "API CRUD avec CQRS sur 3 backends"
+  - "Signalement de dégâts avec photos"
+  - "Infos espèces via iNaturalist / GBIF"
+  - "Upload photos vers RustFS (S3)"
+  - "Design responsive mobile"
+  - "Authentification BetterAuth"
+  - "180+ tests unitaires, intégration et E2E"
+  - "Cache mémoire LRU avec TTL 5min"
+  - "Benchmarking via Docker Compose"
+plannedFeatures:
+  - "Matrice CI pour Go"
+highlights:
+  - title: "CQRS"
+    description: "Commandes, requêtes et événements de domaine séparés, implémentés à l'identique en NestJS et Go."
+  - title: "Testcontainers"
+    description: "PostgreSQL isolé par test, sans état partagé."
+  - title: "3 Backends"
+    description: "NestJS, Go et Spring Boot avec la même API et configs de cache identiques."
+  - title: "Cache Mémoire"
+    description: "LRU avec invalidation par ID, cohérent sur les trois backends."
+pubDate: 2026-05-18
+ogImage: "/og/projects/green-algeria-map.png"
+ogImageAlt: "Aperçu du projet Green Algeria Map"
+---

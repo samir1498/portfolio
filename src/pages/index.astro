@@ -6,10 +6,41 @@ import Academic from "@/components/Academic.astro";
 import Portfolio from "@/components/Portfolio.astro";
 import Footer from "@/components/Footer.astro";
 import Layout from "@/layouts/Layout.astro";
+import { siteConfig } from "@/config/seo";
 const lang = "en";
+
+const personLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      name: "Samir Bettahar",
+      url: siteConfig.siteUrl,
+      sameAs: [
+        "https://github.com/samir1498",
+        "https://www.linkedin.com/in/samir-bettahar/",
+      ],
+      jobTitle: "Software Engineer",
+    },
+    {
+      "@type": "WebSite",
+      name: "Samir.Dev",
+      url: siteConfig.siteUrl,
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${siteConfig.siteUrl}/?q={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
+};
 ---
 
 <Layout>
+  <script is:inline set:html={JSON.stringify(personLd)} />
   <Hero lang={lang} />
   <Experience lang={lang} />
   <Skills lang={lang} />
