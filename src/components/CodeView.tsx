@@ -7,7 +7,7 @@ const highlighterStyles = {
   fontSize: "0.75rem",
   lineHeight: "1.5",
   background: "transparent",
-  overflowX: "auto",
+  overflowX: "auto" as const,
   maxWidth: "100%",
   minWidth: 0,
 };

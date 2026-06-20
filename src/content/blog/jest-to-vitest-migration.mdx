@@ -1,0 +1,56 @@
+---
+title: "Why I Migrated From Jest to Vitest"
+description: "ESM packages broke Jest. Tried to fix it. Could not. Switched to Vitest."
+tldr: "Supertest v7 and @thallesp/nestjs-better-auth are ESM-only. Jest could not load them. Tried transformIgnorePatterns. Did not work. Switched to Vitest."
+pubDate: 2026-06-20
+draft: false
+ogImage: "/og/blog/jest-to-vitest-migration.png"
+ogImageAlt: "Jest to Vitest migration blog post preview image"
+tags: ["vitest", "jest", "testing", "typescript", "nestjs"]
+---
+
+Two packages I needed were ESM-only. Jest could not load them. I tried `transformIgnorePatterns`. It partially worked for one but not the other. Switched to Vitest. Everything worked immediately.
+
+Uninstalled Jest. Installed Vitest. Rewrote configs.
+
+```typescript
+// vitest.unit.config.ts
+import { defineConfig, mergeConfig } from "vitest/config";
+import baseConfig from "./vitest.base";
+
+export default mergeConfig(
+  baseConfig,
+  defineConfig({
+    test: { include: ["src/**/*.unit.spec.ts"] },
+  }),
+);
+```
+
+Unit config uses the default `threads` pool. Fast, no Docker.
+
+```typescript
+// vitest.it.config.ts
+import { defineConfig, mergeConfig } from "vitest/config";
+import baseConfig from "./vitest.base";
+
+export default mergeConfig(
+  baseConfig,
+  defineConfig({
+    test: {
+      include: ["test/**/*.it.spec.ts"],
+      pool: "forks",
+      testTimeout: 120_000,
+    },
+  }),
+);
+```
+
+Unit and integration configs split by include pattern. Same assertions. Different imports. Auth tests passed immediately. CI scripts changed from `jest` to `vitest`.
+
+One gotcha: Nest's `tsconfig.build.json` does not exclude `vitest*.ts` by default. The `import.meta` in vitest configs breaks the build. Added it manually.
+
+```json
+{
+  "exclude": ["node_modules", "dist", "vitest*.ts"]
+}
+```
