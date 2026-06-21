@@ -2,40 +2,39 @@
 title: "pc-ctx"
 subtitle: "A context repo your AI agent actually reads and writes"
 description: "Markdown files became a CLI, then an MCP server, then three packages. All because AI agents need to share plans."
-status: "in-development"
-github: "https://github.com/samir1498/personal-context"
+status: "live"
+github: "https://github.com/samir1498/pc-ctx"
 techStack:
-  - Bun 1.3
   - TypeScript
+  - MCP (Model Context Protocol)
   - citty (CLI framework)
   - js-yaml
-  - MCP (Model Context Protocol)
   - Git
 features:
+  - "16 MCP tools: plan_list, plan_show, plan_status, plan_validate, plan_set_status, plan_task_status, plan_add, plan_add_task, plan_references, roadmap_list, roadmap_show, research_list, research_show, graph, sync, setup"
   - "Plans with tasks, acceptance criteria, and cross-references"
   - "Roadmaps that reference plans, so agents know the big picture"
   - "Research files indexed from linked repos, browsable from the CLI"
   - "Dependency graph: agents trace why a task matters"
   - "Validation: the CLI rejects malformed plans before agents read them"
   - "`ctx setup` scaffolds the whole thing in one command"
-  - "MCP server: any agent calls plan_list / plan_task_status directly, no file parsing"
+  - "MCP server: any agent calls tools directly, no file parsing needed"
   - "Git-backed. Agents commit their own progress."
-  - "Agent auto-logging: MCP tools update plan status when work is done"
-  - "8 plans, all valid, all the time"
+  - "GitHub sync — `ctx sync` pushes and pulls context across machines"
+  - "Three npm packages published: @pc-ctx/core, @pc-ctx/cli, @pc-ctx/mcp"
+  - "Zero opencode awareness — purely generic, works with any agent"
 plannedFeatures:
-  - "GitHub sync, push/pull context repos across machines"
-  - "npm packages for core, CLI, and MCP"
   - "Web UI to browse plans on GitHub Pages"
-  - "Weekly and daily log management"
+  - "Weekly / daily log management CLI commands"
 highlights:
   - title: "Scope Creep, but Make It Useful"
-    description: "It started as markdown files and a note saying 'agents should read these'. Then there was a CLI so they would not parse YAML themselves. Then an MCP server so they would not parse CLI output either. Two dependencies became a library, a CLI, and an MCP package."
+    description: "It started as markdown files and a note saying 'agents should read these'. Then a CLI so they would not parse YAML themselves. Then an MCP server so they would not parse CLI output either. What was a single script became three npm packages."
   - title: "Built for Agents, Not Dashboards"
     description: "No UI, no database, no auth. Just markdown files with structured frontmatter in a git repo. The CLI and MCP server exist so agents can manipulate them deterministically."
-  - title: "MCP Means Any Agent Works"
-    description: "OpenCode, Claude Code, Cursor, Windsurf. If it speaks MCP, it reads and writes plans. No adapter per agent. No CLAUDE.md hacks."
-  - title: "One Command to Start"
-    description: "`npx pc-ctx setup` creates the whole directory tree, writes templates, runs bun install, git init, and initial commit. From zero to context in 5 seconds."
+  - title: "16 MCP Tools, Zero Adapters"
+    description: "OpenCode, Claude Code, Cursor, Windsurf. If it speaks MCP, it reads and writes plans. No adapter per agent. No CLAUDE.md hacks. 16 tools covering plans, roadmaps, research, graph, and sync."
+  - title: "Install Any Way You Like"
+    description: "`npm install -g @pc-ctx/cli`, `pnpm add -g @pc-ctx/cli`, or `bun add -g @pc-ctx/cli` — pick your package manager. Then `ctx setup ./project` creates the whole tree, writes templates, installs deps, and inits git."
   - title: "Format Is the Product"
     description: "Tasks have IDs and statuses, acceptance criteria are checkboxes, everything has a schema. Agents can't drift, the CLI validates before every read."
 pubDate: 2026-06-18
