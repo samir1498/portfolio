@@ -1,40 +1,51 @@
 ---
 title: "pc-ctx"
 subtitle: "مستودع سياق يقرأه ويكتبه وكيل الذكاء الاصطناعي"
-description: "بدأ كملفات markdown مع frontmatter وبعض قواعد الوكيل. ثم ظهر CLI. ثم ظهر خادم MCP. الآن هناك مكتبة أساسية و CLI وخادم MCP."
-status: "in-development"
-github: "https://github.com/samir1498/personal-context"
+description: "بدأ كملفات markdown، ثم أصبح CLI، ثم خادم MCP، ثم واجهة ويب. لأن وكلاء الذكاء الاصطناعي يحتاجون لمشاركة الخطط."
+status: "live"
+github: "https://github.com/samir1498/pc-ctx"
+demo: "https://personal-context.pages.dev"
 techStack:
-  - Bun 1.3
   - TypeScript
-  - citty
+  - React
+  - Hono
+  - Tailwind CSS v4
+  - framer-motion
+  - TanStack Router
+  - TanStack Query
+  - MCP (Model Context Protocol)
+  - citty (CLI framework)
+  - Cloudflare Pages
+  - Cloudflare Access
   - js-yaml
-  - MCP
   - Git
 features:
-  - "خطط مع مهام ومعايير قبول ومراجع متبادلة"
-  - "خرائط طريق ترجع للخطط"
-  - "ملفات بحث مفهرسة من مستودعات مرتبطة"
-  - "رسم بياني للتبعيات"
-  - "CLI يرفض الخطط غير الصالحة"
-  - "ctx setup ينشئ كل شيء بأمر واحد"
+  - "واجهة ويب مع لوحة تحكم متحركة ورسوم بيانية وبحث نص كامل"
+  - "16 أداة MCP: plan_list, plan_show, plan_status, وغيرها"
+  - "خطط مع مهام ومعايير قبول ومراجع متقاطعة"
+  - "خرائط طريق تشير إلى الخطط"
+  - "ملفات بحث مفهرسة من المستودعات المرتبطة"
+  - "رسم بياني للتبعيات بين الخطط وخرائط الطريق والبحث"
+  - "التحقق من الصحة: الـ CLI يرفض الخطط غير الصالحة"
+  - "`ctx setup` ينشئ الهيكل الكامل بأمر واحد"
   - "خادم MCP للوكلاء"
-  - "مدعوم بـ Git"
-  - "8 خطط، كلها صالحة"
+  - "مدعوم بـ Git — الوكلاء يلتزمون بتقدمهم الخاص"
+  - "مزامنة GitHub — `ctx sync` يدفع ويسحب السياق بين الأجهزة"
+  - "3 حزم npm منشورة: @pc-ctx/core, @pc-ctx/cli, @pc-ctx/mcp"
+  - "مصادقة Cloudflare Access — خاص افتراضياً، بدون إعداد"
 plannedFeatures:
-  - "مزامنة GitHub"
-  - "حزم npm"
-  - "واجهة ويب"
+  - "مجالات الأفكار والعمليات"
+  - "أوامر CLI لإدارة السجلات الأسبوعية"
+  - "تنسيق ملف تقدم موحد"
 highlights:
   - title: "توسع النطاق، لكنه مفيد"
-    description: "بدأ كملفات markdown. ثم CLI. ثم خادم MCP. أصبحت مكتبة و CLI وحزمة MCP."
-  - title: "مبني للوكلاء، لا للوحات المعلومات"
-    description: "لا واجهة مستخدم، لا قاعدة بيانات، لا مصادقة. مجرد markdown و CLI و MCP."
-  - title: "MCP يعني أي وكيل يعمل"
-    description: "OpenCode، Claude Code، Cursor. أي وكيل يدعم MCP يقرأ الخطط."
-  - title: "أمر واحد للبدء"
-    description: "npx pc-ctx setup ينشئ كل شيء في 5 ثوان."
+    description: "بدأ كملفات markdown. ثم CLI. ثم خادم MCP. أصبح ثلاثة حزم npm وواجهة ويب كاملة."
+  - title: "مصمم للوكلاء والبشر معاً"
+    description: "الـ CLI وخادم MCP موجودان ليتعامل معهما الوكلاء. الواجهة web موجودة ليتصفحها البشر دون فتح الطرفية."
+  - title: "16 أداة MCP، بدون محولات"
+    description: "OpenCode, Claude Code, Cursor, Cline, Windsurf. إذا كان يدعم MCP، فهو يقرأ ويكتب الخطط."
 pubDate: 2026-06-18
+updatedDate: 2026-06-22
 ogImage: "/og/projects/pc-ctx.png"
-ogImageAlt: "معاينة مشروع pc-ctx CLI"
+ogImageAlt: "صورة تعريفية لمشروع pc-ctx"
 ---

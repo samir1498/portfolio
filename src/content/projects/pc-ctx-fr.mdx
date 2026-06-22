@@ -1,40 +1,56 @@
 ---
 title: "pc-ctx"
 subtitle: "Un dépôt de contexte que votre agent IA lit et écrit"
-description: "Commencé comme des fichiers markdown avec frontmatter et quelques règles d'agent. Puis le CLI est arrivé. Puis le serveur MCP. Maintenant il y a une bibliothèque core, un CLI, et un serveur MCP."
-status: "in-development"
-github: "https://github.com/samir1498/personal-context"
+description: "Commencé comme des fichiers markdown, devenu un CLI, un serveur MCP, puis une interface web. Parce que les agents IA ont besoin de partager des plans."
+status: "live"
+github: "https://github.com/samir1498/pc-ctx"
+demo: "https://personal-context.pages.dev"
 techStack:
-  - Bun 1.3
   - TypeScript
-  - citty
+  - React
+  - Hono
+  - Tailwind CSS v4
+  - framer-motion
+  - TanStack Router
+  - TanStack Query
+  - MCP (Model Context Protocol)
+  - citty (CLI framework)
+  - Cloudflare Pages
+  - Cloudflare Access
   - js-yaml
-  - MCP
   - Git
 features:
+  - "Interface web avec tableau de bord animé, graphiques et recherche plein texte"
+  - "16 outils MCP : plan_list, plan_show, plan_status, plan_validate, plan_set_status, plan_task_status, plan_add, plan_add_task, plan_references, roadmap_list, roadmap_show, research_list, research_show, graph, sync, setup"
   - "Plans avec tâches, critères d'acceptation et références croisées"
   - "Roadmaps qui référencent les plans pour donner la vision d'ensemble"
-  - "Fichiers de recherche indexés depuis des dépôts liés"
+  - "Fichiers de recherche indexés depuis des dépôts liés, consultables depuis le CLI et le web"
   - "Graphe de dépendances entre plans, roadmaps et recherche"
   - "Validation : le CLI rejette les plans malformés avant lecture"
   - "`ctx setup` crée toute la structure en une commande"
-  - "Serveur MCP pour les agents (plan_list, plan_task_status)"
-  - "Versionné par Git"
-  - "8 plans, tous valides, tout le temps"
+  - "Serveur MCP pour les agents (appels d'outils directement, sans parsing)"
+  - "Versionné par Git — les agents commitent leur propre progression"
+  - "Synchronisation GitHub — `ctx sync` pousse et tire le contexte entre machines"
+  - "3 packages npm publiés : @pc-ctx/core, @pc-ctx/cli, @pc-ctx/mcp"
+  - "Zéro couplage à opencode — générique, fonctionne avec tout agent"
+  - "Authentification Cloudflare Access — privé par défaut, zéro configuration"
 plannedFeatures:
-  - "Synchronisation GitHub"
-  - "Packages npm pour core, CLI et MCP"
-  - "Interface web sur GitHub Pages"
+  - "Domaines idées et processus (boîte de réception pré-plan + manuel vivant)"
+  - "Commandes CLI pour la gestion des journaux hebdomadaires"
+  - "Format de fichier de progression standardisé"
 highlights:
   - title: "Scope Creep, mais Utile"
-    description: "C'était juste des fichiers markdown. Puis un CLI. Puis un serveur MCP. Deux dépendances sont devenues trois packages."
-  - title: "Conçu pour les Agents, Pas les Tableaux de Bord"
-    description: "Pas d'UI, pas de base de données, pas d'auth. Le CLI et MCP existent pour que les agents manipulent le contexte."
-  - title: "MCP, donc Tout Agent Fonctionne"
-    description: "OpenCode, Claude Code, Cursor. S'ils parlent MCP, ils lisent et écrivent les plans."
-  - title: "Une Commande pour Commencer"
-    description: "npx pc-ctx setup crée tout. De zéro à contexte en 5 secondes."
+    description: "C'était juste des fichiers markdown. Puis un CLI. Puis un serveur MCP. Ce qui était un script est devenu trois packages npm et une interface web complète."
+  - title: "Conçu pour les Agents ET les Humains"
+    description: "Le CLI + serveur MCP existent pour que les agents manipulent les plans de manière déterministe. L'interface web existe pour que les humains naviguent sans ouvrir un terminal. Mêmes données, deux interfaces."
+  - title: "16 Outils MCP, Zéro Adaptateur"
+    description: "OpenCode, Claude Code, Cursor, Cline, Windsurf. Si ça parle MCP, ça lit et écrit des plans. Pas d'adaptateur par agent."
+  - title: "Installation à votre goût"
+    description: "`npm install -g @pc-ctx/cli` ou `pnpm add -g @pc-ctx/cli` ou `bun add -g @pc-ctx/cli`. Puis `ctx setup ./projet` crée l'arborescence complète."
+  - title: "Tableau de Bord Animé, Zéro Infra Supplémentaire"
+    description: "Graphiques donut animés, barres d'activité hebdomadaires, compteurs animés — le tout servi depuis un Worker Hono derrière Cloudflare Access. Pas de base de données. L'API GitHub est la couche de données."
 pubDate: 2026-06-18
+updatedDate: 2026-06-22
 ogImage: "/og/projects/pc-ctx.png"
-ogImageAlt: "Aperçu du projet CLI pc-ctx"
+ogImageAlt: "Image de présentation du projet pc-ctx"
 ---

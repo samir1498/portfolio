@@ -1,0 +1,129 @@
+---
+title: "Building a Web UI for AI Agent Context"
+description: "From markdown files to a React dashboard with animated charts — how a context repo for AI agents got a face, and why Cloudflare is the perfect backend for a zero-infra app."
+tldr: "A Hono Worker on Cloudflare Pages serves a React 19 SPA with animated SVG charts, TanStack Router, and Cloudflare Access auth — all reading live from GitHub API. No database, no server, no ops."
+pubDate: 2026-06-22
+draft: true
+ogImage: "/og/blog/pc-ctx-web-ui.png"
+ogImageAlt: "pc-ctx Web UI dashboard preview"
+tags: ["pc-ctx", "web-ui", "cloudflare", "react", "tanstack", "framer-motion"]
+---
+
+My AI agents can read and write plans via CLI and MCP. But I can't. I don't want to open a terminal to check what's active, what's blocked, or how this week compares to last week.
+
+So I built a web UI.
+
+## The context problem
+
+If you work with AI coding agents — OpenCode, Claude Code, Cline, Cursor — you've seen the pattern:
+
+- CLAUDE.md files with rules
+- Plans stored as markdown
+- "Read the plans before you start" prompts
+
+It works, but it scales poorly. There's no overview. No way to see what's active across all projects. No historical trend.
+
+pc-ctx started as a CLI to manage plans deterministically — `ctx plan add`, `ctx status`, `ctx validate`. Then an MCP server so agents could call tools directly. The CLI is great for agents. The web UI is great for humans. Same data, two interfaces.
+
+## Why not a database?
+
+The whole system is markdown files in a git repo. YAML frontmatter. That's it. No database, no ORM, no API server to maintain.
+
+For the web UI, I needed a read-only view into that repo. The GitHub API is already there, authenticated, serving live data. I just needed to proxy it through a Cloudflare Worker.
+
+Result: zero infrastructure. The Hono Worker deploys with `wrangler pages deploy`, reads from GitHub API with a PAT, and serves the React SPA. To scale, I do nothing — Cloudflare handles it.
+
+## Architecture
+
+```
+Browser → Cloudflare Access → Hono Worker → GitHub API → personal-context repo
+                     ↓
+              React SPA
+         (served by Worker)
+```
+
+Key decisions:
+
+| Concern       | Choice                     | Why                                                          |
+| ------------- | -------------------------- | ------------------------------------------------------------ |
+| Hosting       | Cloudflare Pages + Workers | Zero infra, edge deployment, Access built-in                 |
+| API layer     | Hono (in a Pages Function) | TypeScript-native, tiny bundle, handles routing + CORS       |
+| Frontend      | React 19 + Vite            | Mature ecosystem, fast builds                                |
+| Routing       | TanStack Router            | File-based routes, type-safe params                          |
+| Data fetching | TanStack Query             | 30s stale time, dedup, cache on navigation                   |
+| Charts        | Pure SVG (donut + bars)    | No charting library dependency, full control over animations |
+| Animations    | framer-motion              | Staggered entrance, count-up counters, hover effects         |
+| Auth          | Cloudflare Access          | Zero config, runs at edge, no auth code                      |
+
+## What the dashboard shows
+
+### Stat cards
+
+Four cards at the top showing counts for Plans, Roadmaps, References, and Progress logs. Each has a lucide-react icon, animated count-up (counts from 0 on scroll), and a gradient hover effect.
+
+### Status donut
+
+An SVG donut chart showing active / paused / done / cancelled distribution. Each segment is a `<circle>` with `stroke-dasharray` calculated from the ratio. The animation is pure CSS `stroke-dashoffset` — no chart library needed.
+
+```tsx
+<circle
+  cx={center}
+  cy={center}
+  r={radius}
+  fill="none"
+  stroke={color}
+  strokeWidth={strokeWidth}
+  strokeDasharray={`${length} ${circumference - length}`}
+  strokeDashoffset={-offset}
+/>
+```
+
+### Weekly activity bars
+
+Animated SVG bars showing how many task entries were logged per week. Data comes from progress files that follow a `2026-W25.md` naming pattern. The bars animate from height 0 with staggered delays.
+
+### Top plans + Recent timeline
+
+Priority-sorted plans with hover lift effect. Recent progress logs as a timeline with dot indicators. Both sections use framer-motion `staggerChildren` for entrance animation.
+
+## The hardest part (and the fix)
+
+The GitHub Contents API returns a `download_url` for each file pointing to `raw.githubusercontent.com`. For public repos, this works. For private repos, `raw.githubusercontent.com` **ignores Bearer auth headers** — so the file body was always null.
+
+Fix: use `Accept: application/vnd.github.raw+json` on `api.github.com/contents/...` instead. This returns the raw file content directly, with proper auth handling.
+
+```ts
+const res = await fetch(url, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+    Accept: "application/vnd.github.raw+json",
+  },
+});
+```
+
+## Cloudflare Access
+
+The entire site is private by default. Cloudflare Access sits at the edge and checks auth before traffic reaches the Worker. I configured it in the Zero Trust dashboard — select "Workers" as the app type, pick `personal-context.pages.dev`, set a policy rule.
+
+No auth code. No sessions. No JWTs. It just works.
+
+## What's next
+
+- **Ideas + Processes domains** — Pre-plan inbox and living handbook docs (currently plain directories)
+- **Standardized progress format** — Frontmatter + structured body for progress logs (so the dashboard can show real metrics)
+- **Full-text search across all domains** — Currently filtered by folder, would like cross-domain search
+
+## Tested on
+
+- OpenCode — full MCP tool suite, reads and writes plans
+- Claude Code — MCP tools, reads plans and roadmaps
+- Cline CLI — MCP tools, validates and shows status
+- Cursor — MCP tools, browses and references
+
+All four agents interact with the same data. The CLI, MCP server, and web UI all read from the same files. No adapter per agent. No custom integration.
+
+---
+
+_The web UI is live at [personal-context.pages.dev](https://personal-context.pages.dev) (behind Cloudflare Access — request access if you'd like to see it)._
+
+_Source: [github.com/samir1498/personal-context/tree/main/web](https://github.com/samir1498/personal-context/tree/main/web)_
