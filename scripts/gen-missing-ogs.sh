@@ -14,6 +14,8 @@ scan_dir() {
   local public_base="$2"
   for f in "$src_dir"/*.mdx; do
     [ -f "$f" ] || continue
+    # skip drafts
+    grep -q '^draft: true' "$f" && continue
     og=$(grep 'ogImage:' "$f" | head -1 | sed "s/.*ogImage: *['\"]//;s/['\"].*//")
     [ -z "$og" ] && continue
 

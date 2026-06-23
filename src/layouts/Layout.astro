@@ -74,6 +74,12 @@ const hreflangLinks = alternativeLangs
     return href ? { href, lang: l } : null;
   })
   .filter((x): x is { href: string; lang: string } => x !== null);
+
+const xDefaultHref = isBlogOrEnglishOnly
+  ? null
+  : currentPrefix
+    ? `${siteConfig.siteUrl}${pathname.replace(/^\/[a-z]{2}/, "")}`
+    : `${siteConfig.siteUrl}${pathname}`;
 ---
 
 <!doctype html>
@@ -89,26 +95,35 @@ const hreflangLinks = alternativeLangs
       title="Samir.Dev Blog RSS"
       href="/rss.xml"
     />
-    {
-      hreflangLinks.map((link) => (
-        <link rel="alternate" hreflang={link.lang} href={link.href} />
-      ))
-    }
-    <SEO {...seoConfig} />
+    const xDefaultHref = isBlogOrEnglishOnly ? null : currentPrefix ? `${
+      siteConfig.siteUrl
+    }</head
+  >${pathname.replace(/^\/[a-z]{2}/, "")}` : `${siteConfig.siteUrl}${pathname}`;
+  {
+    xDefaultHref && (
+      <link rel="alternate" hreflang="x-default" href={xDefaultHref} />
+    )
+  }
+  {
+    hreflangLinks.map((link) => (
+      <link rel="alternate" hreflang={link.lang} href={link.href} />
+    ))
+  }
+  <SEO {...seoConfig} />
 
-    <!-- Theme initialization -->
-    <script is:inline>
-      if (
-        localStorage.theme === "dark" ||
-        (!("theme" in localStorage) &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches)
-      ) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    </script>
-  </head>
+  <!-- Theme initialization -->
+  <script is:inline>
+    if (
+      localStorage.theme === "dark" ||
+      (!("theme" in localStorage) &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  </script>
+
   <body
     class="bg-page text-foreground antialiased overflow-x-hidden transition-colors duration-300"
   >
