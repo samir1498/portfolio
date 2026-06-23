@@ -14,12 +14,11 @@ techStack:
   - TanStack Query
   - MCP (Model Context Protocol)
   - citty (CLI framework)
-  - Cloudflare Pages
   - js-yaml
   - Git
 features:
   - "Web UI with animated dashboard, charts, and full-text search across all domains"
-  - "16 MCP tools: plan_list, plan_show, plan_status, plan_validate, plan_set_status, plan_task_status, plan_add, plan_add_task, plan_references, roadmap_list, roadmap_show, research_list, research_show, graph, sync, setup"
+  - "20+ MCP tools covering plans, roadmaps, research, ideas, processes, progress, references, archive, graph, and sync"
   - "Plans with tasks, acceptance criteria, and cross-references"
   - "Roadmaps that reference plans, so agents know the big picture"
   - "Research files indexed from linked repos, browsable from both CLI and web"
@@ -34,7 +33,6 @@ features:
   - "Local web UI: `ctx ui --serve` downloads and runs the SPA locally"
   - "`ctx config --pat <token>` to authenticate API calls from the local web UI"
 plannedFeatures:
-  - "Ideas and processes domains (pre-plan inbox + living handbook)"
   - "Weekly / daily log management CLI commands"
   - "Standard progress file format for structured time tracking"
 highlights:
@@ -42,12 +40,12 @@ highlights:
     description: "It started as markdown files and a note saying 'agents should read these'. Then a CLI so they would not parse YAML themselves. Then an MCP server so they would not parse CLI output either. What was a single script became three npm packages and a full web UI."
   - title: "Built for Agents AND Humans"
     description: "The CLI + MCP server exist so agents can manipulate plans deterministically. The web UI exists so humans can browse everything without opening a terminal. Same data, two interfaces."
-  - title: "16 MCP Tools, Zero Adapters"
-    description: "OpenCode, Claude Code, Cursor, Cline, Windsurf. If it speaks MCP, it reads and writes plans. No adapter per agent. No CLAUDE.md hacks. 16 tools covering plans, roadmaps, research, graph, and sync."
+  - title: "20+ MCP Tools, Zero Adapters"
+    description: "If your agent speaks MCP, it reads and writes plans. No adapter per agent. No CLAUDE.md hacks. 20+ tools covering plans, roadmaps, research, ideas, processes, progress, references, archive, graph, and sync."
   - title: "Install Any Way You Like"
     description: "`npm install -g @pc-ctx/cli`, `pnpm add -g @pc-ctx/cli`, or `bun add -g @pc-ctx/cli` — pick your package manager. Then `ctx setup ./project` creates the whole tree, writes templates, installs deps, and inits git."
   - title: "Flashy Dashboard, Zero Extra Infra"
-    description: "Animated donut charts, weekly activity bars, count-up counters, and a timeline feed — all served from a Hono Worker on Cloudflare Pages. No database, no server. The GitHub API is the data layer. Run it locally with `ctx ui --serve`."
+    description: "Animated donut charts, weekly activity bars, count-up counters, and a timeline feed — all served locally via `ctx ui --serve`. No database, no server. The GitHub API is the data layer. No cloud deployment needed."
 pubDate: 2026-06-18
 updatedDate: 2026-06-22
 ogImage: "/og/projects/pc-ctx.png"
