@@ -7,6 +7,19 @@ export const siteConfig = {
   favicon: "/brand/favicon-brand.svg",
 };
 
+const localeDefaults: Record<string, { title: string; description: string }> = {
+  fr: {
+    title: "Samir.Dev | Ingénieur Full-Stack",
+    description:
+      "Ingénieur full-stack développant des apps web modernes, des services backend scalables et des workflows d'ingénierie pratiques.",
+  },
+  ar: {
+    title: "Samir.Dev | مهندس Full-Stack",
+    description:
+      "مهندس full-stack يبني تطبيقات ويب حديثة وخدمات خلفية قابلة للتوسع وسير عمل هندسية عملية.",
+  },
+};
+
 const toAbsoluteUrl = (url: string) =>
   /^https?:\/\//.test(url)
     ? url
@@ -101,8 +114,8 @@ function buildSeoTweet({
 
 export function getSeoConfig(options?: SeoOptions) {
   const {
-    title = siteConfig.defaultTitle,
-    description = siteConfig.defaultDescription,
+    title,
+    description,
     lang = "en",
     pathname = "/",
     ogImage,
@@ -113,6 +126,11 @@ export function getSeoConfig(options?: SeoOptions) {
     articleTags = [],
   } = options || {};
 
+  const locale = localeDefaults[lang];
+  const effectiveTitle = title || locale?.title || siteConfig.defaultTitle;
+  const effectiveDescription =
+    description || locale?.description || siteConfig.defaultDescription;
+
   const effectivePathname =
     lang === "en" ? pathname.replace(/^\/en(?:\/|$)/, "/") : pathname;
   const canonicalUrl = new URL(
@@ -120,11 +138,11 @@ export function getSeoConfig(options?: SeoOptions) {
     siteConfig.siteUrl,
   ).toString();
   const ogImageUrl = toAbsoluteUrl(ogImage || siteConfig.ogImage);
-  const openGraphImageAlt = ogImageAlt || `${title} preview image`;
+  const openGraphImageAlt = ogImageAlt || `${effectiveTitle} preview image`;
 
   const input: SeoInput = {
-    title,
-    description,
+    title: effectiveTitle,
+    description: effectiveDescription,
     canonicalUrl,
     ogImageUrl,
     ogType,
@@ -137,8 +155,8 @@ export function getSeoConfig(options?: SeoOptions) {
   };
 
   return {
-    title,
-    description,
+    title: effectiveTitle,
+    description: effectiveDescription,
     canonical: canonicalUrl,
     openGraph: buildSeoOpenGraph(input),
     twitter: buildSeoTweet(input),
