@@ -1,20 +1,31 @@
 ---
 title: "pc-ctx"
 subtitle: "A context repo your AI agent actually reads and writes"
-description: "Markdown files became a CLI, then an MCP server, then three packages. All because AI agents need to share plans."
+description: "Markdown files became a CLI, then an MCP server, then a web UI. All because AI agents need to share plans."
 status: "live"
 github: "https://github.com/samir1498/pc-ctx"
+demo: "https://personal-context.pages.dev"
 techStack:
   - TypeScript
+  - React
+  - Hono
+  - Tailwind CSS v4
+  - framer-motion
+  - TanStack Router
+  - TanStack Query
   - MCP (Model Context Protocol)
   - citty (CLI framework)
+  - Cloudflare Pages
+  - Cloudflare Access
   - js-yaml
   - Git
+  - Recharts
 features:
+  - "Web UI with animated dashboard, charts, and full-text search across all domains"
   - "16 MCP tools: plan_list, plan_show, plan_status, plan_validate, plan_set_status, plan_task_status, plan_add, plan_add_task, plan_references, roadmap_list, roadmap_show, research_list, research_show, graph, sync, setup"
   - "Plans with tasks, acceptance criteria, and cross-references"
   - "Roadmaps that reference plans, so agents know the big picture"
-  - "Research files indexed from linked repos, browsable from the CLI"
+  - "Research files indexed from linked repos, browsable from both CLI and web"
   - "Dependency graph: agents trace why a task matters"
   - "Validation: the CLI rejects malformed plans before agents read them"
   - "`ctx setup` scaffolds the whole thing in one command"
@@ -23,21 +34,73 @@ features:
   - "GitHub sync — `ctx sync` pushes and pulls context across machines"
   - "Three npm packages published: @pc-ctx/core, @pc-ctx/cli, @pc-ctx/mcp"
   - "Zero opencode awareness — purely generic, works with any agent"
+  - "Cloudflare Access auth — private by default, zero config"
 plannedFeatures:
-  - "Web UI to browse plans on GitHub Pages"
+  - "Ideas and processes domains (pre-plan inbox + living handbook)"
   - "Weekly / daily log management CLI commands"
+  - "Standard progress file format for structured time tracking"
 highlights:
   - title: "Scope Creep, but Make It Useful"
-    description: "It started as markdown files and a note saying 'agents should read these'. Then a CLI so they would not parse YAML themselves. Then an MCP server so they would not parse CLI output either. What was a single script became three npm packages."
-  - title: "Built for Agents, Not Dashboards"
-    description: "No UI, no database, no auth. Just markdown files with structured frontmatter in a git repo. The CLI and MCP server exist so agents can manipulate them deterministically."
+    description: "It started as markdown files and a note saying 'agents should read these'. Then a CLI so they would not parse YAML themselves. Then an MCP server so they would not parse CLI output either. What was a single script became three npm packages and a full web UI."
+  - title: "Built for Agents AND Humans"
+    description: "The CLI + MCP server exist so agents can manipulate plans deterministically. The web UI exists so humans can browse everything without opening a terminal. Same data, two interfaces."
   - title: "16 MCP Tools, Zero Adapters"
-    description: "OpenCode, Claude Code, Cursor, Windsurf. If it speaks MCP, it reads and writes plans. No adapter per agent. No CLAUDE.md hacks. 16 tools covering plans, roadmaps, research, graph, and sync."
+    description: "OpenCode, Claude Code, Cursor, Cline, Windsurf. If it speaks MCP, it reads and writes plans. No adapter per agent. No CLAUDE.md hacks. 16 tools covering plans, roadmaps, research, graph, and sync."
   - title: "Install Any Way You Like"
     description: "`npm install -g @pc-ctx/cli`, `pnpm add -g @pc-ctx/cli`, or `bun add -g @pc-ctx/cli` — pick your package manager. Then `ctx setup ./project` creates the whole tree, writes templates, installs deps, and inits git."
-  - title: "Format Is the Product"
-    description: "Tasks have IDs and statuses, acceptance criteria are checkboxes, everything has a schema. Agents can't drift, the CLI validates before every read."
+  - title: "Flashy Dashboard, Zero Extra Infra"
+    description: "Animated donut charts, weekly activity bars, count-up counters, and a timeline feed — all served from a Hono Worker behind Cloudflare Access. No database, no server. The GitHub API is the data layer."
 pubDate: 2026-06-18
+updatedDate: 2026-06-22
 ogImage: "/og/projects/pc-ctx.png"
 ogImageAlt: "pc-ctx CLI project preview image"
 ---
+
+The **context system** is a repo of markdown files with structured YAML frontmatter — plans, roadmaps, research references, and progress logs — that AI coding agents read and write as they work. `pc-ctx` is the CLI, MCP server, and web UI that wrap it.
+
+## What changed
+
+Over about three weeks, it went from "a note asking agents to read some markdown files" to:
+
+- **`@pc-ctx/core`** — Types, YAML I/O, plan CRUD, storage backends
+- **`@pc-ctx/cli`** — `ctx plan add`, `ctx status`, `ctx graph`, `ctx research`, `ctx sync`
+- **`@pc-ctx/mcp`** — MCP server wrapping all CLI commands
+- **Web UI** — Dashboard, plans list, folder pages, all behind Cloudflare Access
+
+## Architecture
+
+```
+┌─────────────┐     ┌──────────────┐     ┌────────────┐
+│  CLI (citty)│────▶│  @pc-ctx/core│────▶│  Markdown  │
+│  MCP server │     │  + js-yaml   │     │  + Git     │
+├─────────────┤     └──────────────┘     └────────────┘
+│  Web UI     │
+│  Hono SPA   │────▶ GitHub API (authenticated)
+│  React 19   │
+└─────────────┘
+```
+
+## The Web UI
+
+The web interface is a single Hono Pages Function serving a React 19 SPA:
+
+- **Dashboard**: Animated SVG donut chart for status distribution, animated bar chart for weekly activity, count-up number counters, priority-sorted top plans, recent progress timeline — all with framer-motion staggered entrance animations
+- **Plans page**: Full-text search, status filter, sort by priority/date/name, pagination (10/page), HoverCard summaries on each row
+- **Folder pages**: Shared generic component for roadmaps, references, and progress — each with inline markdown rendering on click
+- **Plan detail**: Rendered markdown with syntax highlighting (highlight.js), task list with status badges, priority and metadata
+- **Responsive**: Side-by-side layout on desktop, stacked on mobile
+- **Auth**: Cloudflare Access at the edge — zero code, private by default
+
+### Stack
+
+| Layer      | Choice                                   |
+| ---------- | ---------------------------------------- |
+| Runtime    | Cloudflare Pages (Hono Functions Worker) |
+| Frontend   | React 19 + Vite + Tailwind CSS v4        |
+| Routing    | TanStack Router (file-based)             |
+| Data       | TanStack Query (30s stale, API cache)    |
+| Charts     | Pure SVG (donut) + animated bars         |
+| Animations | framer-motion                            |
+| Auth       | Cloudflare Access (edge, zero config)    |
+| Deploy     | `wrangler pages deploy`                  |
+| Local dev  | `bun run ctx ui`                         |
