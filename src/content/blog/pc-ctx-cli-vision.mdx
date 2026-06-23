@@ -1,0 +1,69 @@
+---
+title: "pc-ctx: A Context System for AI Agents"
+description: "How a dotfile folder became a CLI, an MCP server, and an open-source tool - the real evolution."
+tldr: "pc-ctx manages plans as structured markdown files with an MCP server and CLI. Agents call MCP tools natively instead of you telling them what to do. Git handles cross-machine sync. Works across OpenCode, Claude Code, and Cline."
+pubDate: 2026-06-23
+draft: false
+tags: ["pc-ctx", "cli", "mcp", "ai-agents", "tooling", "typescript"]
+series: "pc-ctx"
+seriesTitle: "Building pc-ctx"
+seriesOrder: 1
+---
+
+My brain was the context. I just told the agent what to do every session and hoped I remembered everything it needed. Then I wrote AGENTS.md. Then GEMINI.md when Gemini was still a thing. Then Gemini plugins with skills. Then CLAUDE.md. None of it scaled.
+
+The folder kept mutating. A semi-structured folder with markdown files → `.agent` → `.context` (gitignored, in a workspace folder with project repos) → git-tracked for cross-machine sync → `workspace-name-prefix-context` → rules in AGENTS.md → separate skill files. Every few weeks the structure changed and I told the agent to migrate it. It did.
+
+pc-ctx is what it settled into after all those iterations. It's a folder of markdown files in a git repo with an MCP server and a CLI. The evolution took months. The current form is what survived.
+
+## How the data works
+
+Each plan is a markdown file with YAML frontmatter.
+
+```yaml
+---
+slug: my-plan
+title: "My Plan"
+status: active
+priority: 80
+tasks:
+  - id: T1
+    title: "First task"
+    status: done
+  - id: T2
+    title: "Second task"
+    status: pending
+---
+```
+
+The MCP server exposes plan management as tools. Agents call them natively and get JSON back. The CLI does the same thing, agents without MCP fall back to parsing its output.
+
+The git repo lives on GitHub. Pushes happen on each task or small milestone. Same plans, no sync service.
+
+## Token savings drove this
+
+Before the CLI, agents loaded markdown plan files and skill files listing all the rules. Some plans have a lot of text, and the skill files kept growing. Every session started with the agent reading all of it. Token-heavy and repetitive.
+
+The CLI was the first fix. One command replaced loading a dozen files. Deterministic output, same information, fraction of the tokens.
+
+The MCP server came later and saved even more. Instead of spawning a process and parsing text, agents call functions directly. No parsing overhead on either side. The savings add up when an agent checks status and marks tasks done throughout a session.
+
+Today the MCP server is the primary interface. The CLI is just a fallback.
+
+## What agents actually do with it
+
+I start a session and tell the agent to list what's active. It calls the status tool via MCP. Three plans, their priorities, the latest update. I pick what to work on and the agent starts. While working, I almost always discover new things. Some become new plans, some go into ideas. Next session, same flow.
+
+Claude Code and Cline do the same through MCP. Fall back to `ctx status` if MCP isn't available. Same data, three agents, zero custom instructions per agent.
+
+## The cross-machine part
+
+I work across multiple machines. The moment I needed that, I git-tracked the folder. Pushes happen on each task or small milestone. The next machine pulls. The agent calls the status tool and picks up where things stand.
+
+No service, no API, no accounts. Just git.
+
+## What's next
+
+This is post one in a series about pc-ctx. I want to cover the CLI design, the MCP internals, and the web UI. Ideas domain support coming to MCP and CLI soon. The core idea is simple: structured data in a git repo, MCP for native agent access, CLI for agents without MCP.
+
+The code is at [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx). Install the CLI with `npm install -g @pc-ctx/cli`, or add the MCP server to your agent config.
