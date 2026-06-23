@@ -4,7 +4,7 @@ subtitle: "A context repo your AI agent actually reads and writes"
 description: "Markdown files became a CLI, then an MCP server, then a web UI. All because AI agents need to share plans."
 status: "live"
 github: "https://github.com/samir1498/pc-ctx"
-demo: "https://personal-context.pages.dev"
+demo: "https://pc-ctx-web.pages.dev"
 techStack:
   - TypeScript
   - React
@@ -16,10 +16,8 @@ techStack:
   - MCP (Model Context Protocol)
   - citty (CLI framework)
   - Cloudflare Pages
-  - Cloudflare Access
   - js-yaml
   - Git
-  - Recharts
 features:
   - "Web UI with animated dashboard, charts, and full-text search across all domains"
   - "16 MCP tools: plan_list, plan_show, plan_status, plan_validate, plan_set_status, plan_task_status, plan_add, plan_add_task, plan_references, roadmap_list, roadmap_show, research_list, research_show, graph, sync, setup"
@@ -34,7 +32,8 @@ features:
   - "GitHub sync — `ctx sync` pushes and pulls context across machines"
   - "Three npm packages published: @pc-ctx/core, @pc-ctx/cli, @pc-ctx/mcp"
   - "Zero opencode awareness — purely generic, works with any agent"
-  - "Cloudflare Access auth — private by default, zero config"
+  - "Local web UI: `ctx ui --serve` downloads and runs the SPA locally"
+  - "`ctx config --pat <token>` to authenticate API calls from the local web UI"
 plannedFeatures:
   - "Ideas and processes domains (pre-plan inbox + living handbook)"
   - "Weekly / daily log management CLI commands"
@@ -49,7 +48,7 @@ highlights:
   - title: "Install Any Way You Like"
     description: "`npm install -g @pc-ctx/cli`, `pnpm add -g @pc-ctx/cli`, or `bun add -g @pc-ctx/cli` — pick your package manager. Then `ctx setup ./project` creates the whole tree, writes templates, installs deps, and inits git."
   - title: "Flashy Dashboard, Zero Extra Infra"
-    description: "Animated donut charts, weekly activity bars, count-up counters, and a timeline feed — all served from a Hono Worker behind Cloudflare Access. No database, no server. The GitHub API is the data layer."
+    description: "Animated donut charts, weekly activity bars, count-up counters, and a timeline feed — all served from a Hono Worker on Cloudflare Pages. No database, no server. The GitHub API is the data layer. Run it locally with `ctx ui --serve`."
 pubDate: 2026-06-18
 updatedDate: 2026-06-22
 ogImage: "/og/projects/pc-ctx.png"
@@ -65,7 +64,7 @@ Over about three weeks, it went from "a note asking agents to read some markdown
 - **`@pc-ctx/core`** — Types, YAML I/O, plan CRUD, storage backends
 - **`@pc-ctx/cli`** — `ctx plan add`, `ctx status`, `ctx graph`, `ctx research`, `ctx sync`
 - **`@pc-ctx/mcp`** — MCP server wrapping all CLI commands
-- **Web UI** — Dashboard, plans list, folder pages, all behind Cloudflare Access
+- **Web UI** — Dashboard, plans list, folder pages, served from Cloudflare Pages or locally via `ctx ui --serve`
 
 ## Architecture
 
@@ -89,18 +88,17 @@ The web interface is a single Hono Pages Function serving a React 19 SPA:
 - **Folder pages**: Shared generic component for roadmaps, references, and progress — each with inline markdown rendering on click
 - **Plan detail**: Rendered markdown with syntax highlighting (highlight.js), task list with status badges, priority and metadata
 - **Responsive**: Side-by-side layout on desktop, stacked on mobile
-- **Auth**: Cloudflare Access at the edge — zero code, private by default
+- **Local dev**: `ctx ui --serve` downloads the latest SPA and runs it locally with a GitHub API proxy
 
 ### Stack
 
-| Layer      | Choice                                   |
-| ---------- | ---------------------------------------- |
-| Runtime    | Cloudflare Pages (Hono Functions Worker) |
-| Frontend   | React 19 + Vite + Tailwind CSS v4        |
-| Routing    | TanStack Router (file-based)             |
-| Data       | TanStack Query (30s stale, API cache)    |
-| Charts     | Pure SVG (donut) + animated bars         |
-| Animations | framer-motion                            |
-| Auth       | Cloudflare Access (edge, zero config)    |
-| Deploy     | `wrangler pages deploy`                  |
-| Local dev  | `bun run ctx ui`                         |
+| Layer      | Choice                                      |
+| ---------- | ------------------------------------------- |
+| Runtime    | Cloudflare Pages (Hono Functions Worker)    |
+| Frontend   | React 19 + Vite + Tailwind CSS v4           |
+| Routing    | TanStack Router (file-based)                |
+| Data       | TanStack Query (30s stale, API cache)       |
+| Charts     | Pure SVG (donut) + animated bars            |
+| Animations | framer-motion                               |
+| Deploy     | `wrangler pages deploy`                     |
+| Local dev  | `ctx ui --serve` (Hono + @hono/node-server) |
