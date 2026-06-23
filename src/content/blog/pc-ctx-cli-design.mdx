@@ -1,0 +1,262 @@
+---
+title: "The CLI That Does One Thing: Don't Make Me Read Files"
+description: "Behind the scenes of building pc-ctx's CLI — why citty, the factory pattern that generates 15 commands from one function, and why every good CLI embeds a web server."
+tldr: "The pc-ctx CLI is built with citty, uses a factory pattern to generate 7 domain commands from a single function, embeds a Hono web server for local UI serving, and stores config in ~/.pc-ctx/. The core library is separate so both the CLI and MCP server share parsing and validation logic."
+pubDate: 2026-06-23
+draft: true
+ogImage: "/og/blog/pc-ctx-cli-design.png"
+ogImageAlt: "pc-ctx CLI design blog post preview image"
+tags: ["pc-ctx", "cli", "typescript", "tooling", "citty"]
+series: "pc-ctx"
+seriesTitle: "Building pc-ctx"
+seriesOrder: 2
+---
+
+Post one covered the vision — a folder of markdown files with MCP tools so agents don't read files. This one covers the CLI itself. The thing between "agents without MCP" and "structured data on disk."
+
+The code is at [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx), package `@pc-ctx/cli`.
+
+## Why not Commander
+
+Every Node.js CLI tutorial starts with Commander. Then yargs. Then oclif. They're all fine. They also all carry assumptions about how you structure commands, how you parse args, and how you handle subcommands.
+
+I wanted something that stays out of the way. A function I call with a config object, nothing more.
+
+[citty](https://github.com/unjs/citty) does this. It's from the unjs ecosystem (same people behind h3, ofetch, nitropack). You write commands as plain objects with `meta`, `args`, and `run`. That's it.
+
+```typescript
+import { defineCommand, createMain } from "citty";
+
+const listCmd = defineCommand({
+  meta: { name: "list", description: "List all plans" },
+  args: {
+    status: {
+      type: "string",
+      description: "Filter by status",
+      required: false,
+    },
+  },
+  run({ args }) {
+    // args.status — typed string or undefined
+  },
+});
+```
+
+No class inheritance. No decorators. No code generation. A function that returns a command definition. Compose them with `subCommands`.
+
+```typescript
+const mainCmd = defineCommand({
+  meta: { name: "ctx", description: "personal-context CLI" },
+  subCommands: {
+    list: listCmd,
+    show: showCmd,
+    status: statusCmd,
+    validate: validateCmd,
+    plan: planCmd,
+    roadmap: roadmapCmd,
+    // ...
+  },
+});
+
+const main = createMain(mainCmd);
+```
+
+citty handles `--help` generation, argument parsing, and subcommand routing. I write business logic.
+
+## The factory that generates 15 commands
+
+Early on I noticed a pattern. Every domain follows the same cycle:
+
+1. List files in a directory
+2. Parse YAML frontmatter
+3. Display results
+
+Plans do it. Roadmaps do it. Research does it. Ideas do it. Processes, progress, references, archive — all the same shape.
+
+I wrote one function:
+
+```typescript
+function makeDomainCmd(name: string, description: string, dir: string) {
+  const listCmd = defineCommand({
+    meta: { name: "list", description: `List all ${name}` },
+    run() {
+      const items = readAllPlans(dir);
+      // render a table
+    },
+  });
+
+  const showCmd = defineCommand({
+    meta: { name: "show", description: `Show ${name} details` },
+    args: {
+      slug: { type: "positional", description: `${name} slug`, required: true },
+    },
+    run({ args }) {
+      const item = readAllPlans(dir).find((p) => p.slug === args.slug);
+      // render details
+    },
+  });
+
+  const addCmd = defineCommand({
+    meta: { name: "add", description: `Create a new ${name}` },
+    args: {
+      title: { type: "positional", description: "Title", required: true },
+    },
+    run({ args }) {
+      // create file with YAML frontmatter
+    },
+  });
+
+  return defineCommand({
+    meta: { name, description },
+    subCommands: { list: listCmd, show: showCmd, add: addCmd },
+  });
+}
+
+const ideasCmd = makeDomainCmd("ideas", "Manage ideas", IDEAS_DIR);
+const processesCmd = makeDomainCmd(
+  "processes",
+  "Manage process docs",
+  PROCESSES_DIR,
+);
+const progressCmd = makeDomainCmd(
+  "progress",
+  "Manage progress logs",
+  PROGRESS_DIR,
+);
+// ...
+```
+
+One function. Seven domains. Twenty-one commands (list/show/add per domain). The same parsing, the same rendering, the same error handling. If I add a new domain tomorrow, it's three lines.
+
+## Validation as a design constraint
+
+The CLI is the API. Agents parse its output when they can't use MCP. If the output is malformed, the agent chokes. If YAML frontmatter has a typo in a status field, the agent reads a plan with an unknown status and either crashes or ignores it.
+
+Validation isn't an afterthought. It's a hard check before every write operation.
+
+```typescript
+const validateCmd = defineCommand({
+  meta: { name: "validate", description: "Validate all plan files" },
+  args: {
+    domain: {
+      type: "string",
+      description: "Domain to validate",
+      required: false,
+    },
+  },
+  run({ args }) {
+    for (const [domain, dir] of domains) {
+      const plans = readAllPlans(dir);
+      for (const p of plans) {
+        // check required fields, valid statuses, task shapes
+      }
+    }
+  },
+});
+```
+
+Per-domain validation is important. Plans have strict schema — every field is required, tasks need valid statuses. Ideas are loose — a title might be enough. The same loop handles both with a simple if-branch on the domain name.
+
+This runs on `ctx validate`, but more importantly, it runs in CI. If an agent (or I) write a malformed plan file, CI catches it before it merges.
+
+## Architecture at a glance
+
+```
+packages/
+├── core/     # Types, YAML I/O, plan CRUD, validation
+├── cli/      # ctx binary — citty commands, Hono server
+└── mcp/      # MCP server — wraps core tools
+```
+
+The `@pc-ctx/core` package is the library. It exports `parsePlanFile`, `serializePlanFile`, `readAllPlans`, `findPlan`, `resolveRef`, and the type definitions. It has exactly one runtime dependency: `js-yaml`.
+
+The CLI imports core and adds citty on top. The MCP server imports core and adds nothing — it just exposes the same functions as MCP tools.
+
+This split means the MCP server gets bug fixes and features for free when core publishes a new version. (This was broken initially — I published cli with `workspace:*` which pinned the exact version. Switched to `workspace:^` so minor bumps propagate.)
+
+## The embedded web server
+
+The most unexpected feature: the CLI starts an HTTP server.
+
+`ctx ui --serve` starts a Hono server that:
+
+1. Serves a pre-built React SPA from a local cache
+2. Proxies API requests to GitHub (authenticated with a stored PAT)
+3. Falls back to index.html for client-side routing
+
+The server is a single file, 130 lines:
+
+```typescript
+import { Hono } from "hono";
+import { serve } from "@hono/node-server";
+
+export function startUiServer(port: number, staticDir: string, pat: string) {
+  const app = new Hono();
+
+  // API proxy — fetches from GitHub, parses YAML, returns JSON
+  app.get("/api/:folder", async (c) => {
+    /* ... */
+  });
+  app.get("/api/:folder/:slug", async (c) => {
+    /* ... */
+  });
+
+  // Static file server
+  app.get("*", (c) => {
+    /* serve from disk */
+  });
+
+  serve({ fetch: app.fetch, port });
+}
+```
+
+The SPA isn't bundled with the CLI. It's downloaded from GitHub Releases on first use and cached in `~/.pc-ctx/web-ui/`. The CLI shows a progress bar while downloading:
+
+```
+Fetching latest release from samir1498/pc-ctx-web...
+  Downloading... 87% (3.2MB)
+```
+
+Why not bundle it? The SPA is 500KB gzipped. The CLI package should stay lean. More importantly, the web UI evolves independently — separate repo, separate release cycle. The CLI just fetches the latest tarball.
+
+## Config that fits in a directory
+
+The CLI stores config in `~/.pc-ctx/config.json`. Right now it holds one value: a GitHub personal access token for the web UI's API proxy.
+
+```json
+{
+  "pat": "github_pat_..."
+}
+```
+
+The PAT never reaches the SPA. The Hono server stores it in memory and attaches it to GitHub API requests server-side. The browser only sees JSON responses.
+
+`ctx config --show` displays the first 8 characters for confirmation. `ctx config --pat <token>` saves it. Nothing fancy, nothing fragile.
+
+## The classless design
+
+The CLI has zero classes. No `PlanService`, no `CommandFactory`, no `ConfigManager`. Everything is a function that takes data and returns data.
+
+`readAllPlans(dir)` returns `PlanFile[]`. `serializePlanFile(plan)` returns a string. `resolveRef(ref)` returns a `ResolvedRef`. There's no state to manage, no lifecycle to track, no dependency injection container.
+
+This is the right fit for a CLI that reads and writes files. Each command is a pure(ish) pipeline: parse arguments → read files → mutate data → write files → print results. Classes would add ceremony without benefit.
+
+## What I'd do differently
+
+The CLI works. If I rewrote it:
+
+1. **Testing.** The CLI has unit tests for core but no integration tests that actually invoke `ctx` commands. A snapshot-based testing approach would catch regressions fast.
+
+2. **Error messages.** citty generates good error output for missing args, but custom error messages are inconsistent. Some say `error:`, some say `Error:`. I'd standardize on the citty convention.
+
+3. **Streaming output.** The `roadmap show` command loads all entries, parses all referenced plans, then prints. For 5 entries this is instant. For 500 it would be slow. Streaming would help, but I haven't hit that scale yet.
+
+## The point of a CLI for AI agents
+
+The CLI exists because agents need a deterministic interface to structured data. Markdown files are human-readable but not agent-efficient. MCP is more efficient, but not every agent supports it.
+
+The CLI is the middle ground. It's the thing agents fall back to when MCP isn't available. It's also the thing humans use when they don't want to open a browser.
+
+It doesn't need to be beautiful. It needs to be predictable.
+
+The code is at [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx). `npm install -g @pc-ctx/cli` to try it. Next up in the series: the MCP server — wrapping a CLI as tools, the multi-agent challenge, and why `workspace:*` is a trap.
