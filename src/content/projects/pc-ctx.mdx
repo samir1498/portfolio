@@ -47,7 +47,7 @@ highlights:
   - title: "Flashy Dashboard, Zero Extra Infra"
     description: "Animated donut charts, weekly activity bars, count-up counters, and a timeline feed — all served locally via `ctx ui --serve`. No database, no server. The GitHub API is the data layer. No cloud deployment needed."
 pubDate: 2026-06-18
-updatedDate: 2026-06-22
+updatedDate: 2026-06-23
 ogImage: "/og/projects/pc-ctx.png"
 ogImageAlt: "pc-ctx CLI project preview image"
 ---
@@ -61,7 +61,7 @@ Over about three weeks, it went from "a note asking agents to read some markdown
 - **`@pc-ctx/core`** — Types, YAML I/O, plan CRUD, storage backends
 - **`@pc-ctx/cli`** — `ctx plan add`, `ctx status`, `ctx graph`, `ctx research`, `ctx sync`
 - **`@pc-ctx/mcp`** — MCP server wrapping all CLI commands
-- **Web UI** — Dashboard, plans list, folder pages, served from Cloudflare Pages or locally via `ctx ui --serve`
+- **Web UI** — Dashboard, plans list, folder pages, served locally via `ctx ui --serve`
 
 ## Architecture
 
@@ -71,18 +71,18 @@ Over about three weeks, it went from "a note asking agents to read some markdown
 │  MCP server │     │  + js-yaml   │     │  + Git     │
 ├─────────────┤     └──────────────┘     └────────────┘
 │  Web UI     │
-│  Hono SPA   │────▶ GitHub API (authenticated)
+│  Hono       │────▶ GitHub API (authenticated)
 │  React 19   │
 └─────────────┘
 ```
 
 ## The Web UI
 
-The web interface is a single Hono Pages Function serving a React 19 SPA:
+The web interface is a React 19 SPA served by a local Hono server via `ctx ui --serve`:
 
 - **Dashboard**: Animated SVG donut chart for status distribution, animated bar chart for weekly activity, count-up number counters, priority-sorted top plans, recent progress timeline — all with framer-motion staggered entrance animations
 - **Plans page**: Full-text search, status filter, sort by priority/date/name, pagination (10/page), HoverCard summaries on each row
-- **Folder pages**: Shared generic component for roadmaps, references, and progress — each with inline markdown rendering on click
+- **Folder pages**: Shared generic component for roadmaps, references, progress, ideas, and processes — each with inline markdown rendering on click
 - **Plan detail**: Rendered markdown with syntax highlighting (highlight.js), task list with status badges, priority and metadata
 - **Responsive**: Side-by-side layout on desktop, stacked on mobile
 - **Local dev**: `ctx ui --serve` downloads the latest SPA and runs it locally with a GitHub API proxy
@@ -91,11 +91,10 @@ The web interface is a single Hono Pages Function serving a React 19 SPA:
 
 | Layer      | Choice                                      |
 | ---------- | ------------------------------------------- |
-| Runtime    | Cloudflare Pages (Hono Functions Worker)    |
+| Runtime    | Hono + @hono/node-server                    |
 | Frontend   | React 19 + Vite + Tailwind CSS v4           |
 | Routing    | TanStack Router (file-based)                |
 | Data       | TanStack Query (30s stale, API cache)       |
 | Charts     | Pure SVG (donut) + animated bars            |
 | Animations | framer-motion                               |
-| Deploy     | `wrangler pages deploy`                     |
 | Local dev  | `ctx ui --serve` (Hono + @hono/node-server) |
