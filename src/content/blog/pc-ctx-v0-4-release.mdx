@@ -1,0 +1,115 @@
+---
+title: "pc-ctx v0.4: Progress Logging, Stale Plans, and Git Reconciliation"
+description: "pc-ctx v0.4 adds progress_read, stale plan detection, git-based task reconciliation, and a proper progress logging workflow."
+tldr: "pc-ctx v0.4 standardizes progress files, detects stale plans with 3 heuristics, and reconciles git commit ctx: trailers against plan tasks. Now.md frontmatter is minimal (type + updated), daily.md even simpler (type only). Everything ships as CLI commands + MCP tools."
+pubDate: 2026-06-30
+draft: false
+ogImage: "/og/blog/pc-ctx-v0-4-release.png"
+ogImageAlt: "pc-ctx v0.4 release"
+tags: ["pc-ctx", "cli", "mcp", "release"]
+series: "pc-ctx"
+seriesTitle: "Building pc-ctx"
+seriesOrder: 5
+---
+
+pc-ctx started as a folder of markdown files and an MCP server so agents didn't need me to explain everything every session. It worked. But two problems kept surfacing.
+
+First: my progress files had accumulated cruft. now.md had five frontmatter fields I never touched. daily.md had a full blog-post schema. The format drifted between sessions.
+
+Second: plans got stale. I'd mark tasks done in a commit message, but no one was telling the plan files. Agents started each session thinking everything was still pending.
+
+v0.4 is the fix.
+
+## Three features
+
+### Progress file standardization
+
+now.md frontmatter is now two fields:
+
+```yaml
+type: now
+updated: 2026-06-30
+```
+
+That's it. The body has the sections I actually write: Active, Done recently, Pending, Not started.
+
+daily.md is even slimmer:
+
+```yaml
+type: daily
+```
+
+No title, no updated, no tags. Body is chronological entries grouped by date.
+
+The archive threshold dropped from 300 lines to 100. When a progress file hits that, `ctx progress archive` moves it to `archive/` and starts fresh.
+
+`ctx progress read` shows frontmatter + body in JSON. Agents get structured progress data without parsing markdown.
+
+`ctx progress log` appends a timestamped entry to daily.md and optionally bumps now.md.
+
+### Stale plan detection
+
+Stale is three heuristics in one command:
+
+```
+ctx stale
+```
+
+1. Plans where all tasks are done but status is still `active`, suggesting closing
+2. Plans untouched for 14+ days, suggesting review or archive
+3. now.md `updated` field != today, suggesting a focus refresh
+
+I run this at session start. It tells me what needs attention before I pick a plan.
+
+### Git reconciliation
+
+This one took longer to get right.
+
+I wanted commit messages to drive plan state. Write `ctx: <slug> close` in a commit body, run a command, and the plan updates. No manual status changes. No agent guessing what it finished.
+
+The format:
+
+```
+feat: add photo upload
+
+ctx: zone-ux-filtering-detail-page-gallery/T1 close
+ctx: zone-ux-filtering-detail-page-gallery/T2 close
+ctx: zone-ux-filtering-detail-page-gallery close
+```
+
+Trailers sit at the bottom of the commit body. The first two close individual tasks. The third closes the plan.
+
+`ctx reconcile` (default dry-run) scans the last 50 commits, parses all `ctx:` trailers, cross-references against plan files, and reports matched and unmatched refs.
+
+Matched means the slug exists and (for task refs) the task ID is valid. Unmatched means something is wrong: misspelled slug, deleted plan, nonexistent task.
+
+`ctx reconcile --apply` writes changes. For close: task → done + completion date. Plan → done + completion date. For start: task → in-progress + start date. For progress: pending task → in-progress.
+
+Now roadmaps work too. `ctx: blog-posts-2026 close` finds a roadmap in `roadmaps/` and sets it + all entries to done. Feature shipped in 0.4.1.
+
+## Session rituals
+
+The workflow settled into two patterns.
+
+Session start:
+
+```
+ctx stale
+ctx reconcile
+```
+
+See what's stale, see what the last session reconciled. Pick a plan.
+
+Session end:
+
+```
+ctx progress log "Finished photo upload" --tags frontend,e2e --update-now
+ctx reconcile --apply
+ctx stale
+```
+
+Log what you did, reconcile any `ctx:` trailers you wrote in commits, check if anything is still stale.
+
+That's v0.4. Two quality-of-life commands and a convention for keeping plans in sync with commits. The MCP server has all of this too: agents can call `plan_stale`, `plan_reconcile`, `progress_log`, `progress_read` directly.
+
+_Source: [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx)_
