@@ -1,8 +1,8 @@
 ---
 title: "Stale and Reconcile: The MCP Tools That Keep Plans Honest"
-description: "pc-ctx's stale detection and git reconciliation as MCP tools agents call automatically, with CLI fallback when I need to check manually."
-tldr: "Agents start sessions with plan_stale (3 heuristics) and end with plan_reconcile --apply (parses ctx: trailers from git log). The CLI equivalents exist so I can check what the agent found, but agents drive the workflow."
-pubDate: 2026-06-30
+description: "Two MCP tools agents call at session start and end. I barely touch the CLI anymore."
+tldr: "Agents start sessions with plan_stale and end with plan_reconcile --apply. I only reach for the CLI when something unmatched needs investigating."
+pubDate: "2026-06-30"
 draft: false
 ogImage: "/og/blog/pc-ctx-stale-reconcile-cli.png"
 ogImageAlt: "pc-ctx stale detection and git reconciliation"
@@ -12,61 +12,30 @@ seriesTitle: "Building pc-ctx"
 seriesOrder: 6
 ---
 
-Two MCP tools in pc-ctx v0.4 that handle the bookkeeping I used to ignore. Agents run them. I only reach for the CLI when I want to peek at what happened.
+I wrote the [I Stopped Trusting AI Agents](/blog/stopped-trusting-agents/) post and the [v0.4 release](/blog/pc-ctx-v0-4-release/) post back to back. Both talk about plan_stale and plan_reconcile in abstract terms. This one is what it actually looks like to use them.
 
-## plan_stale
-
-The agent calls this at session start. It runs three checks against the entire plan directory and returns JSON:
+Session start. Agent calls `plan_stale`. Output is three buckets:
 
 ```
-all-done:   3 plans where tasks are done but status is still active
-idle:       1 plan untouched for 14+ days
+all-done:   3 plans done but still active
+idle:       1 plan untouched 14+ days
 focus:      now.md updated 2 days ago
 ```
 
-**Heuristic 1 -- all-done**: Plans where every task is done but the plan itself is still `active`. Usually the last task completion should have closed the plan but didn't.
+I scan it in the agent's summary. If the idle plan is something I genuinely abandoned, I don't care. If it's something I forgot about, I pick it. The all-done bucket is the one I actually act on. Close the plan, move on. The focus line is just a reminder to bump now.md.
 
-**Heuristic 2 -- idle**: Plans where the file modification date is >14 days ago. Could be backlog worth keeping, could be abandoned.
-
-**Heuristic 3 -- focus-stale**: now.md `updated` field is before today. Means I probably haven't set direction for the session.
-
-The agent reads the output and surfaces action items in its summary. I don't need to run `ctx stale` myself. The agent already knows what's stale and tells me.
-
-## plan_reconcile
-
-The agent calls this at session end. It scans git log for `ctx:` trailers and reports what matched:
+Session end. Agent calls `plan_reconcile --apply`. This scans the last 50 commits, finds every `ctx:` trailer, cross-references against plan files, and writes the matched ones. Output looks like:
 
 ```
-## Matched (3)
-  33ad093 2026-06-30 blog-posts-2026 close
-  33ad093 2026-06-30 git-commit-convention-skill/T2 progress
-  03de051 2026-06-30 standardize-progress-format close
-
-## Unmatched (0)
+Matched (3):   33ad093 blog-posts-2026 close
+              03de051 standardize-progress-format close
+Unmatched (0)
 ```
 
-Every matched ref shows the commit hash, date, and action. Unmatched shows what went wrong: plan not found, task ID doesn't exist, file unreadable.
+I never read this output unless something is unmatched. That's the part I actually need to see. If a commit says `ctx: broken-slug/T1 close` and the slug doesn't exist, I want to know before the next session starts blind.
 
-With `--apply`, the tool writes the changes: close marks tasks done with the commit date and sets plan to done if all tasks are resolved. Start sets task to in-progress. Progress moves pending to in-progress.
+The CLI exists. `ctx stale` and `ctx reconcile`. But I use it maybe once every few sessions. Always to investigate unmatched refs. The agent drives the ritual. I just verify the edge cases.
 
-Roadmap slugs work the same way. Close sets the roadmap status to done and marks all entries done.
+That's the whole thing. Two tools, three lines of output, one thing I check manually.
 
-## The CLI fallback
-
-The same logic exists as `ctx stale` and `ctx reconcile` in the terminal. I use them when:
-
-- I want to check what the agent reported without parsing its summary
-- Something showed as unmatched and I need to investigate
-- The agent is not in session and I'm working solo
-
-The output looks the same either way. JSON from the MCP tool, formatted table from the CLI. Same engine, two interfaces.
-
-## Where they sit in the workflow
-
-Session start: the agent calls `plan_stale` to scope the work.
-
-Session end: the agent calls `plan_reconcile --apply` to persist everything.
-
-They don't do much individually. Together they close the loop between "I wrote this in a commit" and "the plan file reflects reality." The fact that agents drive this automatically is the whole point. The CLI exists so I can verify when I want to, not because I need to.
-
-_Source: [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx)_
+_Sources: [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx), [github.com/samir1498/pc-ctx-web](https://github.com/samir1498/pc-ctx-web)_
