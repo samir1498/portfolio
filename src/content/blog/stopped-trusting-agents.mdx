@@ -1,0 +1,46 @@
+---
+title: "I Stopped Trusting AI Agents to Mark Plans Done"
+description: "Plans kept going stale because agents said 'done' but never updated the files. So I built a git-based reconciliation system agents call through MCP."
+tldr: "AI agents close tasks in chat but never update plan files. The fix: put the source of truth in git commits and let MCP tools reconcile from there. Now I trust the commits, not the agent's word."
+pubDate: 2026-06-30
+draft: false
+ogImage: "/og/blog/stopped-trusting-agents.png"
+ogImageAlt: "Git-based plan reconciliation for AI agents"
+series: "pc-ctx"
+seriesTitle: "Building pc-ctx"
+seriesOrder: 4
+tags: ["pc-ctx", "ai-agents", "mcp", "workflow"]
+---
+
+I started every session the same way. Tell the agent what to do. It works. It finishes. It says "done."
+
+But the plan file still said `status: active` and all tasks were `pending`.
+
+Next session, different agent. It reads the plan. Sees everything pending. Has no idea the work was done. I re-explain.
+
+This went on for weeks. The plan files drifted further from reality. I'd check a plan, see eight tasks marked pending, and have to reconstruct what actually finished from memory and git history.
+
+The agents weren't malicious. They just don't update plan files reliably. They say "done" in the chat but that doesn't touch the file system. And each new session starts with fresh context, no memory of what the previous agent claimed it had finished.
+
+## The fix: move the source of truth to git
+
+Agents are good at writing commit messages. They're terrible at updating markdown files they didn't create.
+
+So I made commit messages the source of truth. I append a footer to every commit body:
+
+```
+ctx: plan-slug/T1 close
+ctx: plan-slug close
+```
+
+The format tells the story of what changed and which plan it affects. The agent writes the commit, the commit carries the trailer, and the `plan_reconcile` MCP tool reads the trail and updates the plan files. Details on how that tool works are in the next post in this series.
+
+## What it unblocks
+
+I write `ctx:` trailers in every commit now. When I say "close this" in chat, I make sure the commit has the trailer.
+
+Session end: the agent reconciles. All the "done" claims from today's commits become real plan state. Next agent starts with accurate status.
+
+I stopped trusting agents to close plans. I trust the commits.
+
+_Source: [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx)_
