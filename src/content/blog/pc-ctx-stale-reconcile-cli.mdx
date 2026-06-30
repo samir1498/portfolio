@@ -22,7 +22,7 @@ idle:       1 plan untouched 14+ days
 focus:      now.md updated 2 days ago
 ```
 
-I scan it in the agent's summary. If the idle plan is something I genuinely abandoned, I don't care. If it's something I forgot about, I pick it. The all-done bucket is the one I actually act on — close the plan, move on. The focus line is just a reminder to bump now.md.
+I scan it in the agent's summary. If the idle plan is something I genuinely abandoned, I don't care. If it's something I forgot about, I pick it. The all-done bucket is the one I actually act on. Close the plan, move on. The focus line is just a reminder to bump now.md.
 
 Session end. Agent calls `plan_reconcile --apply`. This scans the last 50 commits, finds every `ctx:` trailer, cross-references against plan files, and writes the matched ones. Output looks like:
 
@@ -34,8 +34,8 @@ Unmatched (0)
 
 I never read this output unless something is unmatched. That's the part I actually need to see. If a commit says `ctx: broken-slug/T1 close` and the slug doesn't exist, I want to know before the next session starts blind.
 
-The CLI exists — `ctx stale` and `ctx reconcile` — but I use it maybe once every few sessions. Always to investigate unmatched refs. The agent drives the ritual. I just verify the edge cases.
+The CLI exists. `ctx stale` and `ctx reconcile`. But I use it maybe once every few sessions. Always to investigate unmatched refs. The agent drives the ritual. I just verify the edge cases.
 
 That's the whole thing. Two tools, three lines of output, one thing I check manually.
 
-_Source: [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx)_
+_Sources: [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx), [github.com/samir1498/pc-ctx-web](https://github.com/samir1498/pc-ctx-web)_
