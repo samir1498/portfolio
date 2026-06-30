@@ -21,9 +21,9 @@ scan_dir() {
 
     fullpath="$root/public${og}"
     if [ ! -f "$fullpath" ]; then
-      title=$(grep '^title:' "$f" | head -1 | sed "s/^title: *['\"]//;s/['\"].*//")
-      subtitle=$(grep 'subtitle:' "$f" | head -1 | sed "s/^subtitle: *['\"]//;s/['\"].*//")
-      desc=$(grep 'description:' "$f" | head -1 | sed "s/^description: *['\"]//;s/['\"].*//")
+      title=$(grep '^title:' "$f" || true | head -1 | sed 's/^title: *//;s/^["\x27"]//;s/["\x27"]$//')
+      subtitle=$(grep 'subtitle:' "$f" || true | head -1 | sed 's/^subtitle: *//;s/^["\x27"]//;s/["\x27"]$//')
+      desc=$(grep 'description:' "$f" || true | head -1 | sed 's/^description: *//;s/^["\x27"]//;s/["\x27"]$//')
       sub="${subtitle:-$desc}"
       sub="${sub:-$title}"  # fallback
       sub="$(echo "$sub" | cut -c1-60)"
