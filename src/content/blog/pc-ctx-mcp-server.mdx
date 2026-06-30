@@ -1,0 +1,170 @@
+---
+title: "MCP Server: When Your CLI Grows Tools"
+description: "How the pc-ctx MCP server wraps CLI functions as agent-callable tools, why workspace:* is a trap, and what I learned about JSON-RPC on stdin/stdout."
+tldr: "The pc-ctx MCP server exposes 30+ tools over stdin/stdout JSON-RPC. A domain-tools factory generates list/show/add for 6 domains from one function. The workspace:* publishing trap meant the MCP server was stale for weeks until I fixed it."
+pubDate: 2026-06-23
+draft: false
+ogImage: "/og/blog/pc-ctx-mcp-server.png"
+ogImageAlt: "pc-ctx MCP server blog post preview image"
+tags: ["pc-ctx", "mcp", "typescript", "ai-agents", "tooling", "json-rpc"]
+series: "pc-ctx"
+seriesTitle: "Building pc-ctx"
+seriesOrder: 3
+---
+
+Post two covered the CLI. citty, the factory pattern, the embedded server. This one is the MCP server. The thing agents actually talk to.
+
+The code is at [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx), package `@pc-ctx/mcp`.
+
+## What MCP looks like
+
+MCP is JSON-RPC 2.0 over stdin/stdout. The agent starts your server as a child process, sends requests on stdin, reads responses on stdout.
+
+A tool call:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": { "name": "plan_status", "arguments": {} }
+}
+```
+
+Response:
+
+```json
+{
+  "result": { "content": [{ "type": "text", "text": "{\"active\":[...]}" }] },
+  "jsonrpc": "2.0",
+  "id": 1
+}
+```
+
+No HTTP, no WebSocket. A process that reads and writes. The agent manages the lifecycle.
+
+## The server is four lines
+
+```typescript
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
+export function buildServer(plansDir, roadmapsDir, researchDir, root) {
+  const server = new McpServer({ name: "@pc-ctx/mcp", version: "0.3.0" });
+  registerAllTools(server, { plansDir, roadmapsDir, researchDir, root });
+  return server;
+}
+```
+
+The SDK handles JSON-RPC framing and routing. I register tools.
+
+Main wraps it with stdio transport:
+
+```typescript
+const server = buildServer(plansDir, roadmapsDir, researchDir, root);
+const transport = new StdioServerTransport();
+await server.connect(transport);
+```
+
+## Tool registration
+
+Each tool is a separate file exporting a `register*` function. Same shape every time:
+
+```typescript
+export function registerListTool(server, ctx) {
+  server.tool(
+    "plan_list",
+    "List all plans.",
+    {
+      status: z.enum(["active", "paused", "done", "cancelled"]).optional(),
+      category: z.string().optional(),
+    },
+    async ({ status, category }) => {
+      return { content: [{ type: "text", text: JSON.stringify(results) }] };
+    },
+  );
+}
+```
+
+`server.tool` takes name, description, Zod schema, handler. The SDK converts Zod to JSON Schema, validates args, type-checks the handler.
+
+## The domain factory
+
+Same pattern as the CLI. Six domains, one function:
+
+```typescript
+export function registerDomainTools(server, ctx, domain, dir, label) {
+  server.tool(`${domain}_list`, `List all ${label}.`, {}, async () => { ... });
+  server.tool(`${domain}_show`, `Show a ${label}.`, { slug: z.string() }, async ({ slug }) => { ... });
+  server.tool(`${domain}_add`, `Create a new ${label}.`, { title: z.string(), ... }, async ({ title }) => { ... });
+}
+
+for (const [domain, dir, label] of domains) {
+  registerDomainTools(server, { root }, domain, dir, label);
+}
+```
+
+One function, six domains, eighteen tools.
+
+## The workspace:\* trap
+
+This one cost me weeks of stale MCP tools.
+
+The MCP server depends on `@pc-ctx/core`. When I published `@pc-ctx/mcp@0.2.0`, its package.json had:
+
+```json
+{ "dependencies": { "@pc-ctx/core": "workspace:*" } }
+```
+
+During development, `workspace:*` means "use the local package." On publish, pnpm replaces it with the exact version. `0.1.0`. Locked forever.
+
+I fixed a core bug where research listing only recursed one directory. Published `core@0.1.2` with the fix. CLI picked it up (it was republished too). MCP kept resolving to `0.1.0`. Its dependency was pinned.
+
+Fix: `workspace:^`.
+
+```json
+{ "dependencies": { "@pc-ctx/core": "workspace:^" } }
+```
+
+Now minor bumps propagate. Also, `npx` caches by version. Republishing the same version does nothing. You bump or you clear the cache.
+
+## What agents call
+
+Most-used tools:
+
+- `plan_status` -- session start. Returns grouped counts. Zero args.
+- `plan_list` -- filtered views.
+- `plan_set_status` -- mark done when finished.
+- `plan_task_status` -- update task progress.
+- `plan_add` -- capture a new plan.
+- `plan_validate` -- check all files after mutations.
+
+Pattern: start session, status, pick plan, show, work, task-status, finish, set-status. Three to five MCP calls per session.
+
+## Testing
+
+The integration test starts the server in-process with `InMemoryTransport` and calls tools directly:
+
+```typescript
+const server = buildServer(plansDir, roadmapsDir, researchDir, root);
+const transport = new InMemoryTransport();
+server.connect(transport[client]);
+
+const result = await transport[client].request(
+  { method: "tools/call", params: { name: "plan_validate", arguments: {} } },
+  schema,
+);
+```
+
+Runs in CI alongside unit tests.
+
+## Why MCP over CLI
+
+CLI works. Every agent can parse its output. But MCP saves tokens on both sides.
+
+Agent doesn't spawn a process, wait for stdout, parse text. It sends a JSON-RPC message and gets JSON back.
+
+Server doesn't format tables, handle ANSI codes, truncate for terminal width. It returns JSON directly.
+
+When I started, CLI was primary. Now it's the fallback. MCP is what agents use first.
+
+Add the MCP server to your agent config and agents manage plans natively. Next in the series: the web UI. A React dashboard served locally by the CLI, no cloud deployment.
