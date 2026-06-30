@@ -1,0 +1,71 @@
+---
+title: "4 New MCP Tools Your Agent Should Be Calling"
+description: "pc-ctx v0.4 adds progress_read, plan_stale, plan_reconcile, and progress_log as MCP tools so agents can manage progress and audit plans without CLI access."
+tldr: "pc-ctx v0.4 MCP tools let agents read progress files, detect stale plans, reconcile git commit trailers against plan tasks, and log daily entries. Session start ritual: call plan_stale + plan_reconcile. Session end: progress_log + plan_reconcile --apply."
+pubDate: "2026-06-30"
+draft: false
+ogImage: "/og/blog/pc-ctx-agent-tools-update.png"
+ogImageAlt: "pc-ctx MCP agent tools"
+tags: ["pc-ctx", "mcp", "ai-agents", "typescript", "tooling"]
+series: "pc-ctx"
+seriesTitle: "Building pc-ctx"
+seriesOrder: 7
+---
+
+The MCP server had plan list, show, status, and CRUD tools since v0.1. v0.4 adds four that close the loop between what agents do and what agents track.
+
+## progress_read
+
+Reads now.md or daily.md and returns frontmatter + body as JSON. Zero args besides the filename.
+
+The agent calls this at session start to check what I was doing yesterday. Before this tool existed, agents tried to read files directly, parsed incorrectly, or just guessed.
+
+## progress_log
+
+Appends a timestamped entry to daily.md. The `--update-now` flag also bumps now.md's last-updated date.
+
+The agent calls this at session end with a summary of what it did. No more "I logged your progress" followed by nothing actually written.
+
+```
+progress_log: text="Fixed photo upload race (useLayoutEffect + useRef)", tags=["frontend", "e2e"], updateNow: true
+```
+
+## plan_stale
+
+Exposes the same three heuristics as `ctx stale`: all-done plans, idle plans, stale focus. The agent runs this, gets JSON back, and can act on the results directly.
+
+```
+plan_stale: {}
+→ [{ slug: "standardize-progress-format", heuristic: "all-done", detail: "3/3 done, active" }, ...]
+```
+
+## plan_reconcile
+
+The counterpart to `ctx reconcile`. Default dry-run. Pass `apply: true` to write changes.
+
+The agent runs this at session end to persist what was closed. The agent doesn't need CLI access or file write permissions. The MCP tool writes the plan files.
+
+```
+plan_reconcile: { apply: false, commits: 50 }
+→ { matched: [...], unmatched: [...] }
+```
+
+## Session ritual, MCP side
+
+Session start: the agent calls these on init:
+
+```
+plan_stale → check what needs attention
+plan_reconcile → check if previous session left unmatched trailera
+```
+
+Session end: the agent closes the loop:
+
+```
+progress_log → log what was done
+plan_reconcile → { apply: true } → persist all ctx: trailer actions
+```
+
+The CLI equivalents exist for when I want to check manually. But agents use the MCP tools natively. No shell, no parsing. JSON in, JSON out.
+
+_Source: [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx)_
