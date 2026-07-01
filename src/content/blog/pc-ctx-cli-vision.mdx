@@ -14,9 +14,9 @@ seriesOrder: 1
 
 My brain was the context. I just told the agent what to do every session and hoped I remembered everything it needed. Then I wrote AGENTS.md. Then GEMINI.md when Gemini was still a thing. Then Gemini plugins with skills. Then CLAUDE.md. None of it scaled.
 
-The folder kept mutating. A semi-structured folder with markdown files → `.agent` → `.context` (gitignored, in a workspace folder with project repos) → git-tracked for cross-machine sync → `workspace-name-prefix-context` → rules in AGENTS.md → separate skill files. Every few weeks the structure changed and I told the agent to migrate it. It did.
+I needed a folder to hold rules, plans, and session notes so agents could access them without me explaining everything every time. That folder's structure changed constantly. It started as loose markdown files. Then a hidden `.agent` directory. Then `.context` inside each project (gitignored, so lost on every new clone). Then git-tracked for cross-machine sync. Then prefixed with the workspace name. Then rules leaked into AGENTS.md. Then skills split into separate files. Every few weeks the structure drifted and I told the agent to migrate it. It did.
 
-pc-ctx is what it settled into after all those iterations. It's a folder of markdown files in a git repo with an MCP server and a CLI. The evolution took months. The current form is what survived.
+pc-ctx is what survived after all those iterations. A folder of markdown files in a git repo with an MCP server and a CLI.
 
 ## How the data works
 
