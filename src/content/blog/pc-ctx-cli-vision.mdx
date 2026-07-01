@@ -54,7 +54,7 @@ Today the MCP server is the primary interface. The CLI is just a fallback.
 
 ## What agents actually do with it
 
-I start a session and tell the agent to list what's active. It calls the status tool via MCP. Three plans, their priorities, the latest update. I pick what to work on and the agent starts. While working, I almost always discover new things. Some become new plans, some go into ideas. Next session, same flow.
+I start a session and tell the agent to list what's active. It calls the status tool via MCP. Plans grouped by status, sorted by priority, latest update per project. I pick what to work on and the agent starts. While working, I almost always discover new things. Some become new plans, some go into ideas. Next session, same flow.
 
 Claude Code, Cline, and OpenCode do the same through MCP. Fall back to `ctx status` if MCP isn't available. Same data, three agents, zero custom instructions per agent.
 
