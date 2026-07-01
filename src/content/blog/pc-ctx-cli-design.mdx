@@ -1,7 +1,7 @@
 ---
-title: "The CLI That Does One Thing: Don't Make Me Read Files"
-description: "Behind the scenes of building pc-ctx's CLI. Why citty, the factory pattern that generates 15 commands from one function, and why every good CLI embeds a web server."
-tldr: "The pc-ctx CLI uses citty for composable commands, a factory function to generate 7 domain CLIs from one pattern, and an embedded Hono server for local UI. Core logic lives in a separate library so both the CLI and MCP server share parsing and validation."
+title: "Inside the pc-ctx CLI: Factory Functions, Package Splits, and an Embedded Web Server"
+description: "How pc-ctx's CLI is built with citty, a factory function generating domain commands from one pattern, a three-package split, and an embedded Hono server for local UI."
+tldr: "The pc-ctx CLI uses citty for composable commands, a factory function to generate domain commands from one pattern, and an embedded Hono server for local UI. Core logic lives in a separate library so both the CLI and MCP server share parsing and validation."
 pubDate: 2026-06-23
 draft: false
 ogImage: "/og/blog/pc-ctx-cli-design.png"
@@ -12,7 +12,7 @@ seriesTitle: "Building pc-ctx"
 seriesOrder: 2
 ---
 
-Post one was the vision. A folder of markdown files with MCP tools so agents don't read files. This one is the CLI itself. The bridge between "agent without MCP" and "structured data on disk."
+[Post one](/blog/pc-ctx-cli-vision/) was the vision. A folder of markdown files with MCP tools so agents don't read files. This one is the CLI itself. The bridge between "agent without MCP" and "structured data on disk."
 
 The code is at [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx), package `@pc-ctx/cli`.
 
@@ -50,9 +50,9 @@ const main = createMain(mainCmd);
 
 citty handles help generation, arg parsing, routing. I write business logic.
 
-## The factory pattern
+## Domains and the factory pattern
 
-Every domain follows the same cycle. List files, parse YAML, display results. Plans, roadmaps, research, ideas, processes, progress, references, archive. All the same shape.
+Each content type is a domain. Plans, roadmaps, progress logs, ideas, processes, references, archive, handoffs — 8 domains, each is a directory of markdown files with YAML frontmatter. Every domain follows the same cycle: list files, parse YAML, display results.
 
 I wrote one function:
 
@@ -81,7 +81,7 @@ const processesCmd = makeDomainCmd(
 );
 ```
 
-One function, seven domains, twenty-one commands. Add a new domain tomorrow and it's three lines.
+One function, five of the eight domains, three commands each. Add a new domain tomorrow and it's three lines.
 
 ## Validation is the API
 
@@ -138,4 +138,4 @@ The CLI exists because agents need deterministic access to structured data. MCP 
 
 It doesn't need to be beautiful. It needs to be predictable.
 
-Next in the series: the MCP server. Wrapping CLI functions as tools, the `workspace:*` trap, and what JSON-RPC on stdin/stdout looks like.
+The code is at [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx), package `@pc-ctx/cli`.

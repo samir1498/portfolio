@@ -12,7 +12,7 @@ seriesTitle: "Building pc-ctx"
 seriesOrder: 3
 ---
 
-Post two covered the CLI. citty, the factory pattern, the embedded server. This one is the MCP server. The thing agents actually talk to.
+[Post two](/blog/pc-ctx-cli-design/) covered the CLI. citty, the factory pattern, the embedded server. This one is the MCP server. The thing agents actually talk to.
 
 The code is at [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx), package `@pc-ctx/mcp`.
 
@@ -49,7 +49,7 @@ No HTTP, no WebSocket. A process that reads and writes. The agent manages the li
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 export function buildServer(plansDir, roadmapsDir, researchDir, root) {
-  const server = new McpServer({ name: "@pc-ctx/mcp", version: "0.3.0" });
+  const server = new McpServer({ name: "@pc-ctx/mcp", version: "0.4.1" });
   registerAllTools(server, { plansDir, roadmapsDir, researchDir, root });
   return server;
 }
@@ -89,7 +89,7 @@ export function registerListTool(server, ctx) {
 
 ## The domain factory
 
-Same pattern as the CLI. Six domains, one function:
+Same idea as the CLI. Each content type is a domain — plans, roadmaps, progress, ideas, processes, references, archive, handoffs — and the factory generates three tools per domain: list, show, add.
 
 ```typescript
 export function registerDomainTools(server, ctx, domain, dir, label) {
@@ -103,7 +103,7 @@ for (const [domain, dir, label] of domains) {
 }
 ```
 
-One function, six domains, eighteen tools.
+One function for the factory domains, alongside individually registered plan, roadmap, progress, and research tools, the server exposes over 40 tools total.
 
 ## The workspace:\* trap
 
@@ -167,4 +167,4 @@ Server doesn't format tables, handle ANSI codes, truncate for terminal width. It
 
 When I started, CLI was primary. Now it's the fallback. MCP is what agents use first.
 
-Add the MCP server to your agent config and agents manage plans natively. Next in the series: the web UI. A React dashboard served locally by the CLI, no cloud deployment.
+Add the MCP server to your agent config and agents manage plans natively.
