@@ -12,7 +12,7 @@ seriesTitle: "Building pc-ctx"
 seriesOrder: 7
 ---
 
-The MCP server had plan list, show, status, and CRUD tools since v0.1. v0.4 adds four that close the loop between what agents do and what agents track.
+The MCP server now exposes over 40 tools. Plan CRUD, roadmap management, research browsing, progress tracking, dependency graphs, git sync. But the four that matter most are the ones that close the loop between what agents do and what agents track.
 
 ## progress_read
 
@@ -32,7 +32,7 @@ progress_log: text="Fixed photo upload race (useLayoutEffect + useRef)", tags=["
 
 ## plan_stale
 
-Exposes the same three heuristics as `ctx stale`: all-done plans, idle plans, stale focus. The agent runs this, gets JSON back, and can act on the results directly.
+Exposes the same three heuristics as `ctx stale`: all-done plans, idle plans, stale focus. The agent runs this, gets JSON back, and can act on the results directly. [Why these heuristics matter](/blog/pc-ctx-v0-4-release/#stale-plan-detection).
 
 ```
 plan_stale: {}
@@ -41,7 +41,7 @@ plan_stale: {}
 
 ## plan_reconcile
 
-The counterpart to `ctx reconcile`. Default dry-run. Pass `apply: true` to write changes.
+The counterpart to `ctx reconcile`. Default dry-run. Pass `apply: true` to write changes. [How it works in practice](/blog/pc-ctx-stale-reconcile-cli/#plan-reconcile).
 
 The agent runs this at session end to persist what was closed. The agent doesn't need CLI access or file write permissions. The MCP tool writes the plan files.
 
@@ -50,22 +50,6 @@ plan_reconcile: { apply: false, commits: 50 }
 → { matched: [...], unmatched: [...] }
 ```
 
-## Session ritual, MCP side
+_Source: [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx), [github.com/samir1498/pc-ctx-web](https://github.com/samir1498/pc-ctx-web)_
 
-Session start: the agent calls these on init:
-
-```
-plan_stale → check what needs attention
-plan_reconcile → check if previous session left unmatched trailera
-```
-
-Session end: the agent closes the loop:
-
-```
-progress_log → log what was done
-plan_reconcile → { apply: true } → persist all ctx: trailer actions
-```
-
-The CLI equivalents exist for when I want to check manually. But agents use the MCP tools natively. No shell, no parsing. JSON in, JSON out.
-
-_Source: [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx)_
+Next in the series: [web UI](/blog/pc-ctx-web-ui/).
