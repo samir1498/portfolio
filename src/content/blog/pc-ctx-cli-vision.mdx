@@ -56,7 +56,7 @@ Today the MCP server is the primary interface. The CLI is just a fallback.
 
 I start a session and tell the agent to list what's active. It calls the status tool via MCP. Three plans, their priorities, the latest update. I pick what to work on and the agent starts. While working, I almost always discover new things. Some become new plans, some go into ideas. Next session, same flow.
 
-Claude Code and Cline do the same through MCP. Fall back to `ctx status` if MCP isn't available. Same data, three agents, zero custom instructions per agent.
+Claude Code, Cline, and OpenCode do the same through MCP. Fall back to `ctx status` if MCP isn't available. Same data, three agents, zero custom instructions per agent.
 
 ## The cross-machine part
 
@@ -67,7 +67,5 @@ No service, no API, no accounts. Just git.
 ## What's next
 
 This is post one in a series about pc-ctx. I want to cover the CLI design, the MCP internals, and the web UI. Ideas domain support coming to MCP and CLI soon. The core idea is simple: structured data in a git repo, MCP for native agent access, CLI for agents without MCP.
-
-Next in the series: [CLI design](/blog/pc-ctx-cli-design/).
 
 The code is at [github.com/samir1498/pc-ctx](https://github.com/samir1498/pc-ctx). Install the CLI with `npm install -g @pc-ctx/cli`, or add the MCP server to your agent config.
