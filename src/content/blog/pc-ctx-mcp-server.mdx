@@ -89,7 +89,7 @@ export function registerListTool(server, ctx) {
 
 ## The domain factory
 
-Same pattern as the CLI. Five domains, one function:
+Same idea as the CLI. Each content type is a domain — plans, roadmaps, progress, ideas, processes, references, archive, handoffs — and the factory generates three tools per domain: list, show, add.
 
 ```typescript
 export function registerDomainTools(server, ctx, domain, dir, label) {
@@ -103,7 +103,7 @@ for (const [domain, dir, label] of domains) {
 }
 ```
 
-One function, five domains, fifteen tools. Alongside the individually registered plan, roadmap, research, and infrastructure tools, the server exposes over 40 tools total.
+One function for the factory domains, alongside individually registered plan, roadmap, progress, and research tools, the server exposes over 40 tools total.
 
 ## The workspace:\* trap
 

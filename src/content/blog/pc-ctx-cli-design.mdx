@@ -1,7 +1,7 @@
 ---
 title: "Inside the pc-ctx CLI: Factory Functions, Package Splits, and an Embedded Web Server"
 description: "How pc-ctx's CLI is built with citty, a factory function generating domain commands from one pattern, a three-package split, and an embedded Hono server for local UI."
-tldr: "The pc-ctx CLI uses citty for composable commands, a factory function to generate 7 domain CLIs from one pattern, and an embedded Hono server for local UI. Core logic lives in a separate library so both the CLI and MCP server share parsing and validation."
+tldr: "The pc-ctx CLI uses citty for composable commands, a factory function to generate domain commands from one pattern, and an embedded Hono server for local UI. Core logic lives in a separate library so both the CLI and MCP server share parsing and validation."
 pubDate: 2026-06-23
 draft: false
 ogImage: "/og/blog/pc-ctx-cli-design.png"
@@ -50,9 +50,9 @@ const main = createMain(mainCmd);
 
 citty handles help generation, arg parsing, routing. I write business logic.
 
-## The factory pattern
+## Domains and the factory pattern
 
-Every domain follows the same cycle. List files, parse YAML, display results. Plans, roadmaps, research, ideas, processes, progress, references, archive. All the same shape.
+Each content type is a domain. Plans, roadmaps, progress logs, ideas, processes, references, archive, handoffs — 8 domains, each is a directory of markdown files with YAML frontmatter. Every domain follows the same cycle: list files, parse YAML, display results.
 
 I wrote one function:
 
@@ -81,7 +81,7 @@ const processesCmd = makeDomainCmd(
 );
 ```
 
-One function, five domains, fifteen commands. Add a new domain tomorrow and it's three lines.
+One function, five of the eight domains, three commands each. Add a new domain tomorrow and it's three lines.
 
 ## Validation is the API
 
