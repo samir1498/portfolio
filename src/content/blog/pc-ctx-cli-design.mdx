@@ -1,6 +1,6 @@
 ---
-title: "The CLI That Does One Thing: Don't Make Me Read Files"
-description: "Behind the scenes of building pc-ctx's CLI. Why citty, the factory pattern that generates 15 commands from one function, and why every good CLI embeds a web server."
+title: "Inside the pc-ctx CLI: Factory Functions, Package Splits, and an Embedded Web Server"
+description: "How pc-ctx's CLI is built with citty, a factory function generating domain commands from one pattern, a three-package split, and an embedded Hono server for local UI."
 tldr: "The pc-ctx CLI uses citty for composable commands, a factory function to generate 7 domain CLIs from one pattern, and an embedded Hono server for local UI. Core logic lives in a separate library so both the CLI and MCP server share parsing and validation."
 pubDate: 2026-06-23
 draft: false
