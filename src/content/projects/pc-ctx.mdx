@@ -27,14 +27,16 @@ features:
   - "`ctx setup` scaffolds the whole thing in one command"
   - "MCP server: any agent calls tools directly, no file parsing needed"
   - "Git-backed. Agents commit their own progress."
-  - "GitHub sync — `ctx sync` pushes and pulls context across machines"
+  - "GitHub sync - `ctx sync` pushes and pulls context across machines"
   - "Three npm packages published: @pc-ctx/core, @pc-ctx/cli, @pc-ctx/mcp"
-  - "Zero opencode awareness — purely generic, works with any agent"
+  - "Zero opencode awareness - purely generic, works with any agent"
   - "Local web UI: `ctx ui --serve` downloads and runs the SPA locally"
   - "`ctx config --pat <token>` to authenticate API calls from the local web UI"
-plannedFeatures:
-  - "Weekly / daily log management CLI commands"
+  - "Public demo deployed to Cloudflare Pages at demo-pc-ctx-web.pages.dev"
+  - "Built-in demo mode: add ?demo=true to preview without any backend"
+  - "Weekly / daily progress log CLI commands: ctx progress log, ctx progress read"
   - "Standard progress file format for structured time tracking"
+plannedFeatures: []
 highlights:
   - title: "Scope Creep, but Make It Useful"
     description: "It started as markdown files and a note saying 'agents should read these'. Then a CLI so they would not parse YAML themselves. Then an MCP server so they would not parse CLI output either. What was a single script became three npm packages and a full web UI."
@@ -43,25 +45,25 @@ highlights:
   - title: "20+ MCP Tools, Zero Adapters"
     description: "If your agent speaks MCP, it reads and writes plans. No adapter per agent. No CLAUDE.md hacks. 20+ tools covering plans, roadmaps, research, ideas, processes, progress, references, archive, graph, and sync."
   - title: "Install Any Way You Like"
-    description: "`npm install -g @pc-ctx/cli`, `pnpm add -g @pc-ctx/cli`, or `bun add -g @pc-ctx/cli` — pick your package manager. Then `ctx setup ./project` creates the whole tree, writes templates, installs deps, and inits git."
+    description: "`npm install -g @pc-ctx/cli`, `pnpm add -g @pc-ctx/cli`, or `bun add -g @pc-ctx/cli` - pick your package manager. Then `ctx setup ./project` creates the whole tree, writes templates, installs deps, and inits git."
   - title: "Flashy Dashboard, Zero Extra Infra"
-    description: "Animated donut charts, weekly activity bars, count-up counters, and a timeline feed — all served locally via `ctx ui --serve`. No database, no server. The GitHub API is the data layer. No cloud deployment needed."
+    description: "Animated donut charts, weekly activity bars, count-up counters, and a timeline feed - all served locally via `ctx ui --serve` or deployed to Cloudflare Pages. No database, no server. The GitHub API is the data layer."
 pubDate: 2026-06-18
-updatedDate: 2026-06-23
+updatedDate: 2026-07-04
 ogImage: "/og/projects/pc-ctx.png"
 ogImageAlt: "pc-ctx CLI project preview image"
 ---
 
-The **context system** is a repo of markdown files with structured YAML frontmatter — plans, roadmaps, research references, and progress logs — that AI coding agents read and write as they work. `pc-ctx` is the CLI, MCP server, and web UI that wrap it.
+The **context system** is a repo of markdown files with structured YAML frontmatter - plans, roadmaps, research references, and progress logs - that AI coding agents read and write as they work. `pc-ctx` is the CLI, MCP server, and web UI that wrap it.
 
 ## What changed
 
 Over about three weeks, it went from "a note asking agents to read some markdown files" to:
 
-- **`@pc-ctx/core`** — Types, YAML I/O, plan CRUD, storage backends
-- **`@pc-ctx/cli`** — `ctx plan add`, `ctx status`, `ctx graph`, `ctx research`, `ctx sync`
-- **`@pc-ctx/mcp`** — MCP server wrapping all CLI commands
-- **Web UI** — Dashboard, plans list, folder pages, served locally via `ctx ui --serve`
+- **`@pc-ctx/core`** - Types, YAML I/O, plan CRUD, storage backends
+- **`@pc-ctx/cli`** - `ctx plan add`, `ctx status`, `ctx graph`, `ctx research`, `ctx sync`
+- **`@pc-ctx/mcp`** - MCP server wrapping all CLI commands
+- **Web UI** - Dashboard, plans list, folder pages, served locally via `ctx ui --serve`
 
 ## Architecture
 
@@ -71,18 +73,21 @@ Over about three weeks, it went from "a note asking agents to read some markdown
 │  MCP server │     │  + js-yaml   │     │  + Git     │
 ├─────────────┤     └──────────────┘     └────────────┘
 │  Web UI     │
-│  Hono       │────▶ GitHub API (authenticated)
+│  Hono       │────▶ GitHub GraphQL API (authenticated)
 │  React 19   │
+├─────────────┤
+│  Cloudflare │     Public demo (optional)
+│  Pages      │────▶ demo-pc-ctx-web.pages.dev
 └─────────────┘
 ```
 
 ## The Web UI
 
-The web interface is a React 19 SPA served by a local Hono server via `ctx ui --serve`:
+The web interface is a React 19 SPA - served locally via `ctx ui --serve`, or deployed to Cloudflare Pages for a public demo at [demo-pc-ctx-web.pages.dev](https://demo-pc-ctx-web.pages.dev):
 
-- **Dashboard**: Animated SVG donut chart for status distribution, animated bar chart for weekly activity, count-up number counters, priority-sorted top plans, recent progress timeline — all with framer-motion staggered entrance animations
+- **Dashboard**: Animated SVG donut chart for status distribution, animated bar chart for weekly activity, count-up number counters, priority-sorted top plans, recent progress timeline - all with framer-motion staggered entrance animations
 - **Plans page**: Full-text search, status filter, sort by priority/date/name, pagination (10/page), HoverCard summaries on each row
-- **Folder pages**: Shared generic component for roadmaps, references, progress, ideas, and processes — each with inline markdown rendering on click
+- **Folder pages**: Shared generic component for roadmaps, references, progress, ideas, and processes - each with inline markdown rendering on click
 - **Plan detail**: Rendered markdown with syntax highlighting (highlight.js), task list with status badges, priority and metadata
 - **Responsive**: Side-by-side layout on desktop, stacked on mobile
 - **Local dev**: `ctx ui --serve` downloads the latest SPA and runs it locally with a GitHub API proxy
