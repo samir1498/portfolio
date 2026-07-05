@@ -1,0 +1,47 @@
+---
+title: "The Repos Domain: When Context Knows Your Projects"
+description: "pc-ctx learns project metadata. Stack, commands, rules. Now the context system sees your projects as first-class entities."
+tldr: "pc-ctx has a new domain: repos. A structured project registry with stack, commands, rules, and current_plan. CLI (list/show/add) + MCP tools. AGENTS.md auto-wires it."
+pubDate: 2026-07-05
+draft: false
+ogImage: "/og/blog/pc-ctx-repos-domain.png"
+ogImageAlt: "pc-ctx repos domain blog post preview image"
+tags: ["pc-ctx", "cli", "mcp", "tooling", "typescript"]
+series: "pc-ctx"
+seriesTitle: "Building pc-ctx"
+seriesOrder: 8
+---
+
+pc-ctx could manage plans, roadmaps, progress. Not the projects themselves. Every time an agent started a session on MonStock or GAM, it had to figure out the stack, the commands, the conventions. Sometimes from AGENTS.md, sometimes from memory, sometimes by reading the files.
+
+I wanted the context system to know what it was working on. So I added a repos domain.
+
+## What it looks like
+
+A repo file is structured metadata for a single project.
+
+```yaml
+# repos/green-algeria-map.md
+stack:
+  - TypeScript
+  - NestJS
+  - PostgreSQL
+commands:
+  dev: pnpm run dev
+  test: pnpm run test
+  lint: pnpm run lint
+rules:
+  - NEVER read node_modules/
+  - ONLY commit via PR
+current_plan: infra-move-pg-to-supabase-email-provider
+```
+
+Every project in my workspace has one. AGENTS.md picks them up automatically. The CLI handles the rest.
+
+```
+ctx repos list                    # list everything
+ctx repos show green-algeria-map   # show details
+ctx repos add "portfolio"          # scaffold a new repo file
+```
+
+MCP tools mirror the CLI: `repos_list`, `repos_show`, `repos_add`. The context system can answer "what project are we in and how does it work?" without reading source files.
