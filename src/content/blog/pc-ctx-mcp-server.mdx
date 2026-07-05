@@ -49,7 +49,7 @@ No HTTP, no WebSocket. A process that reads and writes. The agent manages the li
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 export function buildServer(plansDir, roadmapsDir, researchDir, root) {
-  const server = new McpServer({ name: "@pc-ctx/mcp", version: "0.3.0" });
+  const server = new McpServer({ name: "@pc-ctx/mcp", version: "0.4.1" });
   registerAllTools(server, { plansDir, roadmapsDir, researchDir, root });
   return server;
 }
@@ -89,7 +89,7 @@ export function registerListTool(server, ctx) {
 
 ## The domain factory
 
-Same pattern as the CLI. Six domains, one function:
+Same pattern as the CLI. Five domains, one function:
 
 ```typescript
 export function registerDomainTools(server, ctx, domain, dir, label) {
@@ -103,7 +103,7 @@ for (const [domain, dir, label] of domains) {
 }
 ```
 
-One function, six domains, eighteen tools.
+One function, five domains, fifteen tools. Alongside the individually registered plan, roadmap, research, and infrastructure tools, the server exposes over 40 tools total.
 
 ## The workspace:\* trap
 
@@ -167,4 +167,4 @@ Server doesn't format tables, handle ANSI codes, truncate for terminal width. It
 
 When I started, CLI was primary. Now it's the fallback. MCP is what agents use first.
 
-Add the MCP server to your agent config and agents manage plans natively. Next in the series: the web UI. A React dashboard served locally by the CLI, no cloud deployment.
+Add the MCP server to your agent config and agents manage plans natively. Next in the series: [why I stopped trusting agents](/blog/stopped-trusting-agents/) to mark plans done.
