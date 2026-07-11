@@ -10,7 +10,6 @@
     "astro": "astro",
     "check": "astro check",
     "audit:dev": "unlighthouse --site http://localhost:4321 --output-path .unlighthouse --mobile --samples 2 --throttle --no-cache",
-    "prepare": "husky",
     "fallow": "fallow",
     "fallow:health": "fallow health",
     "fallow:dupes": "fallow dupes",
@@ -43,7 +42,6 @@
   },
   "devDependencies": {
     "fallow": "^2.93.0",
-    "husky": "^9.1.7",
     "lint-staged": "^17.0.5",
     "prettier": "^3.8.3",
     "prettier-plugin-astro": "^0.14.1",
