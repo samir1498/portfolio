@@ -1,0 +1,54 @@
+---
+title: "Egui vs Tauri: Two Desktop Frontends, One Backend"
+description: "MonStock's two frontends, one immediate-mode Rust GUI and one React webview, share a backend but approach every design decision differently."
+tldr: "Egui gives you a compiled binary with no runtime dependencies but a limited UI toolkit. Tauri gives you a full web stack with auto-update and professional packaging, but ships with a browser engine. MonStock maintains both, and the differences go deeper than just the rendering layer."
+pubDate: "2026-06-30"
+draft: false
+ogImage: "/og/blog/monstock-egui-vs-tauri.png"
+ogImageAlt: "Egui vs Tauri comparison"
+tags: ["monstock", "rust", "egui", "tauri", "gui"]
+---
+
+MonStock has two desktop frontends. Not one, not an either-or migration path. Two parallel implementations, both maintained, both releaseable.
+
+The egui frontend is a single binary compiled with `eframe`. It starts fast, uses ~10 MB RAM, and has no runtime dependencies beyond what Linux ships. The Tauri frontend is a Rust backend + a full React webview. It needs `webkit2gtk`, ships with a browser engine, and uses more memory, but it gets CSS, HTML, React DevTools, and auto-update.
+
+I wanted to understand what this actually means in practice, not just the bullet points.
+
+## State management
+
+Egui is immediate mode. Every frame, the UI function runs from scratch. Widgets return values, branches render or skip, and state lives in one big struct on the heap. There's no reactivity, no virtual DOM, no diffing. You mutate state directly in response to events.
+
+```rust
+if ui.button(t("products.add", lang)).clicked() {
+    self.products_state.show_add_form = true;
+}
+```
+
+The Tauri frontend uses TanStack Query for server state and component-local state for UI state. The Rust backend is stateless across commands. It opens a connection, runs a query, returns JSON, closes the connection.
+
+This is the biggest practical difference. The egui frontend holds a `&mut SqliteConnection` in its main struct and borrows it on every frame. The Tauri frontend never touches the database directly. Every mutation goes through `invoke()` and comes back as serialized data.
+
+## What each frontend can actually do
+
+The Tauri frontend has better tables. Not because React is inherently better at tables, but because egui's table support (`egui_extras::TableBuilder`) is basic. The Tauri frontend uses Tailwind's utility classes for layout and can render complex forms with less code.
+
+The egui frontend has a barcode scanner that's just a text input. The Tauri frontend also has a barcode scanner that's just a text input. Neither frontend uses a native scanner SDK. The docs say "USB scanner = keyboard emulation. Focus management is critical." Both frontends handle focus the same way: capture input, submit on Enter.
+
+The Tauri frontend has auto-update. That's a genuine advantage for distribution. Egui doesn't have an update mechanism out of the box, and adding one would mean implementing whatever the target platform expects.
+
+## The versioning tells the story
+
+The workspace version is 0.3.0. The Tauri version is 0.2.0. The Tauri version lags because it was started later and hasn't caught up feature-wise. The CI has separate release workflows for `desktop-v*` and `tauri-v*` tags.
+
+Two frontends means two release pipelines, two test suites (the Tauri frontend has 67 Vitest tests, the egui frontend has none), two bundle formats, two sets of user-facing bugs. The project chose to carry this cost.
+
+## Which one should you use
+
+If you want to ship something small and self-contained: egui. Your users don't need anything except the binary. No webkit, no system dependencies beyond GTK. It compiles to ARM, x64, and macOS.
+
+If you want auto-update, rich UI components, and a familiar frontend stack: Tauri. The webview gives you CSS and the whole React ecosystem. The Rust backend handles business logic.
+
+MonStock has both because they're both interesting. I don't think this is a sustainable maintenance model long-term, but as a learning project it surfaces every trade-off in desktop cross-platform development.
+
+_Source: [github.com/samir1498/MonStock](https://github.com/samir1498/MonStock)_

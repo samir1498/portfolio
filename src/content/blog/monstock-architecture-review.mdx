@@ -1,0 +1,56 @@
+---
+title: "MonStock Architecture: Six Crates, One Core, Two Frontends"
+description: "Reviewing the multi-crate Rust workspace architecture behind MonStock: how it's organized, where the seams are good, and where they fray."
+tldr: "MonStock is a 6-crate Rust workspace with a shared core library, two desktop frontends (egui + Tauri), and a dev toolkit CLI. The free-function service/repo pattern is pragmatic for single-user SQLite, but the dual-frontend claim is harder to verify than the README suggests."
+pubDate: "2026-06-30"
+draft: false
+ogImage: "/og/blog/monstock-architecture-review.png"
+ogImageAlt: "MonStock architecture diagram"
+tags: ["monstock", "rust", "architecture", "review"]
+---
+
+MonStock is a desktop inventory app for small businesses in Algeria. It's also a Rust project that manages to pack six crates into a single Cargo workspace. I didn't build this from scratch. I've been working through it with an AI, and after enough sessions I wanted to step back and understand the shape of the thing.
+
+The workspace layout is straightforward:
+
+| Crate | Kind | Responsibility |
+|-------|------|----------------|
+| `monstock-core` | Library | Models, DB schema, repos, services |
+| `monstock-desktop` | Binary | egui frontend (eframe) |
+| `monstock-tauri` | Binary | Tauri v2 frontend (React + Rust backend) |
+| `monstock-cli` | Binary | Dev toolkit (build, seed, test, doctor) |
+| `monstock-backup` | Library | Daily auto-backup + 30-day retention |
+| `monstock-import` | Library | Import products from backup files |
+
+The claim: business logic lives in `monstock-core`, both frontends consume it, the CLI orchestrates development, and the backup/import crates are helpers anyone can reuse.
+
+## The good seams
+
+The core/desktop/tauri split is real. `monstock-core` exports everything through `lib.rs`: schema, models, repos, services, db connection. Neither frontend reaches into Diesel directly. The Tauri commands file has 25 functions that call services through a `conn(&state)` helper. The egui screens do the same through their `&mut SqliteConnection` reference.
+
+The backup crate is genuinely independent. It takes a DB path, creates a dated copy, prunes old ones. No dependency on core. The import crate works the same way. These could be published separately if anyone needed them.
+
+## Where it gets muddy
+
+The free-function pattern without traits or structs is fine for a single-user SQLite app. Every repo function takes `&mut SqliteConnection`. Every service function does too. No abstraction over the backend, no dependency injection, no test doubles. The tests use a real in-memory SQLite database.
+
+This works. It's also not portable. If you wanted to switch from SQLite to PostgreSQL, you'd touch every function signature. If you wanted to mock the database in unit tests, you'd need a different approach. The project chose simplicity over flexibility, which is the right call for a desktop app, but The architecture doesn't really surface that trade-off. It just doesn't have abstractions.
+
+The dual-frontend architecture is the most interesting claim. Two frontends sharing one core sounds like an elegant design. In practice:
+
+- The egui frontend opens one DB connection at startup and holds it for the app's lifetime.
+- The Tauri backend opens a new connection per command.
+- The egui frontend has a custom data table component, screens with state structs, and hand-rolled i18n with ~55 keys per language.
+- The Tauri frontend has TanStack Query, a router, 108 translation keys, and a proper toast notification system.
+
+These aren't the same UI. They're two different UIs with different capabilities, different state models, and different DX. The shared core gives them the same business logic, but nothing about the UI layer is shared: not a component, not a screen, not a single line of frontend code.
+
+## What the architecture tells me
+
+The project is honest about its scope. Single-user, local DB, synchronous, no network layer, no auth, no multi-tenant. The architecture matches the problem. The free-function pattern is pragmatic, the crate boundaries are clean, and the backup/import crates are nice modular touches.
+
+The dual-frontend thing is more of an experiment than a strategy. The egui version is lighter and simpler. The Tauri version is richer and more professional. Neither is going to be the canonical frontend. They're two takes on the same app, and the project maintains both for the learning value more than any practical reason.
+
+That's fine. Not every architecture decision needs to be a production play.
+
+_Source: [github.com/samir1498/MonStock](https://github.com/samir1498/MonStock)_

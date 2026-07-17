@@ -1,0 +1,95 @@
+---
+title: "Git Commit Trailers for AI Agents"
+description: "How Git trailers turned my commit messages into a machine-readable task tracking system, connecting commits to plans, closing tasks, and reconciling progress without manual updates."
+tldr: "I started appending ctx: trailers to Git commit messages so AI agents could reconcile plan progress automatically. A commit like `feat: add photo dedup\n\nctx: gam-photo-upload close` tells the agent to close the plan's task. The @pc-ctx/core library parses these on git log and updates plan files. It's minimal, non-invasive, and has worked better than any structured changelog approach I've tried."
+pubDate: "2026-06-30"
+draft: false
+ogImage: "/og/blog/gam-git-commit-trailers.png"
+ogImageAlt: "Git commit trailers for AI agent task tracking"
+tags: ["git", "cli", "pc-ctx", "ai-agents", "productivity"]
+---
+
+I have a problem: I work with AI agents, I make commits, and the next session starts with stale context. The agent doesn't know what I've done since the last conversation. It checks plan files, finds old task statuses, and assumes nothing has changed.
+
+The fix was absurdly simple: Git trailers.
+
+## The pattern
+
+After a conventional commit message, I add one or more `ctx:` trailers:
+
+```
+feat: add photo URL dedup to zone domain
+
+The zone entity now checks for duplicate photo URLs
+before appending to the photos array.
+
+ctx: gam-photo-upload close
+ctx: gam-three-backends progress
+```
+
+The `ctx:` prefix is a Git trailer key (like `Signed-off-by:` or `Co-authored-by:`). The value is `<plan-slug> <action>` where action is `close`, `progress`, `start`, or a task ID like `T3 done`.
+
+The `@pc-ctx/core` library parses these with `parseCtxTrailers()`:
+
+```typescript
+function parseCtxTrailers(message: string): GitCommitRef[] {
+  // matches `ctx: <slug> <action>` lines
+  // returns structured refs
+}
+```
+
+Then `gitReconcile()` reads `git log` from the last reconciled commit, parses every commit message for `ctx:` trailers, and applies the actions:
+
+- `close` marks the plan (or roadmap) as done
+- `progress` sets started date
+- `start` sets plan active
+- `T3 done` marks a specific task complete
+
+## Why trailers work
+
+Git trailers have three properties that make this work:
+
+1. **They append to existing conventions.** I already write conventional commits (`feat:`, `fix:`, `chore:`). Trailers add machine-readable metadata without changing the human-readable part.
+
+2. **They survive rebase and merge.** Trailers are part of the commit message, which Git treats as immutable (after force-push). They're not in a separate file that can drift.
+
+3. **They're semantically meaningful to both humans and machines.** `ctx: gam-photo-upload close` reads naturally. You don't need a parser to understand what it means.
+
+## The reconciliation workflow
+
+When an agent starts a session, it runs `ctx reconcile --since <last-checked>` (or `ctx reconcile --all` for a full scan). The function runs `git log --format=%H%n%B` on the current repo, parses every commit for `ctx:` trailers, and updates plan files:
+
+```
+$ ctx reconcile --dry-run
+Found 3 unreconciled commits:
+  a1b2c3d - feat: add photo URL dedup
+    → gam-photo-upload: close
+  e4f5g6h - feat: add 3 backends caching+retry parity
+    → gam-three-backends: progress
+  i7j8k9l - fix: rate limiter config initialization
+    → gam-rate-limiting: T4 done
+
+Run without --dry-run to apply.
+```
+
+I use `--dry-run` first to check, then run without it to apply changes to plan files. The agent sees up-to-date task status without manually editing markdown.
+
+## Where it shines
+
+The real benefit is session handoffs. Before, every agent session started with "check the plan files to see what's pending." Now the agent runs `ctx reconcile --since $(git log --format=%H -1 @{4.days.ago})`, gets a diff of what happened while it wasn't running, and starts with accurate context.
+
+The plan-level trailer (`gam-photo-upload close`) is my preferred granularity. Per-task trailers (`T3 done`) are useful for sprint-level tracking but add overhead to commit messages for marginal benefit.
+
+## What it doesn't solve
+
+Trailers don't tell you what the commit changed, only what plan it relates to. You still need the commit body for context.
+
+They require discipline to write. If I forget the `ctx:` trailer in a commit, that commit is invisible to reconciliation. I've started adding it as a habit, same way I write the commit subject.
+
+The system is pc-ctx specific. It writes to the personal-context directory structure, not to GitHub issues or Jira. If you use a different planning system, you'd need a different parser and reconciler.
+
+## The takeaway
+
+Git trailers are an underused feature. They're parsed by `git interpret-trailers`, used by Linux kernel contributors for signed-off-by chains, and ignored by everyone else. But they're the simplest bridge between what Git knows (commits) and what planning systems need (task status updates). No API calls, no webhooks, no CI pipeline changes. Just a line at the end of a commit message that an agent can read.
+
+_Source: [github.com/samir1498/personal-context](https://github.com/samir1498/personal-context)_
