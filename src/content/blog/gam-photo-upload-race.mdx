@@ -1,0 +1,53 @@
+---
+title: "The Photo Upload Race Fix That Wasn't About Photos"
+description: "A Playwright race condition in GAM's photo upload tests turned out to be about CDP contention, not backend synchronization."
+tldr: "GAM's 'photo upload race fix' was a Playwright E2E race: parallel test workers fighting over CDP connections while trying to interact with an opacity-0 file input. The fix: serial test mode, stripping CSS opacity before setInputFiles, and bumping retries from 2 to 5. The backend side has a simpler dedup story."
+pubDate: "2026-06-30"
+draft: false
+ogImage: "/og/blog/gam-photo-upload-race.png"
+ogImageAlt: "Photo upload race fix"
+tags: ["green-algeria-map", "testing", "playwright", "e2e"]
+---
+
+Green Algeria Map has a photo upload feature. Zones get photos uploaded through a React component, the backend signs and uploads to RustFS (S3-compatible), and the zone record gets updated with the new URL. Simple flow, works in production, no race condition there.
+
+The race was in the E2E tests.
+
+## What broke
+
+Playwright runs tests in parallel by default. Multiple workers share a CDP (Chrome DevTools Protocol) connection. When two workers tried to upload photos simultaneously, both called `setInputFiles()` on a file input that has `opacity: 0` (because it's a styled upload button, not a raw HTML file input). The CDP connection couldn't handle the parallel interactions, and tests flaked.
+
+The error was intermittent. Run the test suite twice: first pass green, second pass three failures. All in the photo upload spec.
+
+## The fix
+
+Three changes, all in the E2E test layer:
+
+1. **Serial mode**: `test.describe.configure({ mode: 'serial', retries: 2 })` prevents parallel CDP contention within the photo test file.
+
+2. **Strip opacity before interaction**: Before calling `setInputFiles`, the test evaluates `el.style.opacity = '1'`. Playwright's CDP-based file upload has trouble with invisible elements, even with `force: true`.
+
+3. **Retries from 2 to 5**: The project-wide Playwright retry count was bumped to handle remaining flakiness in other tests too.
+
+## The backend side
+
+While investigating, I also found the backend handles photo deduplication at the domain level. The Zone entity's `addPhoto` method checks whether the URL already exists in the photos array before appending:
+
+```typescript
+addPhoto(photoUrl: string): void {
+  if (this._photos.includes(photoUrl)) return;
+  this._photos.push(photoUrl);
+}
+```
+
+The getter returns a defensive copy. Unit tests verify that external mutation of the returned array doesn't affect internal state.
+
+The S3 upload itself uses `p-retry` with 3 retries and exponential backoff (1-5s). The cache (`zones:all`, `zone:{id}`) is evicted after every successful upload so the new photo appears immediately.
+
+## What I learned
+
+The fix was never about contention at the application level. Two users uploading photos to the same zone simultaneously is not a scenario GAM needs to handle. It's a single-user-at-a-time mapping tool. The race was entirely in the test infrastructure.
+
+This is a good reminder: when you see "race condition" in a fix, check whether it's a production race or a test race. They look the same in the commit message but require completely different solutions. Production races need locks, transactions, or idempotent operations. Test races need serial mode, retries, and workarounds for browser quirks.
+
+_Source: [github.com/samir1498/green-algeria-map](https://github.com/samir1498/green-algeria-map)_

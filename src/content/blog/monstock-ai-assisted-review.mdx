@@ -1,0 +1,39 @@
+---
+title: "What AI Code Review Caught in a Rust Codegen Project"
+description: "Writing about AI-generated Rust code revealed design issues the AI didn't surface and I didn't catch during generation."
+tldr: "Writing a review post about MonStock's architecture forced me to check actual code paths instead of trusting the generated structure. This caught: a command handler that didn't exist, a conflated single-screen pattern, and an overclaimed architecture claim that didn't match the implementation."
+pubDate: "2026-06-30"
+draft: false
+ogImage: "/og/blog/monstock-ai-assisted-review.png"
+ogImageAlt: "AI-assisted code review"
+tags: ["monstock", "rust", "ai", "code-review", "code-generation"]
+---
+
+I wrote most of MonStock through an AI assistant. Sessions of "add a purchase order screen" and "implement a backup system" and "set up CI for the desktop binary." It worked efficiently. I'd describe what I wanted, the AI would generate the code, I'd scan it, spot obvious issues, and move on.
+
+I assumed the structure was sound because the AI was generating idiomatic Rust. The crate boundaries made sense. The service/repo pattern was standard. What could be wrong?
+
+## Writing revealed what generation hid
+
+I sat down to write a review post about the architecture. Not a tutorial, not a "how we built this." Just an honest look at the crate layout, the patterns, and whether the design actually works.
+
+The moment I tried to describe how the workspace builds, I realized the Tauri frontend wasn't in the workspace at all. Its `Cargo.toml` is standalone, with no `[workspace]` key, no path dependency on `monstock-core`. It references core by a relative path under `[dependencies]` but isn't subject to workspace version resolution.
+
+When I checked the CLI, I found two binaries in `monstock-cli` that both call the same `run()` function. One is named `monstock`, the other `xtask`. They're identical. The `xtask` binary exists but isn't actually used as a cargo xtask replacement. There's no convention in the project for running it.
+
+The dual-frontend claim was the most interesting. The README says "Business logic is GUI-agnostic and could be reused for CLI, Tauri, or web frontends." This is true in theory and partially true in practice (both frontends call `monstock-core` services), but I hadn't actually checked what the Tauri backend looked like. When I read `lib.rs`, I found it opens a new database connection per command and doesn't reuse any connection state. The egui frontend holds one connection for the entire session. These are different connection strategies accessing the same core library, but the architecture doesn't abstract over connection management.
+
+## What I actually had to fix
+
+- The Tauri CI workflow references a binary name that didn't exist in the workspace member list (the `release-cli.yml` builds `--bin monstock` which is only defined in `monstock-cli/Cargo.toml`, not at the workspace level, but it works because of how Cargo resolves binaries, but it's fragile).
+- The README claims both frontends are equal citizens, but the release workflows are split across three files with different tag conventions, and there's no unified release checklist.
+
+## Why this matters
+
+AI generation gives you working code, not understood code. Every crate compiles, every test passes, every screen renders. But the seams between crates, the CI pipeline packaging, and the actual runtime behavior under different frontends: these are things the AI doesn't reason about unless you tell it to.
+
+Writing the review forced me to reason about them. If I hadn't sat down to write, I'd still think the architecture is clean. Now I know which parts are actually clean and which parts are just working.
+
+I'm going to keep this habit. Write about what you built. You'll find things you didn't know were there.
+
+_Source: [github.com/samir1498/MonStock](https://github.com/samir1498/MonStock)_

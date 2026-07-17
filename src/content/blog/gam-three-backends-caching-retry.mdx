@@ -1,0 +1,101 @@
+---
+title: "Same App, Two Backends: Caching and Retry Parity in GAM"
+description: "Green Algeria Map's NestJS and Spring Boot backends implement nearly identical caching and retry strategies. Here's where they match, where they diverge, and what it took to align them."
+tldr: "Both GAM backends converged on 5-minute TTL caches with 500 max entries, and S3 upload retry at 3 retries. Spring Boot uses Caffeine + @Cacheable; NestJS uses @nestjs/cache-manager. The retry mechanism differs: Spring's @Retryable has true exponential backoff while NestJS's p-retry uses simpler fixed intervals. Rate limiting is the only area where implementations differ meaningfully."
+pubDate: "2026-06-30"
+draft: false
+ogImage: "/og/blog/gam-three-backends-caching-retry.png"
+ogImageAlt: "Backend caching and retry comparison"
+tags: ["green-algeria-map", "nestjs", "spring-boot", "caching", "architecture"]
+---
+
+Green Algeria Map has two backend implementations: NestJS (the production API) and Spring Boot (the benchmark/comparison project). They share the same domain logic, the same database schema, the same S3 storage service interface. The idea was always to compare them, but I never explicitly designed for parity. I just built the same features in both frameworks.
+
+So when I sat down to compare the caching and retry strategies, I expected divergence. What I found was near-identical behavior.
+
+## Cache configuration
+
+Both backends ended up at exactly the same settings:
+
+- **TTL**: 5 minutes
+- **Max entries**: 500
+- **Eviction policy**: Least Recently Used (default for both Caffeine and cache-manager)
+- **Cache coverage**: zones (`zones:all`, `zone:{id}`) and damage reports (`damage-reports:all`, `damage-report:{id}`, `damage-reports:zone:{zoneId}`)
+
+The implementation differs. Spring Boot uses Caffeine with `@Cacheable` annotations on query handlers and `@CacheEvict` on write handlers:
+
+```java
+@Cacheable("zones")
+public List<Zone> handle(GetAllZonesQuery query) { ... }
+
+@CacheEvict(value = "zones", allEntries = true)
+public void handle(CreateZoneCommand command) { ... }
+```
+
+NestJS uses `@nestjs/cache-manager` with manual `cache.get()` and `cache.del()` calls in CQRS handlers:
+
+```typescript
+async handle(query: GetAllZonesQuery): Promise<ZoneDto[]> {
+  const cached = await this.cache.get('zones:all');
+  if (cached) return cached as ZoneDto[];
+  const zones = await this.queryBus.execute(query);
+  await this.cache.set('zones:all', zones, 300_000);
+  return zones;
+}
+```
+
+Both patterns work. Spring Boot's annotations are cleaner for simple read/write patterns. NestJS's manual approach is more flexible when you need conditional caching or complex invalidation logic.
+
+## Retry strategy
+
+Both backends retry S3 uploads to RustFS. The parameters:
+
+| Parameter | NestJS | Spring Boot |
+|-----------|--------|-------------|
+| Max retries | 3 | 3 |
+| Initial delay | 1,000ms | 1,000ms |
+| Max delay | 5,000ms | 5,000ms |
+| Backoff | Fixed intervals | Exponential (1s, 2s, 4s) |
+| Implementation | `p-retry` library | `@Retryable` annotation |
+
+NestJS's `p-retry` config:
+
+```typescript
+await pRetry(() => this.uploadToS3(buffer), {
+  retries: 3,
+  minTimeout: 1000,
+  maxTimeout: 5000,
+});
+```
+
+Spring Boot's equivalent:
+
+```java
+@Retryable(
+  retryFor = S3Exception.class,
+  maxRetries = 3,
+  backoff = @Backoff(delay = 1000, multiplier = 2.0, maxDelay = 5000)
+)
+public String uploadFile(byte[] buffer) { ... }
+```
+
+The multiplier in Spring Boot gives true exponential backoff (1s, 2s, 4s). NestJS's `p-retry` default is exponential too, but configured differently via `minTimeout` and `factor`.
+
+## Rate limiting: the actual difference
+
+This is where the implementations diverge meaningfully:
+
+- **NestJS** uses `@nestjs/throttler` as a global guard: 100 req/min for GET, 30 req/min for POST/PATCH/DELETE, disabled with `DISABLE_RATE_LIMIT=true`.
+- **Spring Boot** uses a custom Bucket4j interceptor with a `@RateLimit` annotation and conditional `app.rate-limit.enabled` config. Defaults: auth 5/min, write 30/min, read 100/min.
+
+The behavioral difference: Spring Boot's Bucket4j allows per-endpoint tuning with a custom annotation, while NestJS's throttler applies globally with route exclusions. Spring Boot's approach is more granular but requires more code.
+
+## What parity cost
+
+The caching and retry settings converged because I wrote the Spring Boot version last and copied the NestJS parameters. This means the second backend benefited from decisions made for the first, but it also inherited any mistakes.
+
+The rate limiting divergence exists because each framework has its own idiomatic approach. `@nestjs/throttler` is the standard NestJS choice, while `Bucket4j` is the standard Java choice. The interface differences reflect the frameworks, not the requirements.
+
+If I were doing this again, I'd extract the caching and retry configuration into a shared specification document, not rely on cross-framework copy-paste. The copy worked here, but I didn't validate that 5 minutes / 500 entries / 3 retries is actually optimal for the workload. It's just what NestJS had, and Spring Boot matched.
+
+_Source: [github.com/samir1498/green-algeria-map](https://github.com/samir1498/green-algeria-map)_

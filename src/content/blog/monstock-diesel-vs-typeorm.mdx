@@ -1,0 +1,81 @@
+---
+title: "Diesel ORM vs TypeORM: What Switched Felt Like"
+description: "Coming from TypeORM (NestJS/PostgreSQL) to Diesel (Rust/SQLite) for the same kind of app, a compare-and-contrast of two ORM philosophies."
+tldr: "Diesel is compile-time safe, code-gen from DB, synchronous. TypeORM is runtime reflection, decorator-driven, async. Same job, opposite approach. Both are fine. Neither is better. They match their ecosystems."
+pubDate: "2026-06-30"
+draft: false
+ogImage: "/og/blog/monstock-diesel-vs-typeorm.png"
+ogImageAlt: "Diesel vs TypeORM comparison"
+tags: ["monstock", "rust", "diesel", "typeorm", "database", "nestjs"]
+---
+
+I've been working with TypeORM on Green Algeria Map, a NestJS app with PostgreSQL, entities with decorators, async repositories, and the standard "decorator everything" pattern. Then I started MonStock with Diesel on SQLite in Rust. Same kind of app (inventory/stock management), completely different ORM experience.
+
+## Schema direction
+
+TypeORM is entity-first. You write a class with `@Entity()` and `@Column()` decorators, set `synchronize: true` in dev, and the database schema matches your objects. In production you use migrations, but the source of truth is your TypeScript code.
+
+Diesel is database-first. You run `diesel print-schema` against your actual SQLite database, and it generates `schema.rs` with `table!()` macros. You then define Rust structs that derive `Queryable`, `Insertable`, `Selectable` to match.
+
+```rust
+// TypeORM: source of truth is the class
+@Entity()
+export class Product {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ type: 'varchar' })
+  name: string;
+}
+
+// Diesel: source of truth is the database
+diesel::table! {
+    products (id) {
+        id -> Integer,
+        name -> Text,
+    }
+}
+
+#[derive(Queryable, Insertable, Selectable)]
+#[diesel(table_name = crate::schema::products)]
+pub struct Product {
+    pub id: i32,
+    pub name: String,
+}
+```
+
+This difference matters more than I expected. In TypeORM you can rename a column in the entity and forget to update migration files. The app still compiles, the runtime might even work with the old schema until someone deploys. In Diesel, if the schema doesn't match the database, queries fail at compile time.
+
+## Async vs sync
+
+TypeORM is fully async. Every repository call returns a Promise. You await everything.
+
+Diesel SQLite is synchronous. You pass `&mut SqliteConnection` around and call functions directly. No futures, no tokio, no executor.
+
+I thought I'd miss async. I don't. For a single-user desktop app querying a local SQLite file, async adds nothing. The connection is never contended. The queries take microseconds. The async overhead in TypeORM exists because it's designed for networked databases where connection pooling and concurrent requests matter.
+
+## What Diesel does well
+
+Compile-time query checking. This is the feature I wish TypeORM had. If you write `products::table.filter(products::name.eq("foo"))` and `name` is actually an integer column, Diesel tells you at compile time. TypeORM tells you at test time or at runtime.
+
+The derive macros are clean. `#[derive(Queryable, Insertable, Selectable)]` on a struct is less code than `@Entity() @Column() name: string` for every field.
+
+Embedded migrations (`embed_migrations!()`) is a nice desktop-app pattern. Migrations compile into the binary and run automatically on connect. No migration CLI, no partial state.
+
+## What TypeORM does well
+
+Iteration speed. Add a column to an entity, set `synchronize: true`, and it's there. The trade-off is you might accidentally sync something to production, but in development this is fast.
+
+Relation loading with `relations: ['supplier', 'items']` is more ergonomic than Diesel's explicit joins. Diesel requires `joinable!()` macros and manual `.inner_join()` chains. TypeORM infers join conditions from decorators.
+
+Migration management is more flexible. Separate migration files with `up()` and `down()` are explicit and auditable. Diesel's embedded migrations work differently. You generate them with the Diesel CLI and they exist as SQL files, then compile into the binary.
+
+## Which one should you pick
+
+If your app is a single-user desktop app with a local database, Diesel. It's safer, faster to compile, and the compile-time checks prevent real bugs.
+
+If your app is a web API with PostgreSQL and multiple concurrent users, TypeORM (or Prisma, or Drizzle). Async matters when the database is a network service.
+
+Both ORMs work. Neither is bad. They just match their ecosystems. The best thing about working with both is realizing that ORM complaints are usually ecosystem complaints in disguise.
+
+_Source: [github.com/samir1498/MonStock](https://github.com/samir1498/MonStock)_

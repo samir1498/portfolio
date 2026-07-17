@@ -1,0 +1,79 @@
+---
+title: "MonStock CLI: A Development Toolkit, Not a User App"
+description: "The monstock CLI builds, seeds, tests, and deploys two frontends from one tool. It also has a fake xtask binary that does the same thing."
+tldr: "MonStock's CLI is a developer-focused tool with 8 subcommands covering dev servers, building, seeding, testing, linting, and shell completions. It uses Clap derive, supports TOML config files, and has a redundant `xtask` binary. The seed command generates 500 products and 30 days of transaction data in one pass."
+pubDate: "2026-06-30"
+draft: false
+ogImage: "/og/blog/monstock-cli-xtask.png"
+ogImageAlt: "MonStock CLI"
+tags: ["monstock", "cli", "rust", "clap"]
+---
+
+MonStock's CLI is a dev toolkit, not user-facing software. You run `monstock dev --target tauri` to start the Tauri dev server, `monstock seed` to fill the database with test data, `monstock clean` to wipe build artifacts. It's the kind of tool you write because you're tired of remembering `cargo watch -c -x "run --bin monstock-desktop"` and want a single command instead.
+
+The CLI is in its own crate (`monstock-cli`) with a Clap derive interface. Eight subcommands, a config file system, and shell completion generation. It shares core/deps with the frontends but has no UI dependencies itself.
+
+## The commands
+
+| Command | What it does |
+|---------|-------------|
+| `dev --target tauri/egui/all` | Starts dev server with hot reload |
+| `build --target tauri/egui/all --release` | Builds release artifacts |
+| `seed [--file path] [--dry-run]` | Seeds DB with test data |
+| `test` | Runs cargo test + pnpm test |
+| `lint` | Runs clippy + fmt check |
+| `clean` | Removes target/, node_modules/, dist/ |
+| `doctor` | Checks cargo, rustc, node, pnpm, cargo-watch, cargo-tauri |
+| `completions bash/zsh/fish/powershell` | Generates shell completions |
+
+The `dev --target all` command is worth calling out. It starts the Tauri dev server and the egui dev server simultaneously. Both frontends share the same database and core library, so you can test them in parallel. The CLI spawns the egui process and polls to keep both running.
+
+## The seed data generator
+
+The seed command creates 500 products (random names from a pool of 50 adjectives + 10 nouns), 10 suppliers (with Algerian phone numbers), and 30 days of transactions with 20-200 sales per day. It generates realistic inventory movement: products get bought, sold, restocked through purchase orders, and the dashboard reflects actual business data.
+
+The seed respects the service layer, not the repos. It calls `sale_service::record_sale()` and `purchase_order_service::create_purchase_order()` through the same path the UI uses. This means the seed exercises the same business logic as the real app.
+
+## The dead xtask binary
+
+The crate defines two binaries in `Cargo.toml`:
+
+```toml
+[[bin]]
+name = "monstock"
+path = "src/main.rs"
+
+# in src/bin/xtask.rs, identical to main.rs
+```
+
+`xtask.rs` is a one-liner that calls `monstock_cli::run()`. Same function, same behavior. The xtask binary exists because at some point I thought I'd use the cargo xtask convention for build scripts. I don't. The project has never run `cargo xtask` once. But the binary is compiled with every `cargo build --workspace`, adding build time for no benefit.
+
+## What the config looks like
+
+The CLI loads `monstock.toml` from the current directory or `~/.config/monstock/cli.toml`:
+
+```toml
+[tauri]
+dev_port = 5173
+dev_host = "127.0.0.1"
+webkit_disable_dmabuf = true
+
+[egui]
+hot_reload = true
+
+[database]
+path = "~/.local/share/monstock/monstock.db"
+
+[seed]
+default_file = "seeds/default.json"
+```
+
+The webkit disable dmabuf setting is a Linux Wayland workaround cribbed from Tauri issues #9394 and #15050. The Rust code sets `WEBKIT_DISABLE_DMABUF_RENDERER=1` before spawning the Tauri process.
+
+## The takeaway
+
+A CLI toolkit for your own project doesn't have to be polished. It needs to be reliable. The monstock CLI has saved me more time than it took to write. The seed generator alone replaced a manual data-entry workflow that took 15 minutes per session. The doctor command catches missing system dependencies before a confusing build failure. The dev command replaces three terminal tabs with one.
+
+The dead xtask binary just reminds me to clean up after myself occasionally.
+
+_Source: [github.com/samir1498/MonStock](https://github.com/samir1498/MonStock)_

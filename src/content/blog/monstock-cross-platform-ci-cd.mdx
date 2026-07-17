@@ -1,0 +1,64 @@
+---
+title: "Five Workflows: MonStock's Cross-Platform CI\/CD Journey"
+description: "MonStock has 5 CI workflows across 3 OSes for 2 frontends and a CLI. Here's how they're structured and what I learned about Rust release engineering."
+tldr: "Five workflow files covering CI, workspace releases, egui desktop, Tauri desktop, and CLI releases. Three matrix OSes, two frontend build pipelines, auto-update JSON generation, and a separate version tag convention per artifact. The complexity comes from maintaining two frontends, not from Rust itself."
+pubDate: 2026-06-30
+draft: false
+ogImage: "/og/blog/monstock-cross-platform-ci-cd.png"
+ogImageAlt: "Cross-platform CI/CD pipeline"
+tags: ["monstock", "ci-cd", "github-actions", "rust", "tauri"]
+---
+
+MonStock ships to Linux, Windows, and macOS across two frontends plus a CLI. The CI reflects this: five workflow files in `.github/workflows/` that each handle a different release path. I didn't design this system from scratch. It grew as each frontend and release format was added. Tracing through the workflows tells the story of how the project evolved.
+
+## The CI baseline
+
+`ci.yml` runs on every push and PR to `main`. Three-OS matrix (`ubuntu-latest`, `windows-latest`, `macos-latest`), cargo check + clippy + test across the workspace, plus pnpm install + build + test for the Tauri frontend's React app (67 tests).
+
+The Linux job installs webkit2gtk-4.1 and libsoup-3.0, which are Tauri's native shared dependencies on Linux. The macOS and Windows jobs don't need these because webkit ships with the OS on macOS and Tauri uses WebView2 on Windows.
+
+Rust caching is done via `Swatinem/rust-cache@v2`, which is the standard choice and caches compiled crate artifacts between runs. pnpm has its own cache step using `actions/cache@v4` for the store directory.
+
+## Three release workflows, one workspace
+
+The project has separate release workflows for different build targets:
+
+| Workflow | Tag pattern | Builds | Outputs |
+|----------|-------------|--------|---------|
+| `release.yml` | `v*` | Full workspace `--release` | Desktop binary per OS |
+| `release-desktop.yml` | `desktop-v*` | `monstock-desktop` only | Binary per OS |
+| `release-tauri.yml` | `tauri-v*` | pnpm + `cargo tauri build` | .deb/.AppImage/.msi/.dmg + auto-update JSON |
+| `release-cli.yml` | `cli-v*` | `monstock-cli --bin monstock` | Binary per OS |
+
+The version tags are independent. The workspace version (0.3.0) and the Tauri version (0.2.0) don't need to match. This feels messy but reflects reality. The Tauri frontend was started later and isn't at feature parity with egui.
+
+## The Tauri release is the most complex
+
+The Tauri release workflow (`release-tauri.yml`) does more than build. It:
+1. Installs Linux webkit dependencies (only on Ubuntu)
+2. Builds the frontend with pnpm
+3. Runs `cargo tauri build` which compiles the Rust backend and bundles everything
+4. Generates `tauri-update.json`, a metadata file that tells the Tauri updater plugin where to find the latest release on GitHub
+5. Uploads platform-specific bundles (.deb, .AppImage, .rpm for Linux, .msi for Windows, .dmg for macOS)
+
+The auto-update integration is the most interesting part. Tauri's updater plugin reads a JSON file at a configured URL, compares the version with the installed version, and prompts the user to update. The CI workflow generates this JSON from the release metadata and uploads it as a release asset. The desktop app checks this on startup.
+
+## What the CI doesn't do
+
+No integration tests against a real database. The CI runs `cargo test`, which exercises the 25 repo-level integration tests against in-memory SQLite, but there's no end-to-end test that opens the egui window or Tauri webview and verifies a flow.
+
+No cross-signing. The Windows and macOS binaries aren't signed, which means users get the "untrusted developer" warning. The `.deb` packages aren't signed for a package repository either.
+
+No Docker. The project doesn't need it. Desktop apps don't ship in containers.
+
+## What I'd change
+
+The three release workflows should be one parameterized workflow. They share 80% of the same steps (checkout, install deps, cache, build, upload). The differences are the build command and the tag pattern. A single workflow with a matrix over the frontend type would be easier to maintain.
+
+The `release.yml` (legacy workspace release) should probably be removed since it overlaps with `release-desktop.yml` and `release-tauri.yml`. It exists because it was written first and hasn't been pruned.
+
+The auto-update JSON should be generated from a real version comparison, not just embed the tag. The current implementation points at the GitHub release URL. If the tag and the app version drift, the updater breaks silently.
+
+For a project at this scale the CI is fine. Five workflows is more than needed but they all work. The complexity is from the dual-frontend choice, not from Rust cross-compilation or platform issues.
+
+_Source: [github.com/samir1498/MonStock](https://github.com/samir1498/MonStock)_
