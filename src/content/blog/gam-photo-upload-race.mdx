@@ -1,37 +1,60 @@
 ---
-title: "The Photo Upload Race Fix That Wasn't About Photos"
-description: "A Playwright race condition in GAM's photo upload tests turned out to be about CDP contention, not backend synchronization."
-tldr: "GAM's 'photo upload race fix' was a Playwright E2E race: parallel test workers fighting over CDP connections while trying to interact with an opacity-0 file input. The fix: serial test mode, stripping CSS opacity before setInputFiles, and bumping retries from 2 to 5. The backend side has a simpler dedup story."
+title: "The Photo Upload Race"
+description: "How a Playwright E2E flake in GAM's photo upload tests turned out to be CDP contention on an invisible file input, and the native filechooser API that fixed it cleanly."
+tldr: "GAM's photo upload E2E flaked under parallel workers: an opacity-0 file input fought over a shared CDP connection. The clean fix is Playwright's native filechooser event — click the input, intercept the dialog, set the file. No style hacks, no global bridges."
 pubDate: "2026-06-30"
+updatedDate: "2026-07-18"
 draft: false
 ogImage: "/og/blog/gam-photo-upload-race.png"
 ogImageAlt: "Photo upload race fix"
 tags: ["green-algeria-map", "testing", "playwright", "e2e"]
 ---
 
-Green Algeria Map has a photo upload feature. Zones get photos uploaded through a React component, the backend signs and uploads to RustFS (S3-compatible), and the zone record gets updated with the new URL. Simple flow, works in production, no race condition there.
+I have a problem: GAM's photo upload E2E test flakes, but only sometimes, and only when the suite runs in parallel. The feature itself is boring — the backend signs an upload to RustFS (S3-compatible) and writes the URL back to the zone. The race was entirely in the test.
 
-The race was in the E2E tests.
+## The pattern
 
-## What broke
+The uploader renders a styled dropzone: a visible label over an `opacity: 0` file input that fills the box.
 
-Playwright runs tests in parallel by default. Multiple workers share a CDP (Chrome DevTools Protocol) connection. When two workers tried to upload photos simultaneously, both called `setInputFiles()` on a file input that has `opacity: 0` (because it's a styled upload button, not a raw HTML file input). The CDP connection couldn't handle the parallel interactions, and tests flaked.
+```tsx
+<input
+  type="file"
+  accept="image/*"
+  className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+  data-testid="file-input"
+/>
+```
 
-The error was intermittent. Run the test suite twice: first pass green, second pass three failures. All in the photo upload spec.
+The original test forced the input visible and called `setInputFiles`:
 
-## The fix
+```ts
+await page.addStyleTag({ content: '[data-testid="file-input"] { opacity: 1 !important; }' })
+await page.getByTestId('file-input').setInputFiles({ name: 'e2e-test.png', mimeType: 'image/png', buffer })
+```
 
-Three changes, all in the E2E test layer:
+Playwright runs tests in parallel with workers sharing one CDP connection. `addStyleTag` mutates the DOM right before the worker resolves the input locator, and under load the node ID goes stale between resolve and dispatch. The call fails, the test flakes.
 
-1. **Serial mode**: `test.describe.configure({ mode: 'serial', retries: 2 })` prevents parallel CDP contention within the photo test file.
+## Why the clean fix works
 
-2. **Strip opacity before interaction**: Before calling `setInputFiles`, the test evaluates `el.style.opacity = '1'`. Playwright's CDP-based file upload has trouble with invisible elements, even with `force: true`.
+Playwright already has a first-class API for file inputs: the `filechooser` event. When the browser opens the OS file dialog, Playwright intercepts it. So instead of mutating the DOM and fighting CDP, you let the browser do its thing and hand it the file through the intercepted dialog:
 
-3. **Retries from 2 to 5**: The project-wide Playwright retry count was bumped to handle remaining flakiness in other tests too.
+```ts
+const fileChooser = page.waitForEvent('filechooser')
+await page.getByTestId('file-input').click({ force: true })
+await (await fileChooser).setFiles({
+  name: 'e2e-test.png',
+  mimeType: 'image/png',
+  buffer,
+})
+```
+
+The `{ force: true }` is the one wrinkle: the `opacity-0` input sits under a transparent `z-10` layer, so Playwright's actionability check refuses to click "through" it. `force` skips that check, the native click fires, the dialog opens, and the `filechooser` event lands. No style injection, no node IDs, no staleness.
+
+A bridge approach also works — expose a `window.__uploadZonePhoto` handler and call it via `page.evaluate` — but that ships test-only code into the component and couples the test to an internal handler. The `filechooser` API is the real user flow, minus the actual OS picker: click the dropzone, pick a file, done.
 
 ## The backend side
 
-While investigating, I also found the backend handles photo deduplication at the domain level. The Zone entity's `addPhoto` method checks whether the URL already exists in the photos array before appending:
+While debugging the test I found the backend dedupes photos at the domain level. The Zone entity's `addPhoto` checks the URL before appending:
 
 ```typescript
 addPhoto(photoUrl: string): void {
@@ -40,14 +63,10 @@ addPhoto(photoUrl: string): void {
 }
 ```
 
-The getter returns a defensive copy. Unit tests verify that external mutation of the returned array doesn't affect internal state.
+The S3 upload uses `p-retry` with 3 retries and exponential backoff, and the `zones:all` / `zone:{id}` caches are evicted after every successful upload so the new photo shows immediately.
 
-The S3 upload itself uses `p-retry` with 3 retries and exponential backoff (1-5s). The cache (`zones:all`, `zone:{id}`) is evicted after every successful upload so the new photo appears immediately.
+## The takeaway
 
-## What I learned
-
-The fix was never about contention at the application level. Two users uploading photos to the same zone simultaneously is not a scenario GAM needs to handle. It's a single-user-at-a-time mapping tool. The race was entirely in the test infrastructure.
-
-This is a good reminder: when you see "race condition" in a fix, check whether it's a production race or a test race. They look the same in the commit message but require completely different solutions. Production races need locks, transactions, or idempotent operations. Test races need serial mode, retries, and workarounds for browser quirks.
+The race was in the test infrastructure, not the app — GAM is single-user, concurrent uploads aren't a production concern. The fix that's *correct* isn't always the fix that's *first*: the global bridge passed, but left production code polluted for a test. Playwright's `filechooser` API was the clean answer the whole time. It just took going through the hack to appreciate it.
 
 _Source: [github.com/samir1498/green-algeria-map](https://github.com/samir1498/green-algeria-map)_
