@@ -59,16 +59,15 @@ export const EXPERIENCE: Experience[] = [
   {
     company: "ObserveOne",
     role: "Full-Stack Engineer",
-    period: "Nov. 2025 – Present",
+    period: "Nov. 2025 – Nov. 2026",
     location: "Remote",
     description: [
-      "Refactored and shipped features across the React (Vite) frontend — autopilot UI, demo recording pipeline, component extraction, dev mocks, and e2e test suites.",
-      "Built features for the TypeScript CLI (npm package) — API key rotation, suite CI integration, incident management, lossless export/import, and multiple releases.",
-      "Contributed to the Express.js backend — comprehensive security audit (Supabase RLS policies, RPC hardening), autopilot refactor, team resource sharing, and suite APIs.",
-      "Developed a Next.js marketing site with semantic color tokens, branded component library, light-mode fixes, and a /workers sub-landing page.",
-      "Architected a self-hosted distributed monitoring engine in Bun/Hono — 8 probe types, multi-region master-agent architecture, Redis pub/sub SSE replacing dashboard polling.",
-      "Built an admin dashboard (React) — Google indexing dashboard, creators/invites management, alerts history, and demo secret code system.",
-      "Built a programmatic video generation pipeline with Remotion — story-aware zoom strategy, per-clip transitions, and click sound effects.",
+      "Shipped end-to-end features for a QA automation SaaS across a React (Vite) frontend, a TypeScript CLI published on npm, and an Express.js backend.",
+      "Contributed to the Express.js backend, including a security audit: Postgres row-level security policies, RPC hardening, and tenant-boundary checks.",
+      "Architected a self-hosted distributed monitoring engine in Bun/Hono — 8 probe types (HTTP, Playwright browser, TCP, UDP, database liveness, TLS, heartbeat), multi-region master/agent topology, Redis pub/sub over SSE replacing dashboard polling, containerized with multi-stage Docker images.",
+      "Built a React admin dashboard for internal operations — search indexing health, creator and invite management, alert history.",
+      "Built the Next.js marketing site — semantic color tokens, a branded component library, light-mode fixes, and a /workers sub-landing page.",
+      "Built a programmatic demo-video pipeline with Remotion — story-aware zoom strategy, per-clip transitions, and click sound design.",
     ],
   },
   {
