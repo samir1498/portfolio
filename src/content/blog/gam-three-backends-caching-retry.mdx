@@ -50,13 +50,13 @@ Both patterns work. Spring Boot's annotations are cleaner for simple read/write 
 
 Both backends retry S3 uploads to RustFS. The parameters:
 
-| Parameter | NestJS | Spring Boot |
-|-----------|--------|-------------|
-| Max retries | 3 | 3 |
-| Initial delay | 1,000ms | 1,000ms |
-| Max delay | 5,000ms | 5,000ms |
-| Backoff | Fixed intervals | Exponential (1s, 2s, 4s) |
-| Implementation | `p-retry` library | `@Retryable` annotation |
+| Parameter      | NestJS            | Spring Boot              |
+| -------------- | ----------------- | ------------------------ |
+| Max retries    | 3                 | 3                        |
+| Initial delay  | 1,000ms           | 1,000ms                  |
+| Max delay      | 5,000ms           | 5,000ms                  |
+| Backoff        | Fixed intervals   | Exponential (1s, 2s, 4s) |
+| Implementation | `p-retry` library | `@Retryable` annotation  |
 
 NestJS's `p-retry` config:
 

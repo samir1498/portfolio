@@ -23,18 +23,19 @@ Rust caching is done via `Swatinem/rust-cache@v2`, which is the standard choice 
 
 The project has separate release workflows for different build targets:
 
-| Workflow | Tag pattern | Builds | Outputs |
-|----------|-------------|--------|---------|
-| `release.yml` | `v*` | Full workspace `--release` | Desktop binary per OS |
-| `release-desktop.yml` | `desktop-v*` | `monstock-desktop` only | Binary per OS |
-| `release-tauri.yml` | `tauri-v*` | pnpm + `cargo tauri build` | .deb/.AppImage/.msi/.dmg + auto-update JSON |
-| `release-cli.yml` | `cli-v*` | `monstock-cli --bin monstock` | Binary per OS |
+| Workflow              | Tag pattern  | Builds                        | Outputs                                     |
+| --------------------- | ------------ | ----------------------------- | ------------------------------------------- |
+| `release.yml`         | `v*`         | Full workspace `--release`    | Desktop binary per OS                       |
+| `release-desktop.yml` | `desktop-v*` | `monstock-desktop` only       | Binary per OS                               |
+| `release-tauri.yml`   | `tauri-v*`   | pnpm + `cargo tauri build`    | .deb/.AppImage/.msi/.dmg + auto-update JSON |
+| `release-cli.yml`     | `cli-v*`     | `monstock-cli --bin monstock` | Binary per OS                               |
 
 The version tags are independent. The workspace version (0.3.0) and the Tauri version (0.2.0) don't need to match. This feels messy but reflects reality. The Tauri frontend was started later and isn't at feature parity with egui.
 
 ## The Tauri release is the most complex
 
 The Tauri release workflow (`release-tauri.yml`) does more than build. It:
+
 1. Installs Linux webkit dependencies (only on Ubuntu)
 2. Builds the frontend with pnpm
 3. Runs `cargo tauri build` which compiles the Rust backend and bundles everything
