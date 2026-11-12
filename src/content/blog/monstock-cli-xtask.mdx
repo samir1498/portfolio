@@ -15,16 +15,16 @@ The CLI is in its own crate (`monstock-cli`) with a Clap derive interface. Eight
 
 ## The commands
 
-| Command | What it does |
-|---------|-------------|
-| `dev --target tauri/egui/all` | Starts dev server with hot reload |
-| `build --target tauri/egui/all --release` | Builds release artifacts |
-| `seed [--file path] [--dry-run]` | Seeds DB with test data |
-| `test` | Runs cargo test + pnpm test |
-| `lint` | Runs clippy + fmt check |
-| `clean` | Removes target/, node_modules/, dist/ |
-| `doctor` | Checks cargo, rustc, node, pnpm, cargo-watch, cargo-tauri |
-| `completions bash/zsh/fish/powershell` | Generates shell completions |
+| Command                                   | What it does                                              |
+| ----------------------------------------- | --------------------------------------------------------- |
+| `dev --target tauri/egui/all`             | Starts dev server with hot reload                         |
+| `build --target tauri/egui/all --release` | Builds release artifacts                                  |
+| `seed [--file path] [--dry-run]`          | Seeds DB with test data                                   |
+| `test`                                    | Runs cargo test + pnpm test                               |
+| `lint`                                    | Runs clippy + fmt check                                   |
+| `clean`                                   | Removes target/, node_modules/, dist/                     |
+| `doctor`                                  | Checks cargo, rustc, node, pnpm, cargo-watch, cargo-tauri |
+| `completions bash/zsh/fish/powershell`    | Generates shell completions                               |
 
 The `dev --target all` command is worth calling out. It starts the Tauri dev server and the egui dev server simultaneously. Both frontends share the same database and core library, so you can test them in parallel. The CLI spawns the egui process and polls to keep both running.
 

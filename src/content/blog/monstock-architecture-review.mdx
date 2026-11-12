@@ -13,14 +13,14 @@ MonStock is a desktop inventory app for small businesses in Algeria. It's also a
 
 The workspace layout is straightforward:
 
-| Crate | Kind | Responsibility |
-|-------|------|----------------|
-| `monstock-core` | Library | Models, DB schema, repos, services |
-| `monstock-desktop` | Binary | egui frontend (eframe) |
-| `monstock-tauri` | Binary | Tauri v2 frontend (React + Rust backend) |
-| `monstock-cli` | Binary | Dev toolkit (build, seed, test, doctor) |
-| `monstock-backup` | Library | Daily auto-backup + 30-day retention |
-| `monstock-import` | Library | Import products from backup files |
+| Crate              | Kind    | Responsibility                           |
+| ------------------ | ------- | ---------------------------------------- |
+| `monstock-core`    | Library | Models, DB schema, repos, services       |
+| `monstock-desktop` | Binary  | egui frontend (eframe)                   |
+| `monstock-tauri`   | Binary  | Tauri v2 frontend (React + Rust backend) |
+| `monstock-cli`     | Binary  | Dev toolkit (build, seed, test, doctor)  |
+| `monstock-backup`  | Library | Daily auto-backup + 30-day retention     |
+| `monstock-import`  | Library | Import products from backup files        |
 
 The claim: business logic lives in `monstock-core`, both frontends consume it, the CLI orchestrates development, and the backup/import crates are helpers anyone can reuse.
 

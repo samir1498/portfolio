@@ -13,16 +13,15 @@ export const EXPERIENCE: Experience[] = [
   {
     company: "ObserveOne",
     role: "Ingénieur Full-Stack",
-    period: "Nov. 2025 – Présent",
+    period: "Nov. 2025 – Nov. 2026",
     location: "Télétravail",
     description: [
-      "Refonte et développement de fonctionnalités sur le frontend React (Vite) — UI autopilot, pipeline d'enregistrement de démos, extraction de composants, mocks de développement, tests e2e.",
-      "Développement de fonctionnalités pour la CLI TypeScript (package npm) — rotation de clés API, intégration CI de suites, gestion d'incidents, export/import, multiples versions.",
-      "Contributions au backend Express.js — audit de sécurité complet (politiques RLS Supabase, durcissement RPC), refactoring autopilot, partage de ressources d'équipe, APIs de suites.",
-      "Développement du site marketing Next.js — tokens de couleurs sémantiques, composants de marque, corrections mode clair, sous-page /workers.",
-      "Architecture d'un moteur de monitoring distribué auto-hébergé en Bun/Hono — 8 types de sondes, architecture maître-agent multi-régions, bus SSE via Redis.",
-      "Création d'un panneau d'administration React — dashboard d'indexation Google, gestion créateurs/invitations, historique d'alertes, codes secrets de démos.",
-      "Développement d'un pipeline de génération vidéo programmatique avec Remotion — stratégie de zoom contextuelle, transitions par clip, effets sonores.",
+      "Développement de fonctionnalités de bout en bout pour un SaaS d'automatisation QA — frontend React (Vite), CLI TypeScript publiée sur npm, backend Express.js.",
+      "Contribution au backend Express.js, dont un audit de sécurité : politiques RLS Postgres, durcissement des RPC et contrôles d'isolation entre tenants.",
+      "Architecture d'un moteur de monitoring distribué auto-hébergé en Bun/Hono — 8 types de sondes (HTTP, navigateur Playwright, TCP, UDP, liveness base de données, TLS, heartbeat), topologie maître/agent multi-régions, SSE via Redis remplaçant le polling, images Docker multi-stage.",
+      "Création d'un panneau d'administration React pour les opérations internes — santé de l'indexation, gestion des créateurs et invitations, historique des alertes.",
+      "Développement du site marketing Next.js — tokens de couleurs sémantiques, bibliothèque de composants de marque, corrections du mode clair, sous-page /workers.",
+      "Développement d'un pipeline de génération de vidéos de démo avec Remotion — stratégie de zoom contextuelle, transitions par clip, effets sonores.",
     ],
   },
   {
