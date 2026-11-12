@@ -21,15 +21,15 @@ scan_dir() {
 
     fullpath="$root/public${og}"
     if [ ! -f "$fullpath" ]; then
-      title=$(grep '^title:' "$f" || true | head -1 | sed 's/^title: *//;s/^["\x27"]//;s/["\x27"]$//')
-      subtitle=$(grep 'subtitle:' "$f" || true | head -1 | sed 's/^subtitle: *//;s/^["\x27"]//;s/["\x27"]$//')
-      desc=$(grep 'description:' "$f" || true | head -1 | sed 's/^description: *//;s/^["\x27"]//;s/["\x27"]$//')
+      title=$(grep -m1 '^title:' "$f" | sed 's/^title:[[:space:]]*//;s/^["\x27]//;s/["\x27]$//' || true)
+      subtitle=$(grep -m1 '^subtitle:' "$f" | sed 's/^subtitle:[[:space:]]*//;s/^["\x27]//;s/["\x27]$//' || true)
+      desc=$(grep -m1 '^description:' "$f" | sed 's/^description:[[:space:]]*//;s/^["\x27]//;s/["\x27]$//' || true)
       sub="${subtitle:-$desc}"
       sub="${sub:-$title}"  # fallback
-      sub="$(echo "$sub" | cut -c1-60)"
+      sub="$(printf '%s' "$sub" | fold -s -w 60 | head -1 || true)"
       echo "Generating $og → $title"
       bash "$root/scripts/gen_og_card.sh" --title "$title" --subtitle "$sub" --out "$fullpath"
-      ((missing++))
+      missing=$((missing + 1))
     fi
   done
 }
